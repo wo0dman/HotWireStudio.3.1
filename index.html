@@ -21,7 +21,7 @@
   --segthumb:#fff; --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 22px rgba(0,0,0,.07);
   --sceneA:#eef0f5; --sceneB:#dcdfe8;
   --code:#1d1d1f; --codebg:#fafafc; --tintf:rgba(0,122,255,.12);
-  --wl:328px; --wr:352px; --hb:186px;
+  --wl:330px; --wr:356px; --hb:186px;
 }
 html[data-theme="dark"]{
   --bg:#000; --card:#1c1c1e; --card2:#232326; --pane:#141416;
@@ -48,7 +48,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 ::-webkit-scrollbar-track{background:transparent}
 .mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
 
-/* ======================= shell ======================= */
 #app{display:flex;flex-direction:column;height:100dvh;min-width:1024px}
 .menubar{flex:0 0 30px;display:flex;align-items:center;gap:1px;padding:0 8px;background:var(--bar);
   backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);
@@ -61,7 +60,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .mb-item:hover,.mb-item.open{background:var(--blue);color:#fff}
 .menubar .sp{flex:1}
 .mb-state{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--label2);padding-right:6px}
-.mpop{position:fixed;z-index:200;min-width:242px;padding:5px;background:var(--pop);
+.mpop{position:fixed;z-index:200;min-width:246px;padding:5px;background:var(--pop);
   backdrop-filter:blur(38px) saturate(180%);-webkit-backdrop-filter:blur(38px) saturate(180%);
   border-radius:10px;border:.5px solid var(--sep);box-shadow:0 20px 50px rgba(0,0,0,.28);
   animation:pop .16s cubic-bezier(.3,1.3,.6,1)}
@@ -70,7 +69,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .mi{display:flex;align-items:center;gap:9px;padding:5px 9px;border-radius:6px;cursor:default;font-size:13px;white-space:nowrap}
 .mi:hover{background:var(--blue);color:#fff}
 .mi:hover .k,.mi:hover .ck{color:#fff}
-.mi.dis{opacity:.35;pointer-events:none}
 .mi .k{margin-left:auto;color:var(--label3);font-size:11.5px;padding-left:22px}
 .mi .ck{width:14px;margin-left:-2px;color:var(--blue);font-weight:700;flex:0 0 14px}
 .msep{height:.5px;background:var(--sep);margin:5px 8px}
@@ -103,7 +101,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .ptab:hover{background:var(--fill2)}
 .ptab.active{background:var(--card);color:var(--blue);box-shadow:0 .5px 2px rgba(0,0,0,.09)}
 .pane-body{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding-bottom:26px;scrollbar-width:thin}
-.pane-tab[hidden]{display:none}
 .splitter{flex:0 0 5px;cursor:col-resize;background:transparent;position:relative;z-index:20;margin:0 -2.5px}
 .splitter::after{content:"";position:absolute;inset:0 2px;background:transparent;transition:background .18s}
 .splitter:hover::after,.splitter.drag::after{background:var(--blue);opacity:.5;border-radius:2px}
@@ -135,12 +132,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit
 .sdot.run{background:var(--green);animation:pls 1.4s infinite}
 @keyframes pls{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
 
-/* ======================= grouped lists ======================= */
 .group{margin:12px 10px 0}
 .group:first-child{margin-top:10px}
 .group-title{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--label2);
   padding:0 8px 5px;display:flex;align-items:center;gap:6px}
-.group-title .sp{flex:1}
 .card{background:var(--card);border-radius:9px;overflow:hidden;box-shadow:0 .5px 1.5px rgba(0,0,0,.045)}
 html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255,.055)}
 .row{position:relative;min-height:34px;padding:6px 10px;display:flex;align-items:center;gap:8px}
@@ -163,7 +158,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .ico-sq{width:22px;height:22px;border-radius:6px;background:var(--tintf);display:grid;place-items:center;flex:0 0 auto}
 .ico-sq svg{width:13px;height:13px;fill:none;stroke:var(--blue);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
-/* ======================= controls ======================= */
 .btn{border:0;border-radius:7px;padding:6px 11px;font-weight:600;font-size:12.5px;cursor:pointer;letter-spacing:-.1px;
   transition:transform .12s cubic-bezier(.34,1.56,.64,1),filter .18s,background .18s;
   display:inline-flex;align-items:center;gap:5px;justify-content:center}
@@ -172,7 +166,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(1.07)}
 .btn-tint{background:var(--tintf);color:var(--blue)}.btn-tint:hover{background:rgba(0,122,255,.2)}
 .btn-gray{background:var(--fill2);color:var(--label)}.btn-gray:hover{background:var(--fill1)}
-.btn-green{background:var(--green);color:#fff}.btn-red{background:var(--red);color:#fff}
 
 .switch{width:42px;height:25px;border-radius:13px;background:var(--fill1);position:relative;border:0;padding:0;cursor:pointer;
   flex:0 0 auto;transition:background .28s cubic-bezier(.4,0,.2,1)}
@@ -204,18 +197,12 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .tf{flex:1 1 auto;min-width:0;background:var(--fill3);border:.5px solid transparent;border-radius:6px;padding:5px 8px;
   font-size:12.5px;outline:none;transition:border-color .18s,background .18s;user-select:text}
 .tf:focus{border-color:var(--blue);background:var(--card)}
-select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:pointer;
-  background-image:linear-gradient(45deg,transparent 50%,var(--label2) 50%),linear-gradient(135deg,var(--label2) 50%,transparent 50%);
-  background-position:calc(100% - 12px) 52%,calc(100% - 8px) 52%;background-size:4px 4px,4px 4px;background-repeat:no-repeat}
 
 .chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;background:var(--fill2);
   font-size:10.5px;font-weight:700;color:var(--label2);letter-spacing:-.1px;flex:0 0 auto}
 .chip.blue{background:var(--tintf);color:var(--blue)}
 .chip.green{background:rgba(52,199,89,.16);color:var(--green)}
-.chip.red{background:rgba(255,59,48,.14);color:var(--red)}
-.chip.orange{background:rgba(255,149,0,.17);color:var(--orange)}
 
-/* ======================= stage overlays ======================= */
 .vp{position:absolute;z-index:12}
 .hud{background:var(--hud);backdrop-filter:blur(28px) saturate(180%);-webkit-backdrop-filter:blur(28px) saturate(180%);
   border-radius:11px;box-shadow:var(--shadow);border:.5px solid var(--sep)}
@@ -238,10 +225,10 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 .rbtn.act svg{stroke:#fff}
 .vpseg{width:268px;padding:3px}
 #gizmo{position:absolute;top:104px;right:14px;width:104px;height:104px;z-index:13;cursor:pointer}
-.pop{position:absolute;width:256px;z-index:70;padding:5px 0;background:var(--pop);
+.pop{position:absolute;width:262px;z-index:70;padding:5px 0;background:var(--pop);
   backdrop-filter:blur(36px) saturate(180%);-webkit-backdrop-filter:blur(36px) saturate(180%);
   border-radius:11px;box-shadow:0 18px 46px rgba(0,0,0,.28);border:.5px solid var(--sep);
-  animation:pop .18s cubic-bezier(.3,1.3,.6,1);max-height:70vh;overflow:auto}
+  animation:pop .18s cubic-bezier(.3,1.3,.6,1);max-height:72vh;overflow:auto}
 .pop[hidden]{display:none}
 .pop .row{min-height:31px;padding:4px 11px}
 .pop .gt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--label3);padding:7px 12px 3px}
@@ -267,10 +254,9 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 .spinner{width:22px;height:22px;margin:0 auto 8px;border-radius:50%;border:2.5px solid var(--fill1);border-top-color:var(--blue);animation:sp .75s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 #boot{position:absolute;inset:0;z-index:90;display:grid;place-items:center;background:var(--bg);text-align:center;padding:30px}
-#boot div{max-width:460px;font-size:13px;color:var(--label2);line-height:1.5}
+#boot div{max-width:470px;font-size:13px;color:var(--label2);line-height:1.5}
 #boot b{display:block;font-size:16px;color:var(--label);margin-bottom:8px}
 
-/* ======================= code / console ======================= */
 .codebox{background:var(--codebg);font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;line-height:1.6;
   overflow:auto;user-select:text;padding:6px 0}
 .codebox div{display:flex;padding:0 10px;white-space:pre}
@@ -288,7 +274,6 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 .logbox .k.i{color:var(--blue)}.logbox .k.w{color:var(--orange)}.logbox .k.e{color:var(--red)}.logbox .k.s{color:var(--green)}
 .logbox .m{color:var(--label);flex:1;white-space:pre-wrap;word-break:break-word}
 
-/* ======================= report ======================= */
 .bars{padding:9px 10px 11px}
 .bar{height:22px;border-radius:6px;overflow:hidden;display:flex;background:var(--fill2);margin-bottom:8px}
 .bar i{display:block;height:100%;transition:width .5s cubic-bezier(.3,1,.4,1)}
@@ -299,8 +284,11 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 .kpi div{background:var(--card2);border-radius:8px;padding:7px 9px}
 .kpi b{display:block;font-size:16px;font-weight:700;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
 .kpi span{font-size:10px;color:var(--label2);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.seq{display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px;align-items:center}
+.seq b{background:var(--fill2);border-radius:6px;padding:3px 7px;font-size:10.5px;font-weight:600;color:var(--label2)}
+.seq b.hot{background:rgba(255,149,0,.18);color:var(--orange)}
+.seq i{color:var(--label3);font-style:normal}
 
-/* ======================= palette / alert / toast ======================= */
 .scrim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.28);backdrop-filter:blur(3px);display:grid;place-items:center;animation:fi .18s}
 .scrim[hidden]{display:none}
 @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -348,10 +336,7 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
     <div class="mb-item" data-menu="tools">Инструменты</div>
     <div class="mb-item" data-menu="help">Справка</div>
     <div class="sp"></div>
-    <div class="mb-state">
-      <span class="chip blue" id="mbChip">X·Y·A</span>
-      <span id="mbFile">—</span>
-    </div>
+    <div class="mb-state"><span class="chip blue" id="mbChip">X·Y·A</span><span id="mbFile">—</span></div>
   </div>
 
   <div class="toolbar">
@@ -364,12 +349,12 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
     <button class="tbtn" id="tbStart" title="В начало (Home)"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5.5v13L9 12l10-6.5z"/></svg></button>
     <button class="tbtn" id="tbPlay" title="Пуск / пауза (Space)"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4L20 12 7 4.8z" fill="currentColor" stroke="none"/></svg></button>
     <button class="tbtn" id="tbStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
-    <button class="tbtn" id="tbEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/><path d="M21 5v14" opacity="0"/></svg></button>
-    <div style="width:104px;flex:0 0 auto" id="tbSpeed"></div>
+    <button class="tbtn" id="tbEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
+    <div style="width:112px;flex:0 0 auto" id="tbSpeed"></div>
     <div class="tsep"></div>
     <div style="width:252px;flex:0 0 auto" id="tbView"></div>
     <div class="tb-sp"></div>
-    <span class="chip" id="tbPass">— проходов</span>
+    <span class="chip" id="tbPass">—</span>
     <span class="chip green" id="tbTime">—</span>
     <div class="tsep"></div>
     <button class="tbtn" id="tbPal" title="Палитра команд (⌘K)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
@@ -437,12 +422,12 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 
   <footer class="statusbar">
     <span><span class="sdot" id="stDot"></span><b id="stState">Готов</b></span>
-    <span>Проход <b id="stPass">—</b></span>
+    <span>Операция <b id="stPass">—</b></span>
     <span>X <b id="stX">0.000</b></span>
     <span>Y <b id="stY">0.000</b></span>
     <span>A <b id="stA">0.000°</b></span>
     <span>Струна <b id="stWire">выкл</b></span>
-    <span>Режущая длина <b id="stLen">0</b> мм</span>
+    <span>Рез <b id="stLen">0</b> мм</span>
     <span class="sp"></span>
     <span id="stInfo">—</span>
   </footer>
@@ -467,14 +452,11 @@ select.tf{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:poin
 </script>
 
 <script type="module">
-/* ==================================================================
-   Глобальный перехват ошибок — чтобы страница никогда не «молчала»
-================================================================== */
 window.addEventListener('error',function(e){
   var b=document.getElementById('boot');
   if(b){b.style.display='grid';
-    b.innerHTML='<div><b>Ошибка инициализации</b>'+String(e.message||e)+'<br><br>'+
-    'Проверьте подключение к CDN three.js и поддержку WebGL в браузере.</div>';}
+    b.innerHTML='<div><b>Ошибка инициализации</b>'+String((e&&e.message)||e)+
+    '<br><br>Проверьте подключение к CDN three.js и поддержку WebGL.</div>';}
 });
 
 import * as THREE from 'three';
@@ -540,7 +522,9 @@ const IC={
   home:'<svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v8a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 19v-8z"/></svg>',
   warn:'<svg viewBox="0 0 24 24"><path d="M12 4.5l8.5 15h-17l8.5-15zM12 10v4M12 16.6v.1"/></svg>',
   copy:'<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2.2"/><path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1"/></svg>',
-  dl:'<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 18v1.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V18"/></svg>'
+  dl:'<svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 18v1.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V18"/></svg>',
+  rot:'<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0113.7-5.6M20 12a8 8 0 01-13.7 5.6M18 3v4h-4M6 21v-4h4"/></svg>',
+  wire:'<svg viewBox="0 0 24 24"><path d="M3 8l4 4-4 4M21 8l-4 4 4 4M7 12h10"/></svg>'
 };
 
 /* ==================================================================
@@ -548,24 +532,40 @@ const IC={
 ================================================================== */
 const S={
   theme:localStorage.getItem('pr-theme')||'auto',
-  scale:100, rotY:0, offX:0, offY:16, offZ:0,
+  /* ориентация и размещение модели */
+  scale:100, rotX:0, rotY:0, rotZ:0, orient:'asis',
+  offX:0, offY:16, offZ:0,
+  /* заготовка */
   stockD:150, stockH:215, stockX:0, stockZ:0,
+  /* проходы */
   angleMode:'passes', passes:24, angleStep:15, startAngle:0,
   feed:280, rapid:1400, aFeed:1080, wireR:0.35, safeGap:10, dwell:0.7,
+  exitLen:12, waitRot:0.6,
   zigzag:true, compBacklash:false, backlash:0.6,
+  /* точность */
   slices:150, tol:0.12, smooth:false,
-  keepBase:true, baseH:16, baseW:100, trimBase:true, trimH:5, bridge:16,
+  /* основание */
+  keepBase:true, baseH:16, baseW:100, trimBase:true, trimBelow:2, bridge:16,
+  /* G-code */
   post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
-  layers:{stock:true,model:true,result:true,path:true,contours:false,table:true,grid:true,machine:true},
+  layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
+          wire:true,machine:true,table:true,grid:true},
   view:'iso', simSpeed:20, tabL:'model', tabR:'cut', tabB:'unroll'
 };
-const LNAMES={stock:'Заготовка (цилиндр)',model:'STL-модель',result:'Результат резки',path:'Текущий контур',
-  contours:'Все силуэты',table:'Стол оси A',grid:'Сетка и станина',machine:'Портал и струна'};
-const LCOL={stock:'#8e8e93',model:'#0a84ff',result:'#30d158',path:'#ff453a',contours:'#af52de',
-  table:'#6b6f76',grid:'#9aa0aa',machine:'#ff9f0a'};
+const LNAMES={stock:'Заготовка (цилиндр)',model:'STL-модель',result:'Деталь (прогноз)',
+  base:'Основание (технолог.)',path:'Текущий контур',contours:'Все силуэты',
+  wire:'Горячая струна',machine:'Портал и приводы',table:'Стол оси A',grid:'Сетка и станина'};
+const LCOL={stock:'#8e8e93',model:'#0a84ff',result:'#30d158',base:'#ff9f0a',path:'#ff453a',
+  contours:'#af52de',wire:'#ff9f0a',machine:'#6b6f76',table:'#6b6f76',grid:'#9aa0aa'};
+const ORIENTS=[{t:'Как в файле',v:'asis',rx:0,ry:0,rz:0},
+  {t:'Z-up → Y-up',v:'zup',rx:-90,ry:0,rz:0},
+  {t:'На боку',v:'side',rx:0,ry:0,rz:90},
+  {t:'Вверх ногами',v:'flip',rx:180,ry:0,rz:0}];
 
-let RAW=null,SLICES=null,PLACED=null,PASSES=[],RESULT=null,GCODE='';
-let STATS={lines:0,bytes:0,cutLen:0,airLen:0,rotDeg:0,pts:0,time:0,tCut:0,tAir:0,tRot:0,tDwell:0,safeX:60,volR:0,volM:0,excess:0,maxDev:0};
+let RAW=null,SLICES=null,SLICES_KEY='',ORIENT=null,ORIENT_KEY='',
+    PLACED=null,PASSES=[],NPASS=0,RESULT=null,GCODE='';
+let STATS={lines:0,bytes:0,cutLen:0,airLen:0,rotDeg:0,pts:0,time:0,tCut:0,tAir:0,tRot:0,tDwell:0,
+  safeX:60,xMin:0,xMax:0,volR:0,volM:0,excess:0,maxDev:0};
 
 /* ==================================================================
    2 · КОНСТРУКТОР UI
@@ -627,21 +627,19 @@ function seg(opts,key,cb,plain){
   const w=el('div',{cls:'seg'}),th=el('div',{cls:'thumb'});w.appendChild(th);
   const bs=opts.map(function(o){
     const b=el('button',{cls:S[key]===o.v?'active':''},[o.t]);
-    b.onclick=function(){if(S[key]===o.v)return;S[key]=o.v;syncSeg(key);cb(o.v);};
+    b.onclick=function(){if(S[key]===o.v)return;S[key]=o.v;segAll(key,o.v);cb(o.v);};
     w.appendChild(b);return b;});
   const mv=function(){const a=w.querySelector('.active');if(!a||!a.offsetWidth)return;
     th.style.width=a.offsetWidth+'px';th.style.transform='translateX('+a.offsetLeft+'px)';};
-  const api={mv:mv,w:w,set:function(val){S[key]=val;
+  const api={mv:mv,w:w,opts:opts,bs:bs,set:function(val){S[key]=val;
       bs.forEach(function(b,i){b.classList.toggle('active',opts[i].v===val);});mv();}};
   (SEGS[key]=SEGS[key]||[]).push(api);
-  V['seg_'+key]=api;
   requestAnimationFrame(mv);setTimeout(mv,80);setTimeout(mv,400);
   if(window.ResizeObserver)new ResizeObserver(mv).observe(w);
   if(plain)return w;
   return el('div',{cls:'row stack',style:'padding-top:8px'},[w]);
 }
-function syncSeg(key){(SEGS[key]||[]).forEach(function(s){s.mv();});}
-function syncSegs(){Object.keys(SEGS).forEach(syncSeg);}
+function syncSegs(){Object.keys(SEGS).forEach(function(k){(SEGS[k]||[]).forEach(function(s){s.mv();});});}
 function segAll(key,val){(SEGS[key]||[]).forEach(function(s){s.set(val);});}
 function btns(list){return el('div',{cls:'rowbtns'},list.map(function(b){
   return el('button',{cls:'btn '+(b.k||'btn-gray'),onclick:b.fn},[b.t]);}));}
@@ -656,7 +654,6 @@ function setVal(id,t,c){const n=V[id];if(n){n.textContent=t;n.className='rv '+(c
 ================================================================== */
 const VIEWS=[{t:'Изометрия',v:'iso'},{t:'Спереди',v:'front'},{t:'Сверху',v:'top'},{t:'Сбоку',v:'side'}];
 function buildPanes(){
-  /* левая */
   const tl=$('#tabsL');tl.innerHTML='';
   [['model','Модель',IC.cube],['stock','Заготовка',IC.cyl],['layers','Слои',IC.layers]].forEach(function(a){
     const b=el('button',{cls:'ptab'+(S.tabL===a[0]?' active':''),html:a[2]+'<span>'+a[1]+'</span>',
@@ -670,16 +667,27 @@ function buildPanes(){
     tap('Открыть STL-файл…',IC.cube,function(){$('#file').click();}),
     info('Имя','—','mName'),info('Треугольников','—','mTri'),
     info('Габариты X·Y·Z','—','mBox'),info('Объём','—','mVol'),
+    info('Высота после поворота','—','mH'),
     btns([{t:'Демо-модель',k:'btn-tint',fn:loadDemo},{t:'Вписать в заготовку',k:'btn-blue',fn:fitModel}])
   ],'Внутренние отверстия и полости STL игнорируются: для каждого среза берётся только внешняя выпуклая оболочка.'));
+
+  pM.appendChild(group('Ориентация модели',[
+    seg(ORIENTS.map(function(o){return {t:o.t,v:o.v};}),'orient',function(v){applyOrientPreset(v);}),
+    slider('Поворот вокруг X','rotX','°','-180','180','1',null,'var(--indigo)'),
+    slider('Поворот вокруг Y','rotY','°','-180','180','1',null,'var(--indigo)'),
+    slider('Поворот вокруг Z','rotZ','°','-180','180','1',null,'var(--indigo)'),
+    btns([{t:'Сбросить ориентацию',k:'btn-gray',fn:function(){S.rotX=0;S.rotY=0;S.rotZ=0;S.orient='asis';
+      segAll('orient','asis');['rotX','rotY','rotZ'].forEach(sync);rebuild();}}])
+  ],'Порядок поворотов: X → Y → Z. Поворот выполняется относительно центра габаритов модели, поэтому положение не «уезжает».'));
+
   pM.appendChild(group('Размещение модели',[
     slider('Масштаб','scale','%','10','400','0.5',null,'var(--indigo)'),
-    slider('Поворот вокруг Y','rotY','°','-180','180','1',null,'var(--indigo)'),
     slider('Смещение X','offX','мм','-120','120','0.5',null,'var(--indigo)'),
-    slider('Высота над столом','offY','мм','-30','200','0.5',null,'var(--indigo)'),
+    slider('Зазор от стола (низ модели)','offY','мм','0','200','0.5',null,'var(--indigo)'),
     slider('Смещение Z','offZ','мм','-120','120','0.5',null,'var(--indigo)'),
-    btns([{t:'Центрировать по оси A',k:'btn-gray',fn:function(){S.offX=0;S.offZ=0;sync('offX');sync('offZ');rebuild();log('Модель центрирована по оси A');}}])
-  ]));
+    btns([{t:'Центрировать по оси A',k:'btn-gray',fn:function(){S.offX=0;S.offZ=0;sync('offX');sync('offZ');rebuild();
+      log('Модель центрирована по оси A');}}])
+  ],'Низ модели всегда точно на высоте «зазор от стола» — деталь (зелёный прогноз) строится строго в пределах STL.'));
 
   pS.appendChild(group('Виртуальная цилиндрическая заготовка',[
     slider('Диаметр','stockD','мм','20','400','1',null,'var(--teal)'),
@@ -693,11 +701,11 @@ function buildPanes(){
   pS.appendChild(group('Контроль размещения',[
     info('Модель в заготовке','—','chkFit'),info('Запас по диаметру','—','chkD'),
     info('Запас по высоте','—','chkH'),info('Проходов / шаг A','—','chkP'),
-    info('Рабочий ход X (±)','—','chkX')
+    info('Рабочая зона X','—','chkX'),info('Подрезка основания','—','chkT')
   ]));
 
   pL.appendChild(group('Слои сцены',Object.keys(LNAMES).map(layerToggle),
-    'Слой «Результат» — прогноз формы детали после всех проходов (пересечение силуэтных призм).'));
+    '«Горячая струна» и «Портал и приводы» переключаются независимо.'));
   pL.appendChild(group('Проекция камеры',[seg(VIEWS,'view',function(v){setView(v);})]));
 
   /* правая */
@@ -711,22 +719,37 @@ function buildPanes(){
         rG=el('div',{'data-rtab':'code'}),rR=el('div',{'data-rtab':'rep'});
   [rC,rB,rG,rR].forEach(function(n){br.appendChild(n);});
 
+  rC.appendChild(group('Цикл одного прохода',[
+    el('div',{cls:'seq'},[
+      el('b',{},['подход вне заготовки']),el('i',{},['→']),
+      el('b',{cls:'hot'},['струна ВКЛ']),el('i',{},['→']),
+      el('b',{cls:'hot'},['рез по силуэту']),el('i',{},['→']),
+      el('b',{cls:'hot'},['выход за заготовку']),el('i',{},['→']),
+      el('b',{},['пауза / ожидание']),el('i',{},['→']),
+      el('b',{},['струна ВЫКЛ']),el('i',{},['→']),
+      el('b',{},['поворот стола A'])])
+  ],'Струна обходит силуэт, выходит за пределы заготовки и ждёт поворота стола на заданный угол. Затем обход повторяется в обратном направлении. Подрезка основания выполняется только в самом конце.'));
+
   rC.appendChild(group('Разбиение на проходы',[
-    seg([{t:'Число проходов',v:'passes'},{t:'Угол поворота A',v:'angle'}],'angleMode',function(v){buildCutMode();scheduleRebuild();}),
+    seg([{t:'Число проходов',v:'passes'},{t:'Угол поворота A',v:'angle'}],'angleMode',function(){buildCutMode();scheduleRebuild();}),
     el('div',{id:'cutMode'}),
     slider('Начальный угол A','startAngle','°','0','359','1'),
-    toggle('Реверс обхода (зиг-заг)','zigzag','Стол — всегда в одну сторону, струна — встречно'),
+    toggle('Реверс обхода (зиг-заг)','zigzag','Стол всегда в одну сторону, струна — встречно'),
     toggle('Компенсация люфта A','compBacklash','Перелёт на угол люфта и возврат перед резом'),
     slider('Люфт оси A','backlash','°','0','3','0.05',null,'var(--gray)')
-  ],'Стол поворачивается на заданный угол — струна обходит силуэт в обратном направлении. Деталь = пересечение всех силуэтных призм.'));
+  ]));
+
   rC.appendChild(group('Режимы резания',[
     slider('Рабочая подача','feed','мм/мин','20','2000','10',null,'var(--orange)'),
     slider('Холостой ход','rapid','мм/мин','100','6000','50',null,'var(--orange)'),
     slider('Скорость оси A','aFeed','°/мин','30','3600','10',null,'var(--orange)'),
     slider('Радиус струны','wireR','мм','0','1.5','0.05',null,'var(--orange)'),
+    slider('Выход за заготовку','exitLen','мм','2','60','0.5',null,'var(--orange)'),
     slider('Безопасный отступ','safeGap','мм','1','60','0.5',null,'var(--orange)'),
-    slider('Прогрев струны','dwell','с','0','5','0.1',null,'var(--orange)')
+    slider('Прогрев струны','dwell','с','0','5','0.1',null,'var(--orange)'),
+    slider('Пауза перед поворотом A','waitRot','с','0','10','0.1',null,'var(--orange)')
   ]));
+
   rC.appendChild(group('Точность аппроксимации',[
     slider('Срезов по высоте','slices','','16','400','2',null,'var(--purple)'),
     slider('Допуск упрощения','tol','мм','0','1.5','0.01',null,'var(--purple)'),
@@ -738,13 +761,13 @@ function buildPanes(){
     slider('Высота основания','baseH','мм','0','80','0.5',null,'var(--mint)'),
     slider('Ширина основания','baseW','%','40','160','1',null,'var(--mint)')
   ],'Основание — неподрезанный низ заготовки: струна не опускается ниже этой высоты, деталь не падает.'));
-  rB.appendChild(group('Подрезка основания (последний проход)',[
-    toggle('Подрезать на последнем проходе','trimBase','Отделяет деталь от подставки'),
-    slider('Высота подрезки','trimH','мм','0','60','0.5',null,'var(--mint)'),
+  rB.appendChild(group('Подрезка основания (в самом конце)',[
+    toggle('Подрезать после всех проходов','trimBase','Отдельная финальная операция'),
+    slider('Рез ниже низа модели','trimBelow','мм','0','40','0.5',null,'var(--mint)'),
     slider('Перемычка (не дорезать)','bridge','мм','0','80','1',null,'var(--mint)')
-  ],'Перемычка удерживает деталь от падения — после резки она легко ломается руками.'));
-  rB.appendChild(group('Карта проходов',[el('div',{id:'passList',style:'max-height:300px;overflow:auto'})],
-    'Клик по проходу — переход к нему в симуляции.'));
+  ],'Финальный проход режет горизонтально на заданной высоте: сначала с одной стороны до перемычки, затем с другой. Деталь остаётся на тонком донце и легко снимается.'));
+  rB.appendChild(group('Карта операций',[el('div',{id:'passList',style:'max-height:300px;overflow:auto'})],
+    'Клик по операции — переход к ней в симуляции.'));
 
   rG.appendChild(group('Постпроцессор',[
     seg([{t:'LinuxCNC',v:'linuxcnc'},{t:'Mach3',v:'mach3'},{t:'GRBL',v:'grbl'}],'post',function(){genGCode();log('Постпроцессор: '+S.post);}),
@@ -755,7 +778,7 @@ function buildPanes(){
     field('Имя файла','fileName','program',false,function(){}),
     info('Строк / размер','—','sFile'),
     btns([{t:'Скачать .nc',k:'btn-blue',fn:download},{t:'Копировать',k:'btn-tint',fn:copyCode}])
-  ],'Ось A — поворотный стол вокруг Y. Струна включена только на контуре, повороты стола — при выключенной струне.'));
+  ],'Ось A — поворотный стол вокруг Y. Струна включена только на рабочем ходу; повороты стола и подходы — при выключенной струне.'));
   rG.appendChild(group('Предпросмотр УП',[
     el('div',{style:'padding:8px 10px'},[el('div',{cls:'codebox',id:'codeBox',
       style:'max-height:330px;border-radius:8px;border:.5px solid var(--sep)'})])]));
@@ -767,22 +790,19 @@ function buildPanes(){
 
   buildCutMode();
 
-  /* нижняя панель */
   const tb=$('#tabsB');tb.innerHTML='';
   [['unroll','Развёртка траектории',IC.wave],['log','Журнал',IC.list],['code','G-code',IC.code]].forEach(function(a){
     const b=el('button',{cls:'ptab'+(S.tabB===a[0]?' active':''),html:a[2]+'<span>'+a[1]+'</span>',
       onclick:function(){switchB(a[0]);}});
     b.dataset.k=a[0];tb.appendChild(b);});
 
-  /* сегменты вида в тулбаре и на сцене */
   const s1=seg(VIEWS,'view',function(v){setView(v);},true);s1.classList.add('sm');$('#tbView').appendChild(s1);
   const s2=seg([{t:'Изо',v:'iso'},{t:'Спереди',v:'front'},{t:'Сверху',v:'top'},{t:'Сбоку',v:'side'}],
     'view',function(v){setView(v);},true);s2.classList.add('sm');$('#vpSeg').appendChild(s2);
   const s3=seg([{t:'5×',v:5},{t:'20×',v:20},{t:'200×',v:200}],'simSpeed',function(){},true);
   s3.classList.add('sm');$('#tbSpeed').appendChild(s3);
 
-  buildLayerPop();
-  drawLegend();
+  buildLayerPop();drawLegend();
   switchL(S.tabL);switchR(S.tabR);switchB(S.tabB);
   setTimeout(syncSegs,60);
 }
@@ -798,12 +818,15 @@ function buildLayerPop(){
   p.appendChild(el('div',{cls:'gt'},['Слои сцены']));
   Object.keys(LNAMES).forEach(function(k){p.appendChild(layerToggle(k));});
   p.appendChild(el('div',{cls:'gt'},['Проекция камеры']));
-  VIEWS.forEach(function(v){
-    const mark=el('span',{cls:'ck',style:'width:14px;color:var(--blue);font-weight:700'},[S.view===v.v?'✓':'']);
+  VIEWS.forEach(function(v,i){
+    const mark=el('span',{style:'width:14px;flex:0 0 14px;color:var(--blue);font-weight:700'},[S.view===v.v?'✓':'']);
     const r=el('div',{cls:'row tap',style:'min-height:31px;padding:4px 11px',onclick:function(){
       setView(v.v);
-      Array.prototype.forEach.call(p.querySelectorAll('.ck'),function(n,i){n.textContent=(VIEWS[i].v===v.v)?'✓':'';});
+      const ms=p.querySelectorAll('.row.tap .ckmark');
+      Array.prototype.forEach.call(p.querySelectorAll('.row.tap'),function(row,j){
+        row.firstChild.textContent=(j===i)?'✓':'';});
     }},[mark,el('div',{cls:'rt'},[v.t])]);
+    mark.className='ckmark';
     p.appendChild(r);});
 }
 function switchL(k){S.tabL=k;
@@ -813,11 +836,11 @@ function switchL(k){S.tabL=k;
 function switchR(k){S.tabR=k;
   $$('#tabsR .ptab').forEach(function(b){b.classList.toggle('active',b.dataset.k===k);});
   $$('#bodyR>[data-rtab]').forEach(function(n){n.hidden=(n.dataset.rtab!==k);});
-  requestAnimationFrame(function(){syncSegs();});}
+  requestAnimationFrame(syncSegs);}
 function switchB(k){S.tabB=k;
   $$('#tabsB .ptab').forEach(function(b){b.classList.toggle('active',b.dataset.k===k);});
   $$('[data-btab]').forEach(function(n){n.hidden=(n.dataset.btab!==k);});
-  requestAnimationFrame(function(){resizeAll();});}
+  requestAnimationFrame(resizeAll);}
 function drawLegend(){
   const L=$('#legend');if(!L)return;L.innerHTML='';
   Object.keys(LNAMES).forEach(function(k){
@@ -825,6 +848,13 @@ function drawLegend(){
       S.layers[k]=!S.layers[k];syncLayerBtns(k);applyLayers();drawLegend();}});
     d.innerHTML='<i style="background:'+LCOL[k]+'"></i>'+LNAMES[k];
     L.appendChild(d);});
+}
+function applyOrientPreset(v){
+  const o=ORIENTS.filter(function(x){return x.v===v;})[0];
+  if(!o)return;
+  S.rotX=o.rx;S.rotY=o.ry;S.rotZ=o.rz;
+  ['rotX','rotY','rotZ'].forEach(sync);
+  rebuild();log('Ориентация модели: '+o.t+' (X '+o.rx+'° Y '+o.ry+'° Z '+o.rz+'°)');
 }
 
 /* ==================================================================
@@ -840,6 +870,8 @@ const MENUS={
   edit:[{t:'Пересчитать траекторию',k:'R',fn:function(){rebuild();}},
     {t:'Вписать модель в заготовку',k:'⇧F',fn:fitModel},
     {t:'Подобрать заготовку',fn:autoStock},{sep:1},
+    {t:'Ориентация: как в файле',fn:function(){applyOrientPreset('asis');segAll('orient','asis');}},
+    {t:'Ориентация: Z-up → Y-up',fn:function(){applyOrientPreset('zup');segAll('orient','zup');}},
     {t:'Сбросить параметры резания',fn:resetParams},{sep:1},
     {t:'Тема оформления',k:'T',fn:cycleTheme}],
   view:[{t:'Изометрия',k:'1',fn:function(){setView('iso');}},{t:'Спереди (плоскость XY)',k:'2',fn:function(){setView('front');}},
@@ -851,13 +883,13 @@ const MENUS={
   tools:[{t:'Пуск / пауза симуляции',k:'Space',fn:function(){setPlaying(!SIM.playing);}},
     {t:'В начало',k:'Home',fn:function(){setPlaying(false);setSimTime(0);}},
     {t:'В конец',k:'End',fn:function(){setPlaying(false);setSimTime(SIM.total);}},
-    {t:'Следующий проход',k:'→',fn:function(){stepPass(1);}},
-    {t:'Предыдущий проход',k:'←',fn:function(){stepPass(-1);}},{sep:1},
+    {t:'Следующая операция',k:'→',fn:function(){stepPass(1);}},
+    {t:'Предыдущая операция',k:'←',fn:function(){stepPass(-1);}},{sep:1},
     {t:'Палитра команд',k:'⌘K',fn:openPalette},{sep:1},
     {t:'Проверить размещение',fn:function(){validate(false);}}],
   help:[{t:'О методе резки',fn:aboutMethod},{t:'Горячие клавиши',k:'?',fn:showKeys},
     {t:'О программе',fn:function(){alert_('Пенорез Studio · Desktop',
-      '4-осевая ЧПУ-резка пенопласта горячей струной. X и Y — линейные оси, A — поворотный стол вокруг оси Y. Версия 2026.10.09.','');}}]
+      '4-осевая ЧПУ-резка пенопласта горячей струной. X и Y — линейные оси, A — поворотный стол вокруг оси Y. Версия 2026.10.09 (v2).','');}}]
 };
 function toggleConsole(){const b=$('#bottom');
   b.style.display=(b.style.display==='none')?'flex':'none';resizeAll();}
@@ -903,8 +935,8 @@ const CMDS=[
   {t:'Пуск / пауза симуляции',k:'Space',i:IC.play,fn:function(){setPlaying(!SIM.playing);}},
   {t:'Симуляция: в начало',k:'Home',i:IC.home,fn:function(){setPlaying(false);setSimTime(0);}},
   {t:'Симуляция: в конец',k:'End',i:IC.wave,fn:function(){setPlaying(false);setSimTime(SIM.total);}},
-  {t:'Следующий проход',k:'→',i:IC.wave,fn:function(){stepPass(1);}},
-  {t:'Предыдущий проход',k:'←',i:IC.wave,fn:function(){stepPass(-1);}},
+  {t:'Следующая операция',k:'→',i:IC.wave,fn:function(){stepPass(1);}},
+  {t:'Предыдущая операция',k:'←',i:IC.wave,fn:function(){stepPass(-1);}},
   {t:'Вид: изометрия',k:'1',i:IC.cube,fn:function(){setView('iso');}},
   {t:'Вид: спереди (XY)',k:'2',i:IC.cube,fn:function(){setView('front');}},
   {t:'Вид: сверху',k:'3',i:IC.cube,fn:function(){setView('top');}},
@@ -912,10 +944,18 @@ const CMDS=[
   {t:'Показать всё',k:'F',i:IC.fit,fn:fitAll},
   {t:'Вписать модель в заготовку',k:'⇧F',i:IC.wand,fn:fitModel},
   {t:'Подобрать заготовку по модели',i:IC.cyl,fn:autoStock},
+  {t:'Ориентация: как в файле',i:IC.rot,fn:function(){applyOrientPreset('asis');segAll('orient','asis');}},
+  {t:'Ориентация: Z-up → Y-up',i:IC.rot,fn:function(){applyOrientPreset('zup');segAll('orient','zup');}},
+  {t:'Ориентация: на боку',i:IC.rot,fn:function(){applyOrientPreset('side');segAll('orient','side');}},
+  {t:'Ориентация: вверх ногами',i:IC.rot,fn:function(){applyOrientPreset('flip');segAll('orient','flip');}},
   {t:'Подрезка основания: вкл/выкл',i:IC.base,fn:function(){S.trimBase=!S.trimBase;
     if(V.sw_trimBase)V.sw_trimBase.classList.toggle('on',S.trimBase);rebuild();}},
   {t:'Технологическое основание: вкл/выкл',i:IC.base,fn:function(){S.keepBase=!S.keepBase;
     if(V.sw_keepBase)V.sw_keepBase.classList.toggle('on',S.keepBase);rebuild();}},
+  {t:'Струна: показать / скрыть',i:IC.wire,fn:function(){S.layers.wire=!S.layers.wire;
+    syncLayerBtns('wire');applyLayers();drawLegend();}},
+  {t:'Портал: показать / скрыть',i:IC.layers,fn:function(){S.layers.machine=!S.layers.machine;
+    syncLayerBtns('machine');applyLayers();drawLegend();}},
   {t:'Показать все силуэты',i:IC.layers,fn:function(){S.layers.contours=!S.layers.contours;
     syncLayerBtns('contours');applyLayers();drawLegend();}},
   {t:'Развёртка траектории (внизу)',i:IC.wave,fn:function(){switchB('unroll');}},
@@ -939,8 +979,7 @@ function filterPal(q){
   palList.forEach(function(c,i){
     const r=el('div',{cls:'pr'+(i===0?' sel':''),onclick:function(){closePalette();c.fn();}},
       [el('span',{cls:'pi',html:c.i||IC.wand}),el('span',{},[c.t]),c.k?el('span',{cls:'pk mono'},[c.k]):null]);
-    r.onmouseenter=function(){palSel=i;
-      $$('.pr').forEach(function(n,j){n.classList.toggle('sel',j===i);});};
+    r.onmouseenter=function(){palSel=i;$$('.pr').forEach(function(n,j){n.classList.toggle('sel',j===i);});};
     box.appendChild(r);});
   if(!palList.length)box.innerHTML='<div class="pr" style="opacity:.5">Ничего не найдено</div>';
 }
@@ -959,7 +998,7 @@ function showKeys(){
   const rows=[['⌘/Ctrl + K','Палитра команд'],['⌘/Ctrl + O','Открыть STL'],['⌘/Ctrl + S','Экспорт G-code'],
     ['Space','Пуск / пауза симуляции'],['R','Пересчитать траекторию'],['F','Показать всё'],
     ['Shift + F','Вписать модель в заготовку'],['1  2  3  4','Изометрия / спереди / сверху / сбоку'],
-    ['←  →','Предыдущий / следующий проход'],['Home / End','В начало / в конец симуляции'],
+    ['←  →','Предыдущая / следующая операция'],['Home / End','В начало / в конец симуляции'],
     ['⌘/Ctrl + ~','Показать или скрыть консоль'],['T','Переключить тему'],['?','Эта справка']];
   let html='<div class="keys">';
   rows.forEach(function(r){html+='<kbd>'+r[0]+'</kbd><span>'+r[1]+'</span>';});
@@ -968,19 +1007,20 @@ function showKeys(){
 }
 function aboutMethod(){
   alert_('Метод резки · оси X, Y, A',
-    'Струна перпендикулярна плоскости XY и обходит силуэт модели. Стол оси A поворачивается вокруг Y на заданный угол — и струна идёт по силуэту в обратном направлении. Так выполняется заданное число проходов.',
+    'Струна перпендикулярна плоскости XY и обходит силуэт модели, выходя за пределы заготовки. Затем она ждёт, стол оси A поворачивается вокруг Y на заданный угол — и струна обходит силуэт в обратном направлении. После всех проходов отдельной операцией подрезается основание.',
     '<div class="keys"><span class="hd">Деталь = пересечение всех силуэтных призм, поэтому:</span>'+
     '<kbd>◦</kbd><span>внутренние отверстия и полости игнорируются — берётся только внешний контур;</span>'+
     '<kbd>◦</kbd><span>каждое горизонтальное сечение стремится к своей выпуклой оболочке;</span>'+
     '<kbd>◦</kbd><span>чем больше проходов, тем меньше огранка и избыток материала;</span>'+
-    '<kbd>◦</kbd><span>последний проход подрезает основание и отделяет деталь от подставки.</span></div>');
+    '<kbd>◦</kbd><span>прогноз детали строится строго в габаритах STL-модели.</span></div>');
 }
 function resetParams(){
   S.passes=24;S.angleStep=15;S.startAngle=0;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
-  S.safeGap=10;S.dwell=0.7;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;S.slices=150;S.tol=0.12;
-  S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;S.trimBase=true;S.trimH=5;S.bridge=16;
-  ['passes','angleStep','startAngle','feed','rapid','aFeed','wireR','safeGap','dwell','backlash','slices','tol',
-   'baseH','baseW','trimH','bridge'].forEach(sync);
+  S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
+  S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
+  S.trimBase=true;S.trimBelow=2;S.bridge=16;
+  ['passes','angleStep','startAngle','feed','rapid','aFeed','wireR','safeGap','dwell','exitLen','waitRot',
+   'backlash','slices','tol','baseH','baseW','trimBelow','bridge'].forEach(sync);
   [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true],['trimBase',true]].forEach(function(p){
     if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
   rebuild();toast('Параметры сброшены');log('Параметры резания сброшены к значениям по умолчанию');
@@ -1002,8 +1042,9 @@ function applyTheme(){
 /* ==================================================================
    6 · THREE.JS СЦЕНА
 ================================================================== */
-let renderer,scene,camera,controls,tableGroup,machineGroup,wireGroup,wireMesh,wireGlow,stockMesh,modelMesh,
-    resultMesh,baseMesh,pathLine,pathRest,contourGroup,armMesh,carriage,gridH,polarG,bedMesh,tableMesh;
+let renderer,scene,camera,controls,tableGroup,machineGroup,wireGroup,wireCore,wireLine,wireGlow,
+    coneA,coneB,stockMesh,modelMesh,resultMesh,baseMesh,pathLine,pathRest,contourGroup,
+    armMesh,carriage,gridH,polarG,bedMesh,tableMesh;
 
 function initScene(){
   renderer=new THREE.WebGLRenderer({canvas:$('#scene'),antialias:true,alpha:true,preserveDrawingBuffer:true});
@@ -1058,11 +1099,11 @@ function initScene(){
       side:THREE.DoubleSide,depthWrite:false}));
   modelMesh.renderOrder=2;tableGroup.add(modelMesh);
   resultMesh=new THREE.Mesh(new THREE.BufferGeometry(),
-    new THREE.MeshStandardMaterial({color:0x30d158,roughness:0.5,metalness:0.04,transparent:true,opacity:0.6,
+    new THREE.MeshStandardMaterial({color:0x30d158,roughness:0.5,metalness:0.04,transparent:true,opacity:0.62,
       side:THREE.DoubleSide,depthWrite:false}));
   resultMesh.renderOrder=3;tableGroup.add(resultMesh);
   baseMesh=new THREE.Mesh(new THREE.BufferGeometry(),
-    new THREE.MeshStandardMaterial({color:0xff9f0a,roughness:0.6,transparent:true,opacity:0.42,
+    new THREE.MeshStandardMaterial({color:0xff9f0a,roughness:0.6,transparent:true,opacity:0.4,
       side:THREE.DoubleSide,depthWrite:false}));
   baseMesh.renderOrder=3;tableGroup.add(baseMesh);
 
@@ -1072,16 +1113,23 @@ function initScene(){
   pathRest=new THREE.Line(new THREE.BufferGeometry(),new THREE.LineBasicMaterial({color:0x0a84ff,transparent:true,opacity:0.4}));
   pathRest.renderOrder=5;scene.add(pathRest);
 
+  /* ---- СТРУНА: отдельный объект (конусы-держатели + линия между ними) ---- */
   wireGroup=new THREE.Group();scene.add(wireGroup);
-  wireMesh=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,10,10),
-    new THREE.MeshStandardMaterial({color:0xb9bec6,emissive:0xff453a,emissiveIntensity:0.25,roughness:0.3}));
-  wireMesh.rotation.x=Math.PI/2;wireGroup.add(wireMesh);
-  const hm=new THREE.MeshStandardMaterial({color:0xb0b6bd,roughness:0.32,metalness:0.82});
-  [-1,1].forEach(function(s){const c=new THREE.Mesh(new THREE.ConeGeometry(6,20,16),hm);
-    c.rotation.x=s*Math.PI/2;c.userData.side=s;wireGroup.add(c);});
+  const hm=new THREE.MeshStandardMaterial({color:0xc7ccd3,roughness:0.3,metalness:0.85});
+  coneA=new THREE.Mesh(new THREE.ConeGeometry(7,24,20),hm);coneA.rotation.x=Math.PI/2;wireGroup.add(coneA);
+  coneB=new THREE.Mesh(new THREE.ConeGeometry(7,24,20),hm);coneB.rotation.x=-Math.PI/2;wireGroup.add(coneB);
+  wireCore=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.5,10,10),
+    new THREE.MeshStandardMaterial({color:0xb9bec6,emissive:0xff453a,emissiveIntensity:0.2,roughness:0.3,
+      transparent:true,opacity:0.95}));
+  wireCore.rotation.x=Math.PI/2;wireGroup.add(wireCore);
+  wireLine=new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-50),new THREE.Vector3(0,0,50)]),
+    new THREE.LineBasicMaterial({color:0xff453a,transparent:true,opacity:0.95}));
+  wireLine.renderOrder=8;wireGroup.add(wireLine);
   wireGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9f0a,transparent:true,opacity:0,
     blending:THREE.AdditiveBlending,depthWrite:false}));
-  wireGlow.scale.set(64,64,1);wireGroup.add(wireGlow);
+  wireGlow.scale.set(70,70,1);wireGroup.add(wireGlow);
+  updateWireLen();
 
   if(window.ResizeObserver)new ResizeObserver(function(){resizeAll();}).observe($('#stage'));
   resizeAll();
@@ -1092,6 +1140,15 @@ function glowTex(){
   const r=g.createRadialGradient(32,32,0,32,32,32);
   r.addColorStop(0,'rgba(255,224,170,1)');r.addColorStop(0.35,'rgba(255,140,40,.5)');r.addColorStop(1,'rgba(255,80,0,0)');
   g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
+}
+function updateWireLen(){
+  if(!wireGroup)return;
+  const L=Math.max(70,S.stockD*1.35),hz=L/2;
+  coneA.position.set(0,0,-(hz+12));coneB.position.set(0,0,(hz+12));
+  wireCore.scale.set(1,1,L);
+  const pos=wireLine.geometry.attributes.position;
+  pos.setXYZ(0,0,0,-hz);pos.setXYZ(1,0,0,hz);pos.needsUpdate=true;
+  wireLine.geometry.computeBoundingSphere();
 }
 function resizeAll(){
   if(!renderer)return;
@@ -1129,29 +1186,33 @@ function setViewDir(d){
 }
 function fitAll(){
   if(!controls)return;
-  controls.target.set(S.stockX,(S.stockH||215)*0.46,S.stockZ);
+  controls.target.set(S.stockX,S.offY+(S.stockH||215)*0.42,S.stockZ);
   setView(S.view);
 }
 function applyLayers(){
   if(!stockMesh)return;
-  stockMesh.visible=S.layers.stock;modelMesh.visible=S.layers.model;
-  resultMesh.visible=S.layers.result;baseMesh.visible=S.layers.result;
-  contourGroup.visible=S.layers.contours;tableMesh.visible=S.layers.table;
+  stockMesh.visible=S.layers.stock;
+  modelMesh.visible=S.layers.model;
+  resultMesh.visible=S.layers.result;
+  baseMesh.visible=S.layers.base;
+  contourGroup.visible=S.layers.contours;
+  tableMesh.visible=S.layers.table;
   polarG.visible=S.layers.grid;gridH.visible=S.layers.grid;bedMesh.visible=S.layers.grid;
   machineGroup.children.forEach(function(o){
     if(o!==bedMesh&&o!==gridH&&o.type!=='Group')o.visible=S.layers.machine;});
-  wireGroup.visible=S.layers.machine;
+  wireGroup.visible=S.layers.wire;
   pathLine.visible=S.layers.path;pathRest.visible=S.layers.path;
 }
 function screenshot(){
   if(!renderer)return;
   renderer.render(scene,camera);
   const a=document.createElement('a');
-  a.download=(S.fileName||'view')+'.png';a.href=renderer.domElement.toDataURL('image/png');a.click();
+  a.download=(S.fileName||'view')+'.png';a.href=renderer.domElement.toDataURL('image/png');
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){if(a.parentNode)a.parentNode.removeChild(a);},500);
   toast('Снимок вида сохранён');log('Снимок вида экспортирован в PNG','s');
 }
 
-/* гизмо ориентации */
 const AXV=[{v:new THREE.Vector3(1,0,0),c:'#ff453a',l:'X'},
            {v:new THREE.Vector3(0,1,0),c:'#30d158',l:'Y'},
            {v:new THREE.Vector3(0,0,1),c:'#0a84ff',l:'Z'}];
@@ -1181,9 +1242,10 @@ $('#gizmo').addEventListener('click',function(e){
   let best=null,bd=1e9;
   gizPts.forEach(function(a){const d=Math.hypot(a.sx-x,a.sy-y);if(d<bd){bd=d;best=a;}});
   if(best&&bd<28*k){
-    const s=best.z>0?1:-1;
-    const dir=best.v.clone().multiplyScalar(s);
-    if(best.l==='Y')dir.set(0,s,0.001);else if(best.l==='Z')dir.set(0,0.001,s);else dir.set(s,0.001,0);
+    const s=best.z>0?1:-1;let dir;
+    if(best.l==='Y')dir=new THREE.Vector3(0,s,0.001);
+    else if(best.l==='Z')dir=new THREE.Vector3(0,0.001,s);
+    else dir=new THREE.Vector3(s,0.001,0);
     setViewDir(dir);
     const map={X:'side',Y:'top',Z:'front'};S.view=map[best.l];segAll('view',S.view);
   }
@@ -1211,24 +1273,26 @@ function parseSTL(buf){
   for(let i=0;i<n;i++){o+=12;for(let j=0;j<9;j++){pos[i*9+j]=dv.getFloat32(o,true);o+=4;}o+=2;}
   return pos;
 }
+function bboxOf(pos){
+  const mn=[1e18,1e18,1e18],mx=[-1e18,-1e18,-1e18];
+  for(let i=0;i<pos.length;i+=3){
+    const x=pos[i],y=pos[i+1],z=pos[i+2];
+    if(x<mn[0])mn[0]=x;if(y<mn[1])mn[1]=y;if(z<mn[2])mn[2]=z;
+    if(x>mx[0])mx[0]=x;if(y>mx[1])mx[1]=y;if(z>mx[2])mx[2]=z;
+  }
+  return {min:mn,max:mx,cx:(mn[0]+mx[0])/2,cy:(mn[1]+mx[1])/2,cz:(mn[2]+mx[2])/2,
+    size:[mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2]]};
+}
 function meshInfo(pos){
   const n=Math.floor(pos.length/9);let vol=0;
-  const mn=[1e18,1e18,1e18],mx=[-1e18,-1e18,-1e18];
   for(let i=0;i<n;i++){
     const a=i*9;
     const ax=pos[a],ay=pos[a+1],az=pos[a+2],bx=pos[a+3],by=pos[a+4],bz=pos[a+5],
           cx=pos[a+6],cy=pos[a+7],cz=pos[a+8];
     vol+=(ax*(by*cz-bz*cy)-ay*(bx*cz-bz*cx)+az*(bx*cy-by*cx))/6;
-    if(ax<mn[0])mn[0]=ax;if(bx<mn[0])mn[0]=bx;if(cx<mn[0])mn[0]=cx;
-    if(ay<mn[1])mn[1]=ay;if(by<mn[1])mn[1]=by;if(cy<mn[1])mn[1]=cy;
-    if(az<mn[2])mn[2]=az;if(bz<mn[2])mn[2]=bz;if(cz<mn[2])mn[2]=cz;
-    if(ax>mx[0])mx[0]=ax;if(bx>mx[0])mx[0]=bx;if(cx>mx[0])mx[0]=cx;
-    if(ay>mx[1])mx[1]=ay;if(by>mx[1])mx[1]=by;if(cy>mx[1])mx[1]=cy;
-    if(az>mx[2])mx[2]=az;if(bz>mx[2])mx[2]=bz;if(cz>mx[2])mx[2]=cz;
   }
-  return {count:n,vol:Math.abs(vol),min:mn,max:mx,
-    center:[(mn[0]+mx[0])/2,(mn[1]+mx[1])/2,(mn[2]+mx[2])/2],
-    size:[mx[0]-mn[0],mx[1]-mn[1],mx[2]-mn[2]],name:'model'};
+  const bb=bboxOf(pos);
+  return {count:n,vol:Math.abs(vol),min:bb.min,max:bb.max,center:[bb.cx,bb.cy,bb.cz],size:bb.size,name:'model'};
 }
 function buildDemoModel(){
   const P=[];
@@ -1270,8 +1334,25 @@ function buildDemoModel(){
 }
 
 /* ==================================================================
-   8 · СРЕЗЫ И ОБОЛОЧКИ
+   8 · ОРИЕНТАЦИЯ (XYZ) + СРЕЗЫ
 ================================================================== */
+function buildOrient(){
+  const key=[S.scale,S.rotX,S.rotY,S.rotZ].join('|');
+  if(ORIENT&&ORIENT_KEY===key)return ORIENT;
+  const c=RAW.info.center,s=S.scale/100,n=RAW.info.count;
+  const m=new THREE.Matrix4().makeRotationFromEuler(
+    new THREE.Euler(S.rotX*D2R,S.rotY*D2R,S.rotZ*D2R,'XYZ'));
+  const pos=new Float32Array(n*9),v=new THREE.Vector3();
+  for(let i=0;i<n*9;i+=3){
+    v.set(RAW.pos[i]-c[0],RAW.pos[i+1]-c[1],RAW.pos[i+2]-c[2]);
+    v.multiplyScalar(s).applyMatrix4(m);
+    pos[i]=v.x;pos[i+1]=v.y;pos[i+2]=v.z;
+  }
+  ORIENT={pos:pos,bb:bboxOf(pos),key:key};
+  ORIENT_KEY=key;
+  SLICES=null;SLICES_KEY='';
+  return ORIENT;
+}
 function hull2(pts){
   const n=pts.length/2;if(n<3)return null;
   const idx=[];for(let i=0;i<n;i++)idx.push(i);
@@ -1288,73 +1369,72 @@ function hull2(pts){
   h.forEach(function(i,k){o[2*k]=pts[2*i];o[2*k+1]=pts[2*i+1];});
   return o;
 }
-function sliceRaw(nL){
-  const pos=RAW.pos,c=RAW.info.center,nT=RAW.info.count;
-  const ymin=RAW.info.min[1],ymax=RAW.info.max[1],span=Math.max(1e-6,ymax-ymin);
+function slicePositions(pos,nL,bb){
+  const nT=Math.floor(pos.length/9);
+  const ymin=bb.min[1],ymax=bb.max[1],span=Math.max(1e-6,ymax-ymin);
   const levels=new Float64Array(nL);
   for(let i=0;i<nL;i++)levels[i]=ymin+span*(i+0.5)/nL;
   const buckets=[];for(let i=0;i<nL;i++)buckets.push([]);
-  const ty=new Float32Array(nT*3);
-  for(let t=0;t<nT;t++){const a=t*9;
-    ty[t*3]=pos[a+1]-c[1];ty[t*3+1]=pos[a+4]-c[1];ty[t*3+2]=pos[a+7]-c[1];}
   for(let t=0;t<nT;t++){
-    const y0=ty[t*3],y1=ty[t*3+1],y2=ty[t*3+2];
+    const a=t*9;
+    const y0=pos[a+1],y1=pos[a+4],y2=pos[a+7];
     const lo=Math.min(y0,y1,y2),hi=Math.max(y0,y1,y2);
     let i0=clamp(Math.floor((lo-ymin)/span*nL-0.5),0,nL-1);
     let i1=clamp(Math.floor((hi-ymin)/span*nL-0.5),0,nL-1);
     if(i1<i0){const m=clamp(Math.round(((lo+hi)/2-ymin)/span*nL-0.5),0,nL-1);i0=i1=m;}
     for(let i=i0;i<=i1;i++)buckets[i].push(t);
   }
-  const hulls=new Array(nL);let tmp=[];
+  const hulls=new Array(nL);
   for(let i=0;i<nL;i++){
-    const hgt=levels[i];tmp=[];const bk=buckets[i];
+    const hgt=levels[i],bk=buckets[i];let tmp=[];
     for(let q=0;q<bk.length;q++){
-      const t=bk[q],a=t*9;
-      const ya=ty[t*3]-hgt,yb=ty[t*3+1]-hgt,yc=ty[t*3+2]-hgt;
-      const ax=pos[a]-c[0],az=pos[a+2]-c[2],bx=pos[a+3]-c[0],bz=pos[a+5]-c[2],
-            cx=pos[a+6]-c[0],cz=pos[a+8]-c[2];
+      const a=bk[q]*9;
+      const ya=pos[a+1]-hgt,yb=pos[a+4]-hgt,yc=pos[a+7]-hgt;
+      const ax=pos[a],az=pos[a+2],bx=pos[a+3],bz=pos[a+5],cx=pos[a+6],cz=pos[a+8];
       if((ya>0)!==(yb>0)){const s=ya/(ya-yb);tmp.push(ax+s*(bx-ax),az+s*(bz-az));}
       if((yb>0)!==(yc>0)){const s=yb/(yb-yc);tmp.push(bx+s*(cx-bx),bz+s*(cz-bz));}
       if((yc>0)!==(ya>0)){const s=yc/(yc-ya);tmp.push(cx+s*(ax-cx),cz+s*(az-cz));}
     }
     hulls[i]=(tmp.length>=6)?hull2(Float64Array.from(tmp)):null;
   }
-  return {levels:levels,hulls:hulls,n:nL};
+  return {levels:levels,hulls:hulls,n:nL,bb:bb};
 }
+/* Размещение: низ модели точно на S.offY, центр по X/Z — смещение от оси A.
+   Деталь (прогноз) строится строго в габаритах STL. */
 function placedSlices(){
-  const s=S.scale/100,r=S.rotY*D2R,cr=Math.cos(r),sr=Math.sin(r),src=SLICES,n=src.n;
-  const levels=new Float64Array(n),hulls=new Array(n);
-  let yMin=1e18,yMax=-1e18,xMin=1e18,xMax=-1e18,zMin=1e18,zMax=-1e18;
-  for(let i=0;i<n;i++){
-    levels[i]=src.levels[i]*s+S.offY;
-    const hh=src.hulls[i];
-    if(!hh){hulls[i]=null;continue;}
-    const o=new Float64Array(hh.length);
-    for(let k=0;k<hh.length;k+=2){
-      const x=(hh[k]*cr+hh[k+1]*sr)*s+S.offX;
-      const z=(-hh[k]*sr+hh[k+1]*cr)*s+S.offZ;
-      o[k]=x;o[k+1]=z;
-      if(x<xMin)xMin=x;if(x>xMax)xMax=x;if(z<zMin)zMin=z;if(z>zMax)zMax=z;
-    }
-    hulls[i]=o;
-    if(levels[i]<yMin)yMin=levels[i];
-    if(levels[i]>yMax)yMax=levels[i];
-  }
-  const valid=[];for(let i=0;i<n;i++)if(hulls[i])valid.push(i);
-  return {levels:levels,hulls:hulls,n:n,valid:valid,
-    yMin:valid.length?levels[valid[0]]:0,yMax:valid.length?levels[valid[valid.length-1]]:1,
-    bbox:{xMin:xMin,xMax:xMax,zMin:zMin,zMax:zMax}};
+  const O=buildOrient(),bb=O.bb;
+  const key=S.slices+'|'+O.key;
+  if(!SLICES||SLICES_KEY!==key){SLICES=slicePositions(O.pos,S.slices|0,bb);SLICES_KEY=key;}
+  const dx=S.offX-bb.cx, dy=S.offY-bb.min[1], dz=S.offZ-bb.cz;
+  const src=SLICES,n=src.n;
+  let first=-1,last=-1;
+  for(let i=0;i<n;i++)if(src.hulls[i]){if(first<0)first=i;last=i;}
+  if(first<0)return null;
+  const outN=n+2;
+  const levels=new Float64Array(outN),hulls=new Array(outN);
+  levels[0]=dy+bb.min[1];hulls[0]=shiftHull(src.hulls[first],dx,dz);
+  for(let i=0;i<n;i++){levels[i+1]=src.levels[i]+dy;hulls[i+1]=src.hulls[i]?shiftHull(src.hulls[i],dx,dz):null;}
+  levels[outN-1]=dy+bb.max[1];hulls[outN-1]=shiftHull(src.hulls[last],dx,dz);
+  const valid=[];for(let i=0;i<outN;i++)if(hulls[i])valid.push(i);
+  return {levels:levels,hulls:hulls,n:outN,valid:valid,
+    yMin:levels[0],yMax:levels[outN-1],dx:dx,dy:dy,dz:dz,
+    hModel:bb.max[1]-bb.min[1]};
+}
+function shiftHull(h,dx,dz){
+  const o=new Float64Array(h.length);
+  for(let k=0;k<h.length;k+=2){o[k]=h[k]+dx;o[k+1]=h[k+1]+dz;}
+  return o;
 }
 
 /* ==================================================================
-   9 · ПРОХОДЫ
+   9 · ПРОХОДЫ (новый цикл резания)
 ================================================================== */
 function support(hull,ca,sa){
-  let mn=1e18,mx=-1e18,cx=0,cz=0;const n=hull.length/2;
+  let mn=1e18,mx=-1e18,cx=0,cz=0;const n=Math.max(1,hull.length/2);
   for(let k=0;k<hull.length;k+=2){
     const d=hull[k]*ca+hull[k+1]*sa;
     if(d<mn)mn=d;if(d>mx)mx=d;cx+=hull[k];cz+=hull[k+1];}
-  return {mn:mn,mx:mx,cx:cx/Math.max(1,n),cz:cz/Math.max(1,n)};
+  return {mn:mn,mx:mx,cx:cx/n,cz:cz/n};
 }
 function rdp(ch,eps){
   if(ch.length<3||eps<=0)return ch;
@@ -1380,17 +1460,26 @@ function chaikin(p){
 }
 function post(ch){let c=rdp(ch,S.tol);if(S.smooth&&c.length>3)c=chaikin(c);return c;}
 function passCount(){
-  return S.angleMode==='passes'?clamp(Math.round(S.passes),2,90):clamp(Math.round(360/Math.max(0.5,S.angleStep)),2,120);
+  return S.angleMode==='passes'?clamp(Math.round(S.passes),2,90)
+                              :clamp(Math.round(360/Math.max(0.5,S.angleStep)),2,120);
 }
+function polyLen(pts){let L=0;for(let i=1;i<pts.length;i++)L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return L;}
+function polyCum(pts){const c=[0];let L=0;
+  for(let i=1;i<pts.length;i++){L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);c.push(L);}
+  return {cum:c,len:L};}
+
 function buildPasses(){
   const P=PLACED;
   if(!P||!P.valid.length)return [];
   const N=passCount(),step=360/N,w=S.wireR,bw=S.baseW/100;
-  const yTop=P.yMax,yModelBot=P.yMin,bh=P.hulls[P.valid[0]],out=[];
+  const yTop=P.yMax,yModelBot=P.yMin,bh=P.hulls[P.valid[0]];
+  const yBot=S.keepBase?Math.min(S.baseH,yModelBot-0.001):Math.max(0.8,yModelBot);
+  const safeTop=S.stockH+S.safeGap,R=S.stockD/2;
+  const out=[];
+  let prevX=0,prevY=S.stockH*0.5;
+
   for(let k=0;k<N;k++){
     const ang=S.startAngle+k*step,a=ang*D2R,ca=Math.cos(a),sa=Math.sin(a);
-    const isLast=(k===N-1),trim=isLast&&S.trimBase;
-    const yBot=trim?Math.min(S.trimH,yModelBot):(S.keepBase?Math.min(S.baseH,yModelBot-0.001):Math.max(0.8,yModelBot));
     const smin=new Float64Array(P.n),smax=new Float64Array(P.n);
     for(let i=0;i<P.n;i++){
       const hh=P.hulls[i];
@@ -1399,6 +1488,8 @@ function buildPasses(){
     }
     const sb=support(bh,ca,sa),cc=sb.cx*ca+sb.cz*sa;
     const bMin=cc+((sb.mn-w)-cc)*bw,bMax=cc+((sb.mx+w)-cc)*bw;
+
+    /* замкнутый силуэт */
     const Rc=[],Lc=[];
     let si=P.valid[0];
     for(let q=0;q<P.valid.length;q++){if(P.levels[P.valid[q]]>=yBot-1e-9){si=P.valid[q];break;}}
@@ -1418,20 +1509,53 @@ function buildPasses(){
     }
     if(Rc.length&&Rc[Rc.length-1][1]<yTop-1e-9){
       Rc.push([Rc[Rc.length-1][0],yTop]);Lc.push([Lc[Lc.length-1][0],yTop]);}
-    let poly=post(Rc).concat(post(Lc).slice().reverse());
-    let open=false;
-    if(trim&&S.bridge>0&&poly.length>3){
-      const cc2=(bMin+bMax)/2,hf=S.bridge/2;
-      poly=[[Math.min(cc2+hf,bMax),yBot]].concat(poly).concat([[Math.max(cc2-hf,bMin),yBot]]);
-      open=true;
+    let contour=post(Rc).concat(post(Lc).slice().reverse());
+    if(contour.length>2){
+      const f=contour[0],l=contour[contour.length-1];
+      if(Math.hypot(f[0]-l[0],f[1]-l[1])>1e-9)contour.push([f[0],f[1]]);
     }
     const dir=(S.zigzag&&k%2===1)?-1:1;
-    if(dir<0)poly=poly.slice().reverse();
-    let len=0;const cum=[0];
-    for(let i=1;i<poly.length;i++){len+=Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]);cum.push(len);}
-    if(!open&&poly.length>1)len+=Math.hypot(poly[0][0]-poly[poly.length-1][0],poly[0][1]-poly[poly.length-1][1]);
-    out.push({k:k,ang:ang,dir:dir,poly:poly,cum:cum,len:len,open:open,smin:smin,smax:smax,
-      yBot:yBot,yTop:yTop,a:a});
+    if(dir<0)contour=contour.slice().reverse();
+
+    /* выход за пределы заготовки */
+    const cp=S.stockX*ca+S.stockZ*sa;
+    const side=contour[0][0]>=cp?1:-1;
+    const exitX=cp+side*(R+S.exitLen);
+    const y0=contour[0][1];
+
+    const moves=[];
+    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[exitX,safeTop],[exitX,y0]]});
+    moves.push({t:'cut',pts:[[exitX,y0]].concat(contour).concat([[exitX,y0]])});
+
+    const cl=moves[1].pts;
+    const cm=polyCum(cl);
+    out.push({k:k,type:'cut',ang:ang,a:a,dir:dir,contour:contour,moves:moves,
+      cutPts:cl,cum:cm.cum,cutLen:cm.len,smin:smin,smax:smax,yBot:yBot,yTop:yTop,exitX:exitX});
+    prevX=exitX;prevY=y0;
+  }
+  NPASS=N;
+
+  /* финальная операция: подрезка основания */
+  if(S.trimBase){
+    const ang=S.startAngle+N*step,a=ang*D2R,ca=Math.cos(a),sa=Math.sin(a);
+    const yT=Math.max(0.4,yModelBot-Math.max(0,S.trimBelow));
+    const sb=support(bh,ca,sa),cc=sb.cx*ca+sb.cz*sa;
+    const cp=S.stockX*ca+S.stockZ*sa;
+    const xL=cp-(R+S.exitLen),xR=cp+(R+S.exitLen);
+    const moves=[];
+    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[xL,safeTop],[xL,yT]]});
+    if(S.bridge>0.05){
+      const g1=Math.max(xL,cc-S.bridge/2),g2=Math.min(xR,cc+S.bridge/2);
+      moves.push({t:'cut',pts:[[xL,yT],[g1,yT],[xL,yT]]});
+      moves.push({t:'rap',pts:[[xL,yT],[xL,safeTop],[xR,safeTop],[xR,yT]]});
+      moves.push({t:'cut',pts:[[xR,yT],[g2,yT],[xR,yT]]});
+    }else{
+      moves.push({t:'cut',pts:[[xL,yT],[xR,yT]]});
+    }
+    let cutPts=[],cutLen=0;
+    moves.forEach(function(m){if(m.t==='cut'){cutPts=cutPts.concat(m.pts);cutLen+=polyLen(m.pts);}});
+    out.push({k:N,type:'trim',ang:ang,a:a,dir:1,contour:[[xL,yT],[xR,yT]],moves:moves,
+      cutPts:cutPts,cum:null,cutLen:cutLen,smin:null,smax:null,yBot:yT,yTop:yT,exitX:xR,trimY:yT});
   }
   return out;
 }
@@ -1481,22 +1605,28 @@ function distToHull(x,z,f){
   }
   return d;
 }
-function computeResult(passes,upto){
-  const P=PLACED;if(!P||!passes||!passes.length)return null;
+function slabPoly(i,upto,circle){
+  let poly=circle.slice();
+  for(let k=0;k<upto&&k<PASSES.length;k++){
+    const p=PASSES[k];
+    if(p.type!=='cut'||!p.smin)continue;
+    if(isNaN(p.smax[i])||isNaN(p.smin[i]))continue;
+    const ca=Math.cos(p.a),sa=Math.sin(p.a);
+    poly=clipHalf(poly,ca,sa,p.smax[i]);if(poly.length<3)return null;
+    poly=clipHalf(poly,-ca,-sa,-p.smin[i]);if(poly.length<3)return null;
+  }
+  return poly.length>=3?poly:null;
+}
+function computeResult(upto){
+  const P=PLACED;if(!P||!PASSES.length)return null;
   const NS=104,R=S.stockD/2,circle=[];
   for(let j=0;j<44;j++){const t=j/44*Math.PI*2;circle.push([S.stockX+R*Math.cos(t),S.stockZ+R*Math.sin(t)]);}
-  const out=[];let volR=0,volM=0,maxDev=0;
+  const out=[],baseOut=[];let volR=0,volM=0,maxDev=0;
+  /* деталь — строго в габаритах STL: от yMin модели до yMax модели */
   for(let i=0;i<P.n;i++){
     if(!P.hulls[i])continue;
-    let poly=circle.slice();
-    for(let k=0;k<upto&&k<passes.length;k++){
-      const p=passes[k];
-      if(isNaN(p.smax[i])||isNaN(p.smin[i]))continue;
-      const ca=Math.cos(p.a),sa=Math.sin(p.a);
-      poly=clipHalf(poly,ca,sa,p.smax[i]);if(poly.length<3)break;
-      poly=clipHalf(poly,-ca,-sa,-p.smin[i]);if(poly.length<3)break;
-    }
-    if(poly.length<3)continue;
+    if(P.levels[i]<P.yMin-1e-9||P.levels[i]>P.yMax+1e-9)continue;
+    const poly=slabPoly(i,upto,circle);if(!poly)continue;
     const rs=resample(poly,NS);if(!rs)continue;
     volR+=polyArea(poly);volM+=polyAreaFlat(P.hulls[i]);
     const mh=P.hulls[i];
@@ -1508,24 +1638,33 @@ function computeResult(passes,upto){
     out.push({y:P.levels[i],cx:rs.cx,cz:rs.cy,r:rs.r,idx:i});
   }
   out.sort(function(a,b){return a.y-b.y;});
+  /* технологическое основание: от низа реза до низа модели */
+  const yBot=S.keepBase?Math.min(S.baseH,P.yMin-0.001):P.yMin;
+  if(yBot<P.yMin-1e-6){
+    let bi=P.valid[0];
+    for(let q=0;q<P.valid.length;q++){if(P.levels[P.valid[q]]>=P.yMin-1e-9){bi=P.valid[q];break;}}
+    const poly=slabPoly(bi,upto,circle);
+    if(poly){const rs=resample(poly,NS);
+      if(rs){baseOut.push({y:Math.max(0.2,yBot),cx:rs.cx,cz:rs.cy,r:rs.r,idx:bi});
+             baseOut.push({y:P.yMin,cx:rs.cx,cz:rs.cy,r:rs.r,idx:bi});}}
+  }
   const dY=out.length>1?(out[1].y-out[0].y):1;
-  return {levels:out,NS:NS,volR:volR*dY/1000,volM:volM*dY/1000,
+  return {levels:out,base:baseOut,NS:NS,volR:volR*dY/1000,volM:volM*dY/1000,
     excess:volM>0?(volR-volM)/volM*100:0,maxDev:maxDev};
 }
-function loftGeo(lv,NS,a,b){
-  const rows=lv.slice(a,b+1);
-  if(rows.length<2)return new THREE.BufferGeometry();
+function loftGeo(lv,NS){
+  if(lv.length<2)return new THREE.BufferGeometry();
   const pos=[],idx=[];
-  for(let i=0;i<rows.length;i++){const rw=rows[i];
+  for(let i=0;i<lv.length;i++){const rw=lv[i];
     for(let j=0;j<=NS;j++){const jj=j%NS,th=jj/NS*Math.PI*2;
       pos.push(rw.cx+rw.r[jj]*Math.cos(th),rw.y,rw.cz+rw.r[jj]*Math.sin(th));}}
-  for(let i=0;i<rows.length-1;i++)for(let j=0;j<NS;j++){
+  for(let i=0;i<lv.length-1;i++)for(let j=0;j<NS;j++){
     const A=i*(NS+1)+j,B=A+1,C=A+NS+1,D=C+1;idx.push(A,C,B,B,C,D);}
-  const f=rows[0],c0=pos.length/3;pos.push(f.cx,f.y,f.cz);
+  const f=lv[0],c0=pos.length/3;pos.push(f.cx,f.y,f.cz);
   for(let j=0;j<=NS;j++){const jj=j%NS,th=jj/NS*Math.PI*2;
     pos.push(f.cx+f.r[jj]*Math.cos(th),f.y,f.cz+f.r[jj]*Math.sin(th));}
   for(let j=0;j<NS;j++)idx.push(c0,c0+1+j,c0+2+j);
-  const l=rows[rows.length-1],c1=pos.length/3;pos.push(l.cx,l.y,l.cz);
+  const l=lv[lv.length-1],c1=pos.length/3;pos.push(l.cx,l.y,l.cz);
   for(let j=0;j<=NS;j++){const jj=j%NS,th=jj/NS*Math.PI*2;
     pos.push(l.cx+l.r[jj]*Math.cos(th),l.y,l.cz+l.r[jj]*Math.sin(th));}
   for(let j=0;j<NS;j++)idx.push(c1,c1+2+j,c1+1+j);
@@ -1537,40 +1676,30 @@ function loftGeo(lv,NS,a,b){
 function buildResultMesh(){
   if(!resultMesh)return;
   const r=RESULT;
-  if(!r||!r.levels.length){
-    resultMesh.geometry.dispose();resultMesh.geometry=new THREE.BufferGeometry();
-    baseMesh.geometry.dispose();baseMesh.geometry=new THREE.BufferGeometry();return;}
-  const lv=r.levels,NS=r.NS;
-  if(S.trimBase&&S.trimH>0.05){
-    let sp=0;for(let i=0;i<lv.length;i++){if(lv[i].y>=S.trimH-1e-9){sp=i;break;}sp=lv.length-1;}
-    if(sp>0&&sp<lv.length){
-      const below=lv.slice(0,sp+1),above=lv.slice(sp);
-      baseMesh.geometry.dispose();baseMesh.geometry=loftGeo(below,NS,0,below.length-1);
-      resultMesh.geometry.dispose();resultMesh.geometry=loftGeo(above,NS,0,above.length-1);
-      return;
-    }
-  }
-  baseMesh.geometry.dispose();baseMesh.geometry=new THREE.BufferGeometry();
-  resultMesh.geometry.dispose();resultMesh.geometry=loftGeo(lv,NS,0,lv.length-1);
+  resultMesh.geometry.dispose();baseMesh.geometry.dispose();
+  if(!r){resultMesh.geometry=new THREE.BufferGeometry();baseMesh.geometry=new THREE.BufferGeometry();return;}
+  resultMesh.geometry=(r.levels.length>1)?loftGeo(r.levels,r.NS):new THREE.BufferGeometry();
+  baseMesh.geometry=(r.base.length>1)?loftGeo(r.base,r.NS):new THREE.BufferGeometry();
 }
 
 /* ==================================================================
    11 · СБОРКА СЦЕНЫ
 ================================================================== */
 function buildSceneObjects(){
+  const O=buildOrient(),bb=O.bb;
   const R=S.stockD/2,H=S.stockH;
-  stockMesh.geometry.dispose();
-  stockMesh.geometry=new THREE.CylinderGeometry(R,R,H,72);
+  stockMesh.geometry.dispose();stockMesh.geometry=new THREE.CylinderGeometry(R,R,H,72);
   stockMesh.position.set(S.stockX,H/2,S.stockZ);
   const g=new THREE.BufferGeometry();
-  g.setAttribute('position',new THREE.BufferAttribute(RAW.pos,3));
-  g.computeVertexNormals();
+  g.setAttribute('position',new THREE.BufferAttribute(O.pos,3));
+  g.computeVertexNormals();g.computeBoundingSphere();
   modelMesh.geometry.dispose();modelMesh.geometry=g;
-  modelMesh.position.set(S.offX,S.offY,S.offZ);
-  modelMesh.rotation.y=S.rotY*D2R;
-  modelMesh.scale.setScalar(S.scale/100);
+  /* положение модели = положение срезов: низ точно на S.offY */
+  modelMesh.position.set(S.offX-bb.cx,S.offY-bb.min[1],S.offZ-bb.cz);
+  modelMesh.rotation.set(0,0,0);modelMesh.scale.setScalar(1);
   tableMesh.position.set(S.stockX,0,S.stockZ);
   polarG.position.set(S.stockX,-19.4,S.stockZ);
+  updateWireLen();
 }
 function buildContours(){
   if(!contourGroup)return;
@@ -1579,10 +1708,11 @@ function buildContours(){
     if(c.geometry)c.geometry.dispose();
     contourGroup.remove(c);
   }
-  const mat=new THREE.LineBasicMaterial({color:0xaf52de,transparent:true,opacity:0.26});
+  const mat=new THREE.LineBasicMaterial({color:0xaf52de,transparent:true,opacity:0.3});
   PASSES.forEach(function(p){
-    const pts=p.poly.map(function(q){return new THREE.Vector3(q[0],q[1],0);});
-    if(!p.open&&pts.length)pts.push(pts[0].clone());
+    if(!p.contour||!p.contour.length)return;
+    const pts=p.contour.map(function(q){return new THREE.Vector3(q[0],q[1],0);});
+    if(p.type==='cut'&&pts.length)pts.push(pts[0].clone());
     contourGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
   });
 }
@@ -1590,15 +1720,17 @@ function passListUI(){
   const box=$('#passList');if(!box)return;box.innerHTML='';
   if(!PASSES.length){box.appendChild(el('div',{cls:'row'},[el('div',{cls:'rt',style:'color:var(--label2)'},['Нет данных'])]));return;}
   PASSES.forEach(function(p,k){
+    const label=p.type==='trim'
+      ? '⚑ Подрезка основания · A '+nf(p.ang,2)+'° · Y '+nf(p.trimY,1)
+      : String(p.k+1).padStart(2,'0')+' · A '+nf(p.ang,2)+'° · '+(p.dir>0?'↻ CCW':'↺ CW');
     const r=el('div',{cls:'row tap',onclick:function(){jumpPass(k);}},[
-      el('div',{cls:'rt mono',style:'font-size:11.5px'},
-        [String(k+1).padStart(2,'0')+' · A '+nf(p.ang,2)+'° · '+(p.dir>0?'↻ CCW':'↺ CW')+(p.open?' · рез основания':'')]),
-      el('div',{cls:'rv'},[nf(p.len,1)+' мм'])]);
+      el('div',{cls:'rt mono',style:'font-size:11.5px'},[label]),
+      el('div',{cls:'rv'},[nf(p.cutLen,1)+' мм'])]);
     r.dataset.k=k;box.appendChild(r);});
 }
 function jumpPass(k){
   let target=null;
-  for(let i=0;i<SIM.segs.length;i++){if(SIM.segs[i].type==='cut'&&SIM.segs[i].k===k){target=SIM.segs[i];break;}}
+  for(let i=0;i<SIM.segs.length;i++){if(SIM.segs[i].k===k&&SIM.segs[i].type==='mv'){target=SIM.segs[i];break;}}
   if(target){setPlaying(false);setSimTime(target.t0+1e-6);}
 }
 function stepPass(d){
@@ -1614,46 +1746,61 @@ function stepPass(d){
 function genGCode(){
   if(!PASSES.length){GCODE='';updateCodeUI();return;}
   const rot=(S.post==='grbl')?'Z':'A',d=S.gDec,F=function(v){return fmt(v,d);};
-  const safeX=STATS.safeX||100;
   const L=[],C=function(s){if(S.gComments)L.push(s);};
   C('(===== PENOREZ STUDIO / HOT WIRE =====)');
   C('(Post      : '+({linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A mapped to Z)'}[S.post])+')');
   C('(Model     : '+RAW.info.name+')');
+  C('(Orient    : X'+F(S.rotX)+' Y'+F(S.rotY)+' Z'+F(S.rotZ)+' deg, scale '+F(S.scale,1)+'%)');
   C('(Triangles : '+RAW.info.count+')');
   C('(Stock     : D'+F(S.stockD)+' x H'+F(S.stockH)+' mm, center X'+F(S.stockX)+' Z'+F(S.stockZ)+')');
-  C('(Passes    : '+PASSES.length+'   step '+F(360/PASSES.length)+' deg   start '+F(S.startAngle)+' deg)');
+  C('(Passes    : '+NPASS+'   step '+F(360/Math.max(1,NPASS))+' deg   start '+F(S.startAngle)+' deg)');
   C('(Wire      : R'+F(S.wireR)+' mm   feed '+S.feed+' mm/min   '+rot+'-feed '+S.aFeed+' deg/min)');
+  C('(Exit beyond stock: '+F(S.exitLen)+' mm   wait before rotate: '+F(S.waitRot,1)+' s)');
+  C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate A)');
+  C(('(Base trim : '+(S.trimBase?('YES, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, bridge '+F(S.bridge)+' mm'):'no'))+')');
   C('(Cut length: '+F(STATS.cutLen,1)+' mm   est. time '+hms(STATS.time)+')');
   C('(Generated: '+new Date().toLocaleString('ru-RU')+')');
   L.push('G21 G90 G94 G17');
-  L.push('G0 '+rot+'0.000');
-  L.push('G0 X0.000 Y'+F(S.stockH*0.5));
   L.push(S.wireOff+(S.gComments?' (wire off)':''));
-  let cx=0,cy=S.stockH*0.5,ca=S.startAngle;
+  L.push('G0 X0.000 Y'+F(S.stockH*0.5));
+  L.push('G0 '+rot+F(S.startAngle));
+
   PASSES.forEach(function(p,k){
-    const last=(k===PASSES.length-1)&&S.trimBase;
     C('');
-    C('(--- PASS '+(k+1)+'/'+PASSES.length+'  '+rot+'='+F(p.ang)+'  '+(p.dir>0?'CCW':'CW')+(last?'  TRIM BASE':'')+' ---)');
-    if(Math.abs(cx-safeX)>1e-6){L.push('G0 X'+F(safeX));cx=safeX;}
-    if(S.compBacklash&&S.backlash>0&&k>0)L.push('G1 '+rot+F(p.ang+S.backlash)+' F'+S.aFeed);
-    if(Math.abs(p.ang-ca)>1e-9){L.push('G1 '+rot+F(p.ang)+' F'+S.aFeed);ca=p.ang;}
-    const s=p.poly[0];
-    L.push('G0 X'+F(s[0])+' Y'+F(s[1]));cx=s[0];cy=s[1];
-    if(S.dwell>0)L.push('G4 P'+F(S.dwell));
-    L.push(S.wireOn+(S.gComments?' (wire on)':''));
-    let first=true;
-    for(let i=1;i<p.poly.length;i++){
-      const q=p.poly[i];
-      if(Math.abs(q[0]-cx)<1e-9&&Math.abs(q[1]-cy)<1e-9)continue;
-      L.push('G1 X'+F(q[0])+' Y'+F(q[1])+(first?' F'+S.feed:''));first=false;cx=q[0];cy=q[1];
-    }
-    if(!p.open){const q=p.poly[0];
-      if(Math.abs(q[0]-cx)>1e-9||Math.abs(q[1]-cy)>1e-9){L.push('G1 X'+F(q[0])+' Y'+F(q[1]));cx=q[0];cy=q[1];}}
+    if(p.type==='trim')C('(--- FINAL: BASE TRIM  '+rot+'='+F(p.ang)+'  Y='+F(p.trimY)+' ---)');
+    else C('(--- PASS '+(k+1)+'/'+NPASS+'  '+rot+'='+F(p.ang)+'  '+(p.dir>0?'CCW':'CW')+' ---)');
+    p.moves.forEach(function(m){
+      if(m.t==='rap'){
+        for(let i=1;i<m.pts.length;i++){
+          const q=m.pts[i],pr=m.pts[i-1];
+          if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
+          L.push('G0 X'+F(q[0])+' Y'+F(q[1]));
+        }
+        if(S.dwell>0&&m===p.moves[0])L.push('G4 P'+F(S.dwell)+(S.gComments?' (heat)':''));
+        L.push(S.wireOn+(S.gComments?' (wire on)':''));
+      }else{
+        let first=true;
+        for(let i=1;i<m.pts.length;i++){
+          const q=m.pts[i],pr=m.pts[i-1];
+          if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
+          L.push('G1 X'+F(q[0])+' Y'+F(q[1])+(first?' F'+S.feed:''));first=false;
+        }
+      }
+    });
+    if(S.waitRot>0)L.push('G4 P'+F(S.waitRot)+(S.gComments?' (wait, wire outside stock)':''));
     L.push(S.wireOff+(S.gComments?' (wire off)':''));
-    if(Math.abs(cx-safeX)>1e-6){L.push('G0 X'+F(safeX));cx=safeX;}
+    /* поворот стола — после выхода струны за заготовку */
+    const nxt=PASSES[k+1];
+    if(nxt&&Math.abs(nxt.ang-p.ang)>1e-9){
+      if(S.compBacklash&&S.backlash>0)L.push('G1 '+rot+F(nxt.ang+S.backlash)+' F'+S.aFeed);
+      L.push('G1 '+rot+F(nxt.ang)+' F'+S.aFeed+(S.gComments?' (rotate table)':''));
+    }
   });
   C('');C('(--- END OF PROGRAM ---)');
-  L.push('G0 '+rot+'0.000');L.push('G0 X0.000 Y0.000');L.push(S.wireOff);L.push('M2');L.push('%');
+  L.push('G0 '+rot+F(S.startAngle));
+  L.push('G0 X0.000 Y0.000');
+  L.push(S.wireOff);
+  L.push('M2');L.push('%');
   GCODE=L.join('\n');
   STATS.lines=L.length;STATS.bytes=GCODE.length;
   updateCodeUI();
@@ -1692,29 +1839,31 @@ function download(){
 function copyCode(){
   if(!GCODE){toast('Нет данных для копирования',false);return;}
   const done=function(){toast('G-code скопирован');log('G-code скопирован в буфер обмена','s');};
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(GCODE).then(done).catch(function(){fallbackCopy();});
-  }else fallbackCopy();
-  function fallbackCopy(){
+  const fallback=function(){
     const ta=document.createElement('textarea');ta.value=GCODE;document.body.appendChild(ta);
     ta.select();try{document.execCommand('copy');done();}catch(e){toast('Не удалось скопировать',false);}
-    document.body.removeChild(ta);
-  }
+    document.body.removeChild(ta);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(GCODE).then(done).catch(fallback);
+  else fallback();
 }
 function exportReport(){
   const t=[
 'ПЕНОРЕЗ STUDIO — ОТЧЁТ ПО УП','Дата: '+new Date().toLocaleString('ru-RU'),'',
 'МОДЕЛЬ: '+RAW.info.name,'  треугольников: '+RAW.info.count,'  объём: '+nf(RAW.info.vol/1000,1)+' см3',
-'  габариты: '+RAW.info.size.map(function(v){return nf(v,1);}).join(' x ')+' мм',
-'  масштаб '+nf(S.scale,1)+'%  поворот Y '+nf(S.rotY,1)+' град  смещение '+[S.offX,S.offY,S.offZ].map(function(v){return nf(v,1);}).join(' / '),'',
+'  габариты (файл): '+RAW.info.size.map(function(v){return nf(v,1);}).join(' x ')+' мм',
+'  ориентация: X '+nf(S.rotX,1)+'  Y '+nf(S.rotY,1)+'  Z '+nf(S.rotZ,1)+' град',
+'  масштаб '+nf(S.scale,1)+'%   смещение X '+nf(S.offX,1)+' / зазор от стола '+nf(S.offY,1)+' / Z '+nf(S.offZ,1),
+'  высота после поворота: '+nf(PLACED?PLACED.hModel:0,1)+' мм','',
 'ЗАГОТОВКА: цилиндр D'+nf(S.stockD,1)+' x H'+nf(S.stockH,1)+' мм, центр X'+nf(S.stockX,1)+' Z'+nf(S.stockZ,1),'',
-'РЕЗАНИЕ: проходов '+PASSES.length+'  шаг A '+nf(360/Math.max(1,PASSES.length),3)+' град  начальный угол '+nf(S.startAngle,1),
+'ЦИКЛ: подход вне заготовки -> струна ВКЛ -> рез по силуэту -> выход за заготовку ('+nf(S.exitLen,1)+' мм) -> '+
+  'пауза '+nf(S.waitRot,1)+' с -> струна ВЫКЛ -> поворот стола A','',
+'РЕЗАНИЕ: проходов '+NPASS+'  шаг A '+nf(360/Math.max(1,NPASS),3)+' град  начальный угол '+nf(S.startAngle,1),
 '  подача '+S.feed+' мм/мин  холостой ход '+S.rapid+' мм/мин  скорость A '+S.aFeed+' град/мин',
 '  радиус струны '+nf(S.wireR,2)+' мм  отступ '+nf(S.safeGap,1)+' мм  прогрев '+nf(S.dwell,1)+' с',
 '  зиг-заг: '+(S.zigzag?'да':'нет')+'   компенсация люфта: '+(S.compBacklash?nf(S.backlash,2)+' град':'нет'),
 '  срезов по высоте '+S.slices+'  допуск упрощения '+nf(S.tol,2)+' мм  сглаживание: '+(S.smooth?'да':'нет'),'',
 'ОСНОВАНИЕ: '+(S.keepBase?'высота '+nf(S.baseH,1)+' мм, ширина '+nf(S.baseW,0)+'%':'нет')+
-  '   подрезка: '+(S.trimBase?'да, h='+nf(S.trimH,1)+' мм, перемычка '+nf(S.bridge,0)+' мм':'нет'),'',
+  '   подрезка в конце: '+(S.trimBase?'да, на '+nf(S.trimBelow,1)+' мм ниже модели, перемычка '+nf(S.bridge,0)+' мм':'нет'),'',
 'РЕЗУЛЬТАТ: длина реза '+nf(STATS.cutLen,1)+' мм   холостые '+nf(STATS.airLen,0)+' мм   поворот A '+nf(STATS.rotDeg,0)+' град',
 '  расчётное время '+hms(STATS.time),
 '  объём детали (прогноз) '+nf(STATS.volR,1)+' см3   избыток +'+nf(STATS.excess,1)+'%   макс. отклонение '+nf(STATS.maxDev,2)+' мм',
@@ -1730,29 +1879,28 @@ function exportReport(){
 /* ==================================================================
    13 · РАЗВЁРТКА ТРАЕКТОРИИ
 ================================================================== */
-let unrollAcc=0;
 function drawUnroll(){
   const c=$('#unroll');if(!c||!c.width||!c.height)return;
   const g=c.getContext('2d');if(!g)return;
   const dpr=Math.min(window.devicePixelRatio||1,2),k=dpr;
   const W=c.width,H=c.height;
   g.clearRect(0,0,W,H);
-  if(!PASSES.length){
-    g.fillStyle=document.documentElement.getAttribute('data-theme')==='dark'?'rgba(235,235,245,.4)':'rgba(20,20,25,.4)';
-    g.font='600 '+(12*k)+'px -apple-system,Inter,sans-serif';g.textAlign='center';g.textBaseline='middle';
-    g.fillText('Развёртка появится после расчёта траектории',W/2,H/2);return;
-  }
   const dark=document.documentElement.getAttribute('data-theme')==='dark';
   const fg=dark?'rgba(235,235,245,.85)':'rgba(20,20,25,.85)';
   const mut=dark?'rgba(235,235,245,.38)':'rgba(20,20,25,.4)';
   const grid=dark?'rgba(255,255,255,.07)':'rgba(0,0,0,.07)';
+  if(!PASSES.length){
+    g.fillStyle=mut;g.font='600 '+(12*k)+'px -apple-system,Inter,sans-serif';
+    g.textAlign='center';g.textBaseline='middle';
+    g.fillText('Развёртка появится после расчёта траектории',W/2,H/2);return;
+  }
   const ml=56*k,mr=18*k,mt=16*k,mb=28*k;
   const iw=Math.max(10,W-ml-mr),ih=Math.max(10,H-mt-mb);
   let xAbs=1,yMin=0,yMax=S.stockH;
-  PASSES.forEach(function(p){p.poly.forEach(function(q){
+  PASSES.forEach(function(p){if(!p.contour)return;p.contour.forEach(function(q){
     if(Math.abs(q[0])>xAbs)xAbs=Math.abs(q[0]);
     if(q[1]<yMin)yMin=q[1];if(q[1]>yMax)yMax=q[1];});});
-  xAbs*=1.1;const yPad=(yMax-yMin)*0.06||1;yMin-=yPad;yMax+=yPad;
+  xAbs*=1.12;const yPad=(yMax-yMin)*0.06||1;yMin-=yPad;yMax+=yPad;
   const Y=function(y){return mt+ih-((y-yMin)/(yMax-yMin))*ih;};
   g.strokeStyle=grid;g.lineWidth=1*k;
   g.font='600 '+(10*k)+'px -apple-system,Inter,sans-serif';
@@ -1766,32 +1914,34 @@ function drawUnroll(){
   g.strokeRect(ml,mt,iw,ih);g.setLineDash([]);
   const N=PASSES.length,slot=iw/N;
   PASSES.forEach(function(p,i){
+    if(!p.contour||!p.contour.length)return;
     const t=N>1?i/(N-1):0;
-    g.strokeStyle='hsl('+(212+t*70)+' '+(dark?85:90)+'% '+(dark?62:52)+'%)';
-    g.globalAlpha=N>16?0.55:0.8;g.lineWidth=1.1*k;
-    g.beginPath();
+    g.strokeStyle=p.type==='trim'?'#ff9f0a':'hsl('+(212+t*70)+' '+(dark?85:90)+'% '+(dark?62:52)+'%)';
+    g.globalAlpha=N>16?0.55:0.85;g.lineWidth=(p.type==='trim'?1.8:1.1)*k;
     const cxp=ml+slot*(i+0.5),sc=(slot*0.44)/xAbs;
-    p.poly.forEach(function(q,j){
+    g.beginPath();
+    p.contour.forEach(function(q,j){
       const px=cxp+q[0]*sc,py=Y(q[1]);
       if(j)g.lineTo(px,py);else g.moveTo(px,py);});
-    if(!p.open)g.closePath();
+    if(p.type==='cut')g.closePath();
     g.stroke();
   });
   g.globalAlpha=1;
-  if(SIM.wire&&PASSES[SIM.wire.k]){
-    const i=SIM.wire.k,slot2=iw/N,cxp=ml+slot2*(i+0.5)+(SIM.wire.x/((xAbs/1.1))*1)*(slot2*0.44/1)/1;
-    const px=ml+slot2*(i+0.5)+SIM.wire.x*((slot2*0.44)/(xAbs)),py=Y(SIM.wire.y);
+  if(SIM.wire){
+    const i=SIM.wire.k,slot2=iw/N;
+    const sc=(slot2*0.44)/xAbs;
+    const px=ml+slot2*(i+0.5)+SIM.wire.x*sc,py=Y(SIM.wire.y);
     g.strokeStyle='rgba(255,69,58,.5)';g.lineWidth=1*k;
     g.beginPath();g.moveTo(ml,py);g.lineTo(W-mr,py);g.moveTo(px,mt);g.lineTo(px,mt+ih);g.stroke();
     g.fillStyle='#ff453a';g.beginPath();g.arc(px,py,4*k,0,Math.PI*2);g.fill();
     g.strokeStyle='#fff';g.lineWidth=1.4*k;g.stroke();
   }
   g.fillStyle=fg;g.textAlign='center';g.textBaseline='top';
-  g.fillText('Проход / угол поворота стола A  →  0 … 360°',ml+iw/2,H-mb+9*k);
+  g.fillText('Операция / угол поворота стола A  →  0 … 360°',ml+iw/2,H-mb+9*k);
   g.save();g.translate(15*k,mt+ih/2);g.rotate(-Math.PI/2);g.textAlign='center';g.textBaseline='middle';
   g.fillText('Y (высота), мм',0,0);g.restore();
   g.textAlign='left';g.textBaseline='top';g.fillStyle=mut;
-  g.fillText(N+' проходов · шаг '+nf(360/N,2)+'° · развёртка силуэтов',ml+4*k,mt+3*k);
+  g.fillText(NPASS+' проходов · шаг '+nf(360/Math.max(1,NPASS),2)+'°'+(S.trimBase?' · + подрезка основания':''),ml+4*k,mt+3*k);
 }
 
 /* ==================================================================
@@ -1805,11 +1955,11 @@ function rebuild(quiet){
   setTimeout(function(){
     const t0=(window.performance&&performance.now)?performance.now():Date.now();
     try{
-      if(!SLICES||SLICES.n!==(S.slices|0)){SLICES=sliceRaw(S.slices|0);log('Срезы модели: '+SLICES.n+' слоёв по высоте');}
       PLACED=placedSlices();
+      if(!PLACED)throw new Error('модель не имеет ни одного горизонтального сечения');
       buildSceneObjects();
       PASSES=buildPasses();
-      RESULT=computeResult(PASSES,PASSES.length);
+      RESULT=computeResult(PASSES.length);
       buildContours();
       buildResultMesh();
       computeStats();
@@ -1818,16 +1968,17 @@ function rebuild(quiet){
       passListUI();
       updateInfoUI();
       reportUI();
-      setPassPath(PASSES.length-1,1,false);
+      setPassPath(PASSES.length-1,0,false);
       SIM.done=-1;
       if(!SIM.everRun||SIM.t>=SIM.total-1e-6){SIM.t=SIM.total;setSimTime(SIM.total);}
       else setSimTime(SIM.t);
       applyLayers();
       resizeAll();
       const ms=Math.round(((window.performance&&performance.now)?performance.now():Date.now())-t0);
-      if(!quiet)toast('Пересчитано за '+ms+' мс · '+PASSES.length+' проходов');
-      log('Пересчёт: '+PASSES.length+' проходов, шаг '+nf(360/Math.max(1,PASSES.length),2)+'°, '+
-        nf(STATS.pts)+' точек, '+nf(STATS.cutLen/1000,2)+' м реза, '+hms(STATS.time)+' · '+ms+' мс','s');
+      if(!quiet)toast('Пересчитано за '+ms+' мс · '+NPASS+' проходов'+(S.trimBase?' + подрезка':''));
+      log('Пересчёт: '+NPASS+' проходов (шаг '+nf(360/Math.max(1,NPASS),2)+'°)'+
+        (S.trimBase?' + подрезка основания':'')+', '+nf(STATS.pts)+' точек, '+
+        nf(STATS.cutLen/1000,2)+' м реза, '+hms(STATS.time)+' · '+ms+' мс','s');
       validate(true);
     }catch(err){
       console.error(err);
@@ -1839,45 +1990,59 @@ function rebuild(quiet){
 }
 function computeStats(){
   let cut=0,air=0,rot=0,pts=0,tCut=0,tAir=0,tRot=0,tDwell=0;
-  let safeX=10;
-  PASSES.forEach(function(p){p.poly.forEach(function(q){if(Math.abs(q[0])>safeX)safeX=Math.abs(q[0]);});});
-  safeX+=S.safeGap;
-  let px=0,py=S.stockH*0.5,pa=S.startAngle;
-  PASSES.forEach(function(p){
-    cut+=p.len;pts+=p.poly.length;
-    const da=Math.abs(p.ang-pa)+(S.compBacklash?S.backlash*2:0);rot+=da;
-    const dAir=Math.abs(px-safeX)+Math.abs(safeX-p.poly[0][0])+Math.hypot(p.poly[0][0]-px,p.poly[0][1]-py);
-    air+=dAir;
-    tCut+=p.len/S.feed*60;tAir+=dAir/S.rapid*60;tRot+=da/S.aFeed*60;tDwell+=S.dwell;
-    px=p.poly[p.poly.length-1][0];py=p.poly[p.poly.length-1][1];pa=p.ang;
+  let xMin=1e18,xMax=-1e18,pa=S.startAngle;
+  PASSES.forEach(function(p,k){
+    p.moves.forEach(function(m){
+      const L=polyLen(m.pts);
+      m.pts.forEach(function(q){pts++;if(q[0]<xMin)xMin=q[0];if(q[0]>xMax)xMax=q[0];});
+      if(m.t==='cut'){cut+=L;tCut+=L/S.feed*60;}
+      else{air+=L;tAir+=L/S.rapid*60;}
+    });
+    tDwell+=S.dwell+S.waitRot;
+    const nxt=PASSES[k+1];
+    if(nxt){const da=Math.abs(nxt.ang-p.ang)+(S.compBacklash?S.backlash*2:0);rot+=da;tRot+=da/S.aFeed*60;}
+    else rot+=0;
   });
-  tRot+=Math.abs(pa-S.startAngle)/S.aFeed*60;
+  rot+=Math.abs(PASSES.length?PASSES[0].ang-pa:0);
+  tRot+=Math.abs(PASSES.length?PASSES[0].ang-pa:0)/S.aFeed*60;
   STATS.cutLen=cut;STATS.airLen=air;STATS.rotDeg=rot;STATS.pts=pts;
   STATS.tCut=tCut;STATS.tAir=tAir;STATS.tRot=tRot;STATS.tDwell=tDwell;
-  STATS.time=tCut+tAir+tRot+tDwell;STATS.safeX=safeX;
+  STATS.time=tCut+tAir+tRot+tDwell;
+  STATS.xMin=xMin===1e18?0:xMin;STATS.xMax=xMax===-1e18?0:xMax;
+  STATS.safeX=Math.max(Math.abs(STATS.xMin),Math.abs(STATS.xMax));
   STATS.volR=RESULT?RESULT.volR:0;STATS.volM=RESULT?RESULT.volM:0;
   STATS.excess=RESULT?RESULT.excess:0;STATS.maxDev=RESULT?RESULT.maxDev:0;
 }
 function validate(silent){
-  if(!RAW)return true;
-  const I=RAW.info,s=S.scale/100;
-  const dx=I.size[0]*s,dz=I.size[2]*s,dy=I.size[1]*s;
-  const needD=Math.hypot(dx,dz)+2*S.wireR;
-  const okD=needD<=S.stockD-0.5,okH=(dy+S.offY)<=S.stockH-0.5&&S.offY>=-0.01;
+  if(!RAW||!PLACED)return true;
+  const hM=PLACED.hModel;
+  const needD=2*Math.max(Math.abs(PLACED.bbox?PLACED.bbox.xMax:0),1);
+  /* точный требуемый диаметр — по максимальному вылету срезов */
+  let rMax=0;
+  for(let i=0;i<PLACED.n;i++){const h=PLACED.hulls[i];if(!h)continue;
+    for(let k=0;k<h.length;k+=2){const r=Math.hypot(h[k]-S.stockX,h[k+1]-S.stockZ);if(r>rMax)rMax=r;}}
+  const needD2=rMax*2+2*S.wireR;
+  const okD=needD2<=S.stockD-0.5;
+  const topY=PLACED.yMax;
+  const okH=topY<=S.stockH-0.5&&S.offY>=-0.01;
   setVal('chkFit',okD&&okH?'вписывается':'НЕ вписывается',okD&&okH?'ok':'bad');
-  setVal('chkD',nf(S.stockD-needD,1)+' мм',okD?'ok':'bad');
-  setVal('chkH',nf(S.stockH-(dy+S.offY),1)+' мм',okH?'ok':'bad');
-  const N=PASSES.length;
+  setVal('chkD',nf(S.stockD-needD2,1)+' мм',okD?'ok':'bad');
+  setVal('chkH',nf(S.stockH-topY,1)+' мм',okH?'ok':'bad');
+  const N=NPASS;
   setVal('chkP',N+' × '+nf(360/Math.max(1,N),2)+'°',N<6?'warn':'ok');
-  setVal('chkX','± '+nf(STATS.safeX||0,1)+' мм');
+  setVal('chkX',nf(STATS.xMin,1)+' … '+nf(STATS.xMax,1)+' мм');
+  const yT=Math.max(0.4,PLACED.yMin-Math.max(0,S.trimBelow));
+  const okT=!S.trimBase||(yT>0.4&&yT<PLACED.yMin+1e-6);
+  setVal('chkT',S.trimBase?(okT?('Y = '+nf(yT,1)+' мм'):'слишком высоко'):выклText(),okT?'ok':'warn');
+  function выклText(){return 'выкл';}
   const chip=$('#mbChip');
-  if(chip)chip.textContent='X ±'+nf(STATS.safeX||0,0)+' · Y '+nf(S.stockH,0)+' · A '+N+'×'+nf(360/Math.max(1,N),1)+'°';
-  const tp=$('#tbPass');if(tp)tp.textContent=N+' проходов';
+  if(chip)chip.textContent='X '+nf(STATS.xMin,0)+'…'+nf(STATS.xMax,0)+' · Y '+nf(S.stockH,0)+' · A '+N+'×'+nf(360/Math.max(1,N),1)+'°';
+  const tp=$('#tbPass');if(tp)tp.textContent=N+' проходов'+(S.trimBase?' + рез':'');
   const tt=$('#tbTime');if(tt)tt.textContent=hms(STATS.time||0);
   if(!silent&&(!okD||!okH)){
     alert_('Модель не помещается в заготовку',
-      !okD?('Требуемый диаметр '+nf(needD,1)+' мм больше заготовки Ø'+nf(S.stockD,1)+' мм.')
-           :('Высота модели с основанием превышает высоту заготовки '+nf(S.stockH,1)+' мм.'));
+      !okD?('Требуемый диаметр '+nf(needD2,1)+' мм больше заготовки Ø'+nf(S.stockD,1)+' мм.')
+           :('Верх модели ('+nf(topY,1)+' мм) выше заготовки ('+nf(S.stockH,1)+' мм).'));
     log('Проверка: модель НЕ вписывается в заготовку','w');
   }
   return okD&&okH;
@@ -1889,15 +2054,16 @@ function updateInfoUI(){
   setVal('mTri',nf(I.count));
   setVal('mBox',I.size.map(function(v){return nf(v,1);}).join(' × ')+' мм');
   setVal('mVol',nf(I.vol/1000,1)+' см³');
+  setVal('mH',nf(PLACED?PLACED.hModel:0,1)+' мм · низ на Y '+nf(PLACED?PLACED.yMin:0,1));
   const sl=$('#stLen');if(sl)sl.textContent=nf(STATS.cutLen,0);
   const si=$('#stInfo');
-  if(si)si.textContent=PASSES.length+' проходов · '+nf(STATS.cutLen/1000,2)+' м реза · '+
+  if(si)si.textContent=NPASS+' проходов'+(S.trimBase?' + подрезка':'')+' · '+nf(STATS.cutLen/1000,2)+' м реза · '+
     nf(STATS.pts)+' точек · '+hms(STATS.time)+' · '+nf((STATS.bytes||0)/1024,1)+' КБ';
 }
 function reportUI(){
   const k=$('#kpi');if(!k)return;
   const stockV=Math.PI*Math.pow(S.stockD/2,2)*S.stockH/1000;
-  const data=[['Проходов',PASSES.length],['Шаг A',nf(360/Math.max(1,PASSES.length),2)+'°'],
+  const data=[['Проходов',NPASS],['Шаг A',nf(360/Math.max(1,NPASS),2)+'°'],
     ['Длина реза',nf(STATS.cutLen/1000,2)+' м'],['Время УП',hms(STATS.time)],
     ['Объём детали',nf(STATS.volR,1)+' см³'],['Избыток','+'+nf(STATS.excess,1)+' %'],
     ['Отклонение',nf(STATS.maxDev,2)+' мм'],['Удалено',nf(stockV>0?Math.max(0,stockV-STATS.volR)/stockV*100:0,0)+' %']];
@@ -1905,7 +2071,7 @@ function reportUI(){
   data.forEach(function(d){k.appendChild(el('div',{},[el('b',{},[String(d[1])]),el('span',{},[d[0]])]));});
   const T=Math.max(1e-6,(STATS.tCut||0)+(STATS.tAir||0)+(STATS.tRot||0)+(STATS.tDwell||0));
   const parts=[['Резание',STATS.tCut||0,'var(--orange)'],['Холостые',STATS.tAir||0,'var(--blue)'],
-    ['Поворот A',STATS.tRot||0,'var(--purple)'],['Прогрев',STATS.tDwell||0,'var(--gray)']];
+    ['Поворот A',STATS.tRot||0,'var(--purple)'],['Паузы/прогрев',STATS.tDwell||0,'var(--gray)']];
   const bar=el('div',{cls:'bar'});
   parts.forEach(function(p){if(p[1]>0)bar.appendChild(el('i',{style:'width:'+(p[1]/T*100)+'%;background:'+p[2]}));});
   const lg=el('div',{cls:'blg'});
@@ -1915,50 +2081,61 @@ function reportUI(){
   const rows=$('#repRows');rows.innerHTML='';
   const box=el('div',{cls:'card'});
   const info2=[['Постпроцессор',{linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A→Z)'}[S.post]],
-    ['Ось вращения','A вокруг Y'],['Радиус струны',nf(S.wireR,2)+' мм'],
-    ['Срезов по высоте',String(S.slices)],['Допуск упрощения',nf(S.tol,2)+' мм'],
-    ['Точек в УП',nf(STATS.pts)],['Строк УП',nf(STATS.lines)],
+    ['Ось вращения','A вокруг Y'],['Ориентация модели','X'+nf(S.rotX,0)+'° Y'+nf(S.rotY,0)+'° Z'+nf(S.rotZ,0)+'°'],
+    ['Радиус струны',nf(S.wireR,2)+' мм'],['Выход за заготовку',nf(S.exitLen,1)+' мм'],
+    ['Пауза перед поворотом',nf(S.waitRot,1)+' с'],['Срезов по высоте',String(S.slices)],
+    ['Допуск упрощения',nf(S.tol,2)+' мм'],['Точек в УП',nf(STATS.pts)],['Строк УП',nf(STATS.lines)],
     ['Объём заготовки',nf(stockV,0)+' см³'],['Объём модели (срезы)',nf(STATS.volM,1)+' см³'],
     ['Основание',S.keepBase?(nf(S.baseH,1)+' мм / '+nf(S.baseW,0)+' %'):'нет'],
-    ['Подрезка основания',S.trimBase?(nf(S.trimH,1)+' мм, перемычка '+nf(S.bridge,0)+' мм'):'нет']];
+    ['Подрезка основания',S.trimBase?(nf(S.trimBelow,1)+' мм ниже модели, перемычка '+nf(S.bridge,0)+' мм'):'нет']];
   info2.forEach(function(r,i){
     box.appendChild(el('div',{cls:'row'+(i===0?' nosep':'')},
       [el('div',{cls:'rt'},[r[0]]),el('div',{cls:'rv'},[r[1]])]));});
   rows.appendChild(box);
 }
 function autoStock(){
-  const I=RAW.info,s=S.scale/100;
-  S.stockD=Math.ceil(clamp(Math.hypot(I.size[0]*s,I.size[2]*s)+16,30,400));
-  S.stockH=Math.ceil(clamp(I.size[1]*s+Math.max(S.baseH,0)+22,30,500));
+  let rMax=0,hTop=0;
+  if(PLACED){
+    for(let i=0;i<PLACED.n;i++){const h=PLACED.hulls[i];if(!h)continue;
+      for(let k=0;k<h.length;k+=2){const r=Math.hypot(h[k],h[k+1]);if(r>rMax)rMax=r;}}
+    hTop=PLACED.yMax;
+  }
+  S.stockD=Math.ceil(clamp(rMax*2+16,30,400));
+  S.stockH=Math.ceil(clamp(hTop+20,30,500));
   S.stockX=0;S.stockZ=0;
   ['stockD','stockH','stockX','stockZ'].forEach(sync);
   rebuild();toast('Заготовка: Ø'+S.stockD+' × '+S.stockH+' мм');
   log('Заготовка подобрана автоматически: Ø'+S.stockD+' × H'+S.stockH,'s');
 }
 function fitModel(){
-  const I=RAW.info;
-  const s=Math.min((S.stockD-16)/Math.max(1e-6,Math.hypot(I.size[0],I.size[2])),
-                   (S.stockH-Math.max(S.baseH,0)-16)/Math.max(1e-6,I.size[1]));
+  const O=buildOrient(),bb=O.bb;
+  const d=Math.max(1e-6,Math.hypot(bb.size[0],bb.size[2])),h=Math.max(1e-6,bb.size[1]);
+  const baseZone=S.keepBase?Math.max(0,S.baseH):0;
+  const s=Math.min((S.stockD-16)/d,(S.stockH-baseZone-14)/h);
   S.scale=clamp(Math.round(s*1000)/10,5,400);
-  S.offX=0;S.offZ=0;S.offY=S.keepBase?Math.max(0,S.baseH):1;S.rotY=0;
-  ['scale','offX','offZ','offY','rotY'].forEach(sync);
+  S.offX=0;S.offZ=0;S.offY=baseZone>0?baseZone:1;S.rotX=S.rotX;
+  ['scale','offX','offZ','offY'].forEach(sync);
   rebuild();fitAll();
   toast('Модель вписана · '+nf(S.scale,1)+' %');
-  log('Модель вписана в заготовку, масштаб '+nf(S.scale,1)+' %','s');
-}
-function fitModelSilent(){
-  const I=RAW.info;
-  const s=Math.min((S.stockD-16)/Math.max(1e-6,Math.hypot(I.size[0],I.size[2])),
-                   (S.stockH-Math.max(S.baseH,0)-16)/Math.max(1e-6,I.size[1]));
-  S.scale=clamp(Math.round(s*1000)/10,5,400);
-  S.offX=0;S.offZ=0;S.offY=Math.max(0,S.baseH);S.rotY=0;
-  ['scale','offX','offZ','offY','rotY'].forEach(sync);
+  log('Модель вписана в заготовку, масштаб '+nf(S.scale,1)+' %, низ на Y='+nf(S.offY,1),'s');
 }
 function loadDemo(){
   const pos=buildDemoModel();
   RAW={pos:pos,info:meshInfo(pos)};RAW.info.name='демо-ваза (процедурная)';
-  SLICES=null;fitModelSilent();rebuild();
+  ORIENT=null;ORIENT_KEY='';SLICES=null;SLICES_KEY='';
+  S.rotX=0;S.rotY=0;S.rotZ=0;S.orient='asis';segAll('orient','asis');
+  ['rotX','rotY','rotZ'].forEach(sync);
+  fitModelSilent();rebuild();
   log('Загружена демо-модель: '+nf(RAW.info.count)+' треугольников','s');
+}
+function fitModelSilent(){
+  const O=buildOrient(),bb=O.bb;
+  const d=Math.max(1e-6,Math.hypot(bb.size[0],bb.size[2])),h=Math.max(1e-6,bb.size[1]);
+  const baseZone=S.keepBase?Math.max(0,S.baseH):0;
+  const s=Math.min((S.stockD-16)/d,(S.stockH-baseZone-14)/h);
+  S.scale=clamp(Math.round(s*1000)/10,5,400);
+  S.offX=0;S.offZ=0;S.offY=baseZone>0?baseZone:1;
+  ['scale','offX','offZ','offY'].forEach(sync);
 }
 function loadFile(f){
   busy(true,'Чтение STL…');
@@ -1971,7 +2148,8 @@ function loadFile(f){
       RAW={pos:pos,info:meshInfo(pos)};
       RAW.info.name=f.name.replace(/\.stl$/i,'');
       S.fileName='penorez_'+RAW.info.name.slice(0,28).replace(/[^\w\-а-яА-Я]/g,'_');
-      SLICES=null;fitModelSilent();rebuild();fitAll();
+      ORIENT=null;ORIENT_KEY='';SLICES=null;SLICES_KEY='';
+      fitModelSilent();rebuild();fitAll();
       toast('Загружено '+nf(RAW.info.count)+' треугольников');
       log('STL прочитан: '+nf(RAW.info.count)+' треугольников, габариты '+
         RAW.info.size.map(function(v){return nf(v,1);}).join(' × ')+' мм','s');
@@ -1991,32 +2169,48 @@ const SIM={segs:[],total:1,t:0,playing:false,done:-1,everRun:false,wire:null};
 function buildTimeline(){
   SIM.segs=[];let t=0;
   if(!PASSES.length){SIM.total=0.001;return;}
-  const safeX=STATS.safeX||100;
-  let px=0,py=S.stockH*0.5,pa=S.startAngle;
+  let pa=0,px=0,py=S.stockH*0.5;
+  /* начальный поворот стола */
+  if(Math.abs(PASSES[0].ang-pa)>1e-9){
+    const d=Math.max(0.06,Math.abs(PASSES[0].ang-pa)/S.aFeed*60);
+    SIM.segs.push({type:'rot',t0:t,t1:t+d,a0:pa,a1:PASSES[0].ang,k:-1,done:-1,wx:px,wy:py});
+    t+=d;pa=PASSES[0].ang;
+  }
   PASSES.forEach(function(p,k){
-    const da=p.ang-pa;
-    if(Math.abs(da)>1e-9){
-      const d=Math.max(0.06,Math.abs(da)/S.aFeed*60);
-      SIM.segs.push({type:'rot',t0:t,t1:t+d,a0:pa,a1:p.ang,k:k,wx:safeX,wy:py});t+=d;}
-    const d1=Math.abs(px-safeX);
-    if(d1>1e-6){const d=d1/S.rapid*60;
-      SIM.segs.push({type:'rap',t0:t,t1:t+d,x0:px,x1:safeX,y0:py,y1:py,a:p.ang,k:k});t+=d;px=safeX;}
-    const d2=Math.hypot(p.poly[0][0]-px,p.poly[0][1]-py);
-    if(d2>1e-6){const d=d2/S.rapid*60;
-      SIM.segs.push({type:'rap',t0:t,t1:t+d,x0:px,x1:p.poly[0][0],y0:py,y1:p.poly[0][1],a:p.ang,k:k});t+=d;}
-    const dc=Math.max(0.05,p.len/S.feed*60);
-    SIM.segs.push({type:'cut',t0:t,t1:t+dc,k:k,a:p.ang,len:p.len,poly:p.poly,cum:p.cum});
-    t+=dc;px=p.poly[p.poly.length-1][0];py=p.poly[p.poly.length-1][1];pa=p.ang;
+    p.moves.forEach(function(m){
+      const cm=polyCum(m.pts);
+      if(cm.len<1e-9)return;
+      const feed=(m.t==='cut')?S.feed:S.rapid;
+      const d=Math.max(0.02,cm.len/feed*60);
+      SIM.segs.push({type:'mv',t0:t,t1:t+d,k:k,done:k-1,cut:(m.t==='cut'),
+        pts:m.pts,cum:cm.cum,len:cm.len,a:p.ang,pt:p.type});
+      t+=d;
+      px=m.pts[m.pts.length-1][0];py=m.pts[m.pts.length-1][1];
+    });
+    if(S.waitRot>0){
+      SIM.segs.push({type:'wait',t0:t,t1:t+S.waitRot,k:k,done:k-1,cut:true,x:px,y:py,a:p.ang});
+      t+=S.waitRot;
+    }
+    const nxt=PASSES[k+1];
+    if(nxt&&Math.abs(nxt.ang-p.ang)>1e-9){
+      if(S.compBacklash&&S.backlash>0){
+        const d1=S.backlash/S.aFeed*60;
+        SIM.segs.push({type:'rot',t0:t,t1:t+d1,a0:p.ang,a1:p.ang+S.backlash,k:k,done:k,wx:px,wy:py});t+=d1;
+      }
+      const da=Math.abs(nxt.ang-p.ang),d=Math.max(0.06,da/S.aFeed*60);
+      SIM.segs.push({type:'rot',t0:t,t1:t+d,a0:p.ang,a1:nxt.ang,k:k,done:k,wx:px,wy:py});
+      t+=d;pa=nxt.ang;
+    }
   });
   SIM.total=Math.max(0.001,t);
 }
-function atLen(poly,cum,d){
-  if(!poly.length)return [0,0];
-  if(d<=0)return poly[0];
+function atLen(pts,cum,d){
+  if(!pts.length)return [0,0];
+  if(d<=0)return pts[0];
   let lo=0,hi=cum.length-1;
   while(lo<hi-1){const m=(lo+hi)>>1;if(cum[m]<=d)lo=m;else hi=m;}
   const seg=Math.max(1e-9,cum[hi]-cum[lo]),u=clamp((d-cum[lo])/seg,0,1);
-  return [lerp(poly[lo][0],poly[hi][0],u),lerp(poly[lo][1],poly[hi][1],u)];
+  return [lerp(pts[lo][0],pts[hi][0],u),lerp(pts[lo][1],pts[hi][1],u)];
 }
 let lastHl=-1,lastUnroll=0;
 function setSimTime(t){
@@ -2025,42 +2219,50 @@ function setSimTime(t){
   let s=SIM.segs[0];
   for(let i=0;i<SIM.segs.length;i++){if(SIM.t<=SIM.segs[i].t1||i===SIM.segs.length-1){s=SIM.segs[i];break;}}
   const u=clamp((SIM.t-s.t0)/Math.max(1e-9,s.t1-s.t0),0,1);
-  let ang=s.a,x=0,y=0,on=false,done=s.k;
-  if(s.type==='rot'){ang=lerp(s.a0,s.a1,u);x=s.wx;y=s.wy;done=s.k-1;}
-  else if(s.type==='rap'){ang=s.a;x=lerp(s.x0,s.x1,u);y=lerp(s.y0,s.y1,u);done=s.k-1;}
-  else{ang=s.a;const p=atLen(s.poly,s.cum,u*s.len);x=p[0];y=p[1];on=true;done=s.k;}
-  SIM.wire={x:x,y:y,k:s.k,on:on};
+  let ang=s.a,x=0,y=0,on=false;
+  if(s.type==='rot'){ang=lerp(s.a0,s.a1,u);x=s.wx;y=s.wy;on=false;}
+  else if(s.type==='wait'){ang=s.a;x=s.x;y=s.y;on=true;}
+  else{ang=s.a;const p=atLen(s.pts,s.cum,u*s.len);x=p[0];y=p[1];on=!!s.cut;}
+  SIM.wire={x:x,y:y,k:Math.max(0,s.k),on:on};
   if(tableGroup)tableGroup.rotation.y=ang*D2R;
   setWire(x,y,on);
-  updateDRO(x,y,ang,on,PASSES[s.k]);
+  const pp=PASSES[Math.max(0,s.k)];
+  updateDRO(x,y,ang,on,pp);
+  const done=(s.done===undefined)?Math.max(0,s.k):s.done;
   if(done!==SIM.done){
     SIM.done=done;
-    RESULT=computeResult(PASSES,Math.max(0,done+1));
+    RESULT=computeResult(Math.max(0,done+1));
     buildResultMesh();
     STATS.volR=RESULT?RESULT.volR:0;STATS.excess=RESULT?RESULT.excess:0;STATS.maxDev=RESULT?RESULT.maxDev:0;
   }
-  setPassPath(s.k,u,s.type==='cut');
+  if(s.type==='mv')setPassPath(s.k,u,s.cut);
   const r=$('#simRange');if(r&&document.activeElement!==r)r.value=Math.round(SIM.t/SIM.total*1000);
   const st=$('#simTime');if(st)st.textContent=hms(SIM.t)+' / '+hms(SIM.total);
   const fin=SIM.t>=SIM.total-1e-3;
-  const ss=$('#stState');if(ss)ss.textContent=fin?'Готово':(SIM.playing?(on?'Резка':'Холостой ход'):'Пауза');
+  const ss=$('#stState');if(ss)ss.textContent=fin?'Готово':(SIM.playing?(on?'Резка':'Перемещение'):'Пауза');
   const sd=$('#stDot');if(sd)sd.className='sdot'+(on?' hot':(SIM.playing?' run':''));
-  const sp=$('#stPass');if(sp)sp.textContent=(s.k+1)+' / '+PASSES.length;
+  const sp=$('#stPass');if(sp)sp.textContent=(Math.max(0,s.k)+1)+' / '+PASSES.length;
   const spp=$('#simPass');
-  if(spp)spp.textContent=fin?('Резка завершена · '+PASSES.length+' проходов · '+hms(SIM.total))
-    :('Проход '+(s.k+1)+'/'+PASSES.length+' · A '+nf(ang,2)+'° · '+(on?'рез':'холостой ход')+' · '+nf(u*100,0)+' %');
+  if(spp){
+    let label;
+    if(fin)label='Готово · '+NPASS+' проходов'+(S.trimBase?' + подрезка основания':'')+' · '+hms(SIM.total);
+    else if(s.type==='rot')label='Поворот стола A → '+nf(ang,2)+'°';
+    else if(s.type==='wait')label='Ожидание · струна вне заготовки · A '+nf(ang,2)+'°';
+    else label=(s.pt==='trim'?'Подрезка основания':'Проход '+(s.k+1)+'/'+NPASS)+' · A '+nf(ang,2)+'° · '+
+      (s.cut?'рез':'холостой ход')+' · '+nf(u*100,0)+' %';
+    spp.textContent=label;
+  }
   const now=(window.performance&&performance.now)?performance.now():Date.now();
   if(now-lastUnroll>60){lastUnroll=now;drawUnroll();}
 }
 function setWire(x,y,on){
   if(!wireGroup)return;
   wireGroup.position.set(x,y,0);
-  const Lz=Math.max(70,S.stockD*1.3);
-  wireMesh.scale.set(1,1,Lz);
-  wireGroup.children.forEach(function(o){if(o.userData.side)o.position.z=o.userData.side*(Lz/2+7);});
-  wireMesh.material.emissiveIntensity=on?2.4:0.2;
-  wireMesh.material.color.setHex(on?0xffe0b0:0xb9bec6);
-  wireGlow.material.opacity=on?0.8:0;
+  wireCore.material.emissiveIntensity=on?2.6:0.15;
+  wireCore.material.color.setHex(on?0xffe0b0:0xb9bec6);
+  wireLine.material.color.setHex(on?0xff453a:0x9aa0aa);
+  wireLine.material.opacity=on?1:0.75;
+  wireGlow.material.opacity=on?0.85:0;
   const railX=275;
   if(carriage)carriage.position.set(railX,y,0);
   if(armMesh){const dx=railX-x;armMesh.scale.x=Math.max(1,Math.abs(dx));armMesh.position.set(x+dx/2,y,0);}
@@ -2071,7 +2273,7 @@ function updateDRO(x,y,a,on,p){
   if(a1)a1.textContent=x.toFixed(3);
   if(a2)a2.textContent=y.toFixed(3);
   if(a3)a3.textContent=a.toFixed(2);
-  if(a4)a4.textContent=p?(p.dir>0?' ↻':' ↺'):'';
+  if(a4)a4.textContent=p?(p.type==='trim'?' ⚑':(p.dir>0?' ↻':' ↺')):'';
   const b1=$('#stX'),b2=$('#stY'),b3=$('#stA');
   if(b1)b1.textContent=x.toFixed(3);
   if(b2)b2.textContent=y.toFixed(3);
@@ -2080,11 +2282,10 @@ function updateDRO(x,y,a,on,p){
 function setPassPath(k,u,cutting){
   if(!pathLine)return;
   const p=PASSES[k];
-  if(!p){
+  if(!p||!p.cutPts||!p.cutPts.length){
     pathLine.geometry.dispose();pathLine.geometry=new THREE.BufferGeometry();
     pathRest.geometry.dispose();pathRest.geometry=new THREE.BufferGeometry();return;}
-  const pts=p.poly.map(function(q){return new THREE.Vector3(q[0],q[1],0);});
-  if(!p.open&&pts.length)pts.push(pts[0].clone());
+  const pts=p.cutPts.map(function(q){return new THREE.Vector3(q[0],q[1],0);});
   if(pathLine.userData.k!==k||(pathLine.geometry.attributes.position&&pathLine.geometry.attributes.position.count!==pts.length)){
     pathLine.geometry.dispose();pathLine.geometry=new THREE.BufferGeometry().setFromPoints(pts);
     pathRest.geometry.dispose();pathRest.geometry=new THREE.BufferGeometry().setFromPoints(pts);
@@ -2122,7 +2323,7 @@ function animate(ts){
   if(SIM.playing){
     SIM.t+=dt*S.simSpeed;
     if(SIM.t>=SIM.total){SIM.t=SIM.total;setPlaying(false);
-      toast('Резка завершена · '+PASSES.length+' проходов');
+      toast('Резка завершена · '+NPASS+' проходов'+(S.trimBase?' + подрезка':''));
       log('Симуляция завершена. Деталь готова к снятию со стола.','s');}
     setSimTime(SIM.t);
   }
@@ -2144,8 +2345,8 @@ function initSplitters(){
   const save=function(){
     const cs=getComputedStyle(root);
     localStorage.setItem('pr-layout',JSON.stringify({
-      wl:parseInt(cs.getPropertyValue('--wl'))||328,
-      wr:parseInt(cs.getPropertyValue('--wr'))||352,
+      wl:parseInt(cs.getPropertyValue('--wl'))||330,
+      wr:parseInt(cs.getPropertyValue('--wr'))||356,
       hb:parseInt(cs.getPropertyValue('--hb'))||186}));
   };
   $$('.splitter,.hsplit').forEach(function(sp){
@@ -2154,8 +2355,8 @@ function initSplitters(){
       document.body.style.cursor=sp.classList.contains('hsplit')?'row-resize':'col-resize';
       const which=sp.dataset.sp,st=getComputedStyle(root);
       const sx=e.clientX,sy=e.clientY;
-      const w0=parseInt(st.getPropertyValue('--wl'))||328;
-      const r0=parseInt(st.getPropertyValue('--wr'))||352;
+      const w0=parseInt(st.getPropertyValue('--wl'))||330;
+      const r0=parseInt(st.getPropertyValue('--wr'))||356;
       const b0=parseInt(st.getPropertyValue('--hb'))||186;
       const mv=function(ev){
         if(which==='l')root.style.setProperty('--wl',clamp(w0+ev.clientX-sx,240,560)+'px');
@@ -2171,8 +2372,8 @@ function initSplitters(){
       window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
     });
     sp.addEventListener('dblclick',function(){
-      if(sp.dataset.sp==='l')root.style.setProperty('--wl','328px');
-      if(sp.dataset.sp==='r')root.style.setProperty('--wr','352px');
+      if(sp.dataset.sp==='l')root.style.setProperty('--wl','330px');
+      if(sp.dataset.sp==='r')root.style.setProperty('--wr','356px');
       if(sp.dataset.sp==='b')root.style.setProperty('--hb','186px');
       save();resizeAll();syncSegs();
     });
@@ -2267,15 +2468,16 @@ try{
   RAW={pos:pos,info:meshInfo(pos)};
   RAW.info.name='демо-ваза (процедурная)';
   fitModelSilent();
-  log('Пенорез Studio · Desktop запущен','s');
+  log('Пенорез Studio · Desktop v2 запущен','s');
   log('Оси: X и Y — линейные; A — поворотный стол вокруг оси Y. Струна перпендикулярна плоскости XY.');
+  log('Цикл: подход → рез по силуэту → выход за заготовку → пауза → поворот стола. Подрезка основания — в самом конце.');
   rebuild(true);
   setTimeout(function(){
     const b=$('#boot');if(b&&b.parentNode)b.parentNode.removeChild(b);
     fitAll();setSimTime(SIM.total);syncSegs();resizeAll();
     log('Демо-модель загружена: '+nf(RAW.info.count)+' треугольников','s');
     log('Space — запуск симуляции, ⌘/Ctrl+K — палитра команд, ? — горячие клавиши');
-  },120);
+  },140);
 }catch(err){
   console.error(err);
   const b=$('#boot');
