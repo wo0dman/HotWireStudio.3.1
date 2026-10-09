@@ -451,14 +451,17 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 }}
 </script>
 
-<script type="module">
+<script>
+/* Обработчик ошибок в обычном (не module) скрипте — сработает даже если CDN недоступен */
 window.addEventListener('error',function(e){
   var b=document.getElementById('boot');
   if(b){b.style.display='grid';
     b.innerHTML='<div><b>Ошибка инициализации</b>'+String((e&&e.message)||e)+
     '<br><br>Проверьте подключение к CDN three.js и поддержку WebGL.</div>';}
 });
+</script>
 
+<script type="module">
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
@@ -1145,7 +1148,7 @@ function updateWireLen(){
   if(!wireGroup)return;
   const L=Math.max(70,S.stockD*1.35),hz=L/2;
   coneA.position.set(0,0,-(hz+12));coneB.position.set(0,0,(hz+12));
-  wireCore.scale.set(1,1,L);
+  wireCore.scale.set(1,L,1);
   const pos=wireLine.geometry.attributes.position;
   pos.setXYZ(0,0,0,-hz);pos.setXYZ(1,0,0,hz);pos.needsUpdate=true;
   wireLine.geometry.computeBoundingSphere();
@@ -1950,6 +1953,7 @@ function drawUnroll(){
 let tmr=null;
 function scheduleRebuild(){clearTimeout(tmr);tmr=setTimeout(function(){rebuild();},120);}
 function rebuild(quiet){
+  clearTimeout(tmr);        // ← НОВАЯ СТРОКА
   if(!RAW)return;
   busy(!quiet);
   setTimeout(function(){
@@ -2015,8 +2019,6 @@ function computeStats(){
 }
 function validate(silent){
   if(!RAW||!PLACED)return true;
-  const hM=PLACED.hModel;
-  const needD=2*Math.max(Math.abs(PLACED.bbox?PLACED.bbox.xMax:0),1);
   /* точный требуемый диаметр — по максимальному вылету срезов */
   let rMax=0;
   for(let i=0;i<PLACED.n;i++){const h=PLACED.hulls[i];if(!h)continue;
@@ -2034,7 +2036,6 @@ function validate(silent){
   const yT=Math.max(0.4,PLACED.yMin-Math.max(0,S.trimBelow));
   const okT=!S.trimBase||(yT>0.4&&yT<PLACED.yMin+1e-6);
   setVal('chkT',S.trimBase?(okT?('Y = '+nf(yT,1)+' мм'):'слишком высоко'):выклText(),okT?'ok':'warn');
-  function выклText(){return 'выкл';}
   const chip=$('#mbChip');
   if(chip)chip.textContent='X '+nf(STATS.xMin,0)+'…'+nf(STATS.xMax,0)+' · Y '+nf(S.stockH,0)+' · A '+N+'×'+nf(360/Math.max(1,N),1)+'°';
   const tp=$('#tbPass');if(tp)tp.textContent=N+' проходов'+(S.trimBase?' + рез':'');
