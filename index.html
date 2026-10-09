@@ -350,7 +350,7 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
     <button class="tbtn" id="tbPlay" title="Пуск / пауза (Space)"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4L20 12 7 4.8z" fill="currentColor" stroke="none"/></svg></button>
     <button class="tbtn" id="tbStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
     <button class="tbtn" id="tbEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
-    <div style="width:112px;flex:0 0 auto" id="tbSpeed"></div>
+    <div style="width:196px;flex:0 0 auto;display:flex;align-items:center;gap:6px" id="tbSpeed"></div>
     <div class="tsep"></div>
     <div style="width:252px;flex:0 0 auto" id="tbView"></div>
     <div class="tb-sp"></div>
@@ -552,14 +552,14 @@ const S={
   /* G-code */
   post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
   layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
-          wire:true,machine:true,table:true,grid:true},
+          wire:true,table:true,grid:true},
   view:'iso', simSpeed:20, tabL:'model', tabR:'cut', tabB:'unroll'
 };
 const LNAMES={stock:'Заготовка (цилиндр)',model:'STL-модель',result:'Деталь (прогноз)',
   base:'Основание (технолог.)',path:'Текущий контур',contours:'Все силуэты',
-  wire:'Горячая струна',machine:'Портал и приводы',table:'Стол оси A',grid:'Сетка и станина'};
+  wire:'Горячая струна',table:'Стол оси A',grid:'Сетка и станина'};
 const LCOL={stock:'#8e8e93',model:'#0a84ff',result:'#30d158',base:'#ff9f0a',path:'#ff453a',
-  contours:'#af52de',wire:'#ff9f0a',machine:'#6b6f76',table:'#6b6f76',grid:'#9aa0aa'};
+  contours:'#af52de',wire:'#ff9f0a',table:'#6b6f76',grid:'#9aa0aa'};
 const ORIENTS=[{t:'Как в файле',v:'asis',rx:0,ry:0,rz:0},
   {t:'Z-up → Y-up',v:'zup',rx:-90,ry:0,rz:0},
   {t:'На боку',v:'side',rx:0,ry:0,rz:90},
@@ -802,8 +802,7 @@ function buildPanes(){
   const s1=seg(VIEWS,'view',function(v){setView(v);},true);s1.classList.add('sm');$('#tbView').appendChild(s1);
   const s2=seg([{t:'Изо',v:'iso'},{t:'Спереди',v:'front'},{t:'Сверху',v:'top'},{t:'Сбоку',v:'side'}],
     'view',function(v){setView(v);},true);s2.classList.add('sm');$('#vpSeg').appendChild(s2);
-  const s3=seg([{t:'5×',v:5},{t:'20×',v:20},{t:'200×',v:200}],'simSpeed',function(){},true);
-  s3.classList.add('sm');$('#tbSpeed').appendChild(s3);
+  buildSpeedSlider();
 
   buildLayerPop();drawLegend();
   switchL(S.tabL);switchR(S.tabR);switchB(S.tabB);
@@ -815,6 +814,28 @@ function buildCutMode(){
     ? slider('Проходов на оборот','passes','','2','90','1',null,'var(--blue)')
     : slider('Угол поворота стола','angleStep','°','1','45','0.5',null,'var(--blue)'));
   setTimeout(syncSegs,30);
+}
+/* Компактный слайдер скорости симуляции для тулбара */
+function buildSpeedSlider(){
+  const box=$('#tbSpeed');if(!box)return;box.innerHTML='';
+  const inp=el('input',{cls:'sl',type:'range',min:1,max:100,step:1,value:S.simSpeed});
+  inp.style.setProperty('--tintc','var(--blue)');
+  inp.style.flex='1 1 auto';
+  inp.style.minWidth='0';
+  const lbl=el('span',{cls:'mono',
+    style:'flex:0 0 auto;min-width:44px;text-align:right;font-size:11.5px;font-weight:700;color:var(--label)'},
+    ['×'+S.simSpeed]);
+  const paint=function(){inp.style.setProperty('--p',((inp.value-1)/(500-1)*100)+'%');};
+  paint();
+  inp.addEventListener('input',function(){
+    S.simSpeed=parseFloat(inp.value);
+    paint();
+    lbl.textContent='×'+S.simSpeed;
+  });
+  box.appendChild(inp);
+  box.appendChild(lbl);
+  /* сохраняем ссылки — пригодится, если захотите синхронизировать из кода */
+  V['sl_simSpeed']={inp:inp,v:lbl,paint:paint,unit:''};
 }
 function buildLayerPop(){
   const p=$('#popLayers');p.innerHTML='';
@@ -957,8 +978,6 @@ const CMDS=[
     if(V.sw_keepBase)V.sw_keepBase.classList.toggle('on',S.keepBase);rebuild();}},
   {t:'Струна: показать / скрыть',i:IC.wire,fn:function(){S.layers.wire=!S.layers.wire;
     syncLayerBtns('wire');applyLayers();drawLegend();}},
-  {t:'Портал: показать / скрыть',i:IC.layers,fn:function(){S.layers.machine=!S.layers.machine;
-    syncLayerBtns('machine');applyLayers();drawLegend();}},
   {t:'Показать все силуэты',i:IC.layers,fn:function(){S.layers.contours=!S.layers.contours;
     syncLayerBtns('contours');applyLayers();drawLegend();}},
   {t:'Развёртка траектории (внизу)',i:IC.wave,fn:function(){switchB('unroll');}},
@@ -1202,7 +1221,7 @@ function applyLayers(){
   tableMesh.visible=S.layers.table;
   polarG.visible=S.layers.grid;gridH.visible=S.layers.grid;bedMesh.visible=S.layers.grid;
   machineGroup.children.forEach(function(o){
-    if(o!==bedMesh&&o!==gridH&&o.type!=='Group')o.visible=S.layers.machine;});
+    if(o!==bedMesh&&o!==gridH)o.visible=false;});
   wireGroup.visible=S.layers.wire;
   pathLine.visible=S.layers.path;pathRest.visible=S.layers.path;
 }
