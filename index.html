@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Пенорез Studio — ЧПУ горячая струна X·Y·A (Desktop)</title>
+<title>HotWireStudio — векторный CAM - Rotary A</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230a84ff'/><stop offset='1' stop-color='%235856d6'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><g fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 50h36'/><path d='M20 50V22l12-8 12 8v28'/><path d='M28 50V40h8v10'/></g><circle cx='32' cy='32' r='3.2' fill='%23ff9f0a'/><path d='M20 32h24' stroke='%23ff9f0a' stroke-width='2'/></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.0/400.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.0/500.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.0/600.css">
@@ -339,7 +340,7 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 
 <div id="app">
   <div class="menubar" id="menubar">
-    <div class="logo"><i><svg viewBox="0 0 24 24"><path d="M3 19h18M6 19V9l6-4 6 4v10M9.5 19v-5h5v5"/></svg></i>Пенорез Studio</div>
+    <div class="logo"><i><svg viewBox="0 0 24 24"><path d="M3 19h18M6 19V9l6-4 6 4v10M9.5 19v-5h5v5"/></svg></i>HotWireStudio</div>
     <div class="mb-item" data-menu="file">Файл</div>
     <div class="mb-item" data-menu="edit">Правка</div>
     <div class="mb-item" data-menu="view">Вид</div>
@@ -370,7 +371,7 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 
     <main class="stage" id="stage">
       <canvas id="scene"></canvas>
-      <div id="boot"><div><b>Загрузка Пенорез Studio…</b>
+      <div id="boot"><div><b>Загрузка HotWireStudio…</b>
         Инициализация 3D-сцены и расчётного ядра. Если сообщение не исчезает — проверьте доступ к CDN (three.js) и поддержку WebGL.</div></div>
 
       <div class="vp hud dro">
@@ -1047,7 +1048,7 @@ const MENUS={
     {t:'Буквы осей станка…',fn:openAxisDialog},
     {t:'Проверить размещение',fn:function(){validate(false);}}],
   help:[{t:'О методе резки',fn:aboutMethod},{t:'Горячие клавиши',k:'?',fn:showKeys},
-    {t:'О программе',fn:function(){alert_('Пенорез Studio · Desktop',
+    {t:'О программе',fn:function(){alert_('HotWireStudio — векторный CAM - Rotary A',
       '4-осевая ЧПУ-резка пенопласта горячей струной. X и Y — линейные оси, A — поворотный стол вокруг оси Y. Версия 2026.10.09 (v2).','');}}]
 };
 function toggleConsole(){const b=$('#bottom');
@@ -2270,7 +2271,7 @@ function copyCode(){
 }
 function exportReport(){
   const t=[
-'ПЕНОРЕЗ STUDIO — ОТЧЁТ ПО УП','Дата: '+new Date().toLocaleString('ru-RU'),'',
+'HotWireStudio — ОТЧЁТ ПО УП','Дата: '+new Date().toLocaleString('ru-RU'),'',
 'МОДЕЛЬ: '+RAW.info.name,'  треугольников: '+RAW.info.count,'  объём: '+nf(RAW.info.vol/1000,1)+' см3',
 '  габариты (файл): '+RAW.info.size.map(function(v){return nf(v,1);}).join(' x ')+' мм',
 '  ориентация: X '+nf(S.rotX,1)+'  Y '+nf(S.rotY,1)+'  Z '+nf(S.rotZ,1)+' град',
@@ -2931,7 +2932,7 @@ try{
   RAW={pos:pos,info:meshInfo(pos)};
   RAW.info.name='демо-ваза (процедурная)';
   fitModelSilent();
-  log('Пенорез Studio · Desktop v2 запущен','s');
+  log('HotWireStudio — векторный CAM - Rotary A запущен','s');
   log('Оси: X и Y — линейные; A — поворотный стол вокруг оси Y. Струна перпендикулярна плоскости XY.');
   log('Цикл: подход → рез по силуэту → выход за заготовку → пауза → поворот стола. Подрезка основания — в самом конце.');
   rebuild(true);
