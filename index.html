@@ -300,6 +300,43 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .seq b.hot{background:rgba(255,149,0,.18);color:var(--orange)}
 .seq i{color:var(--label3);font-style:normal}
 
+/* ======================= Справка (модальное окно) ======================= */
+.helpbox{width:min(720px,94vw);max-height:88vh;background:var(--pop);
+  backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);
+  border-radius:14px;border:.5px solid var(--sep);
+  box-shadow:0 26px 64px rgba(0,0,0,.36);display:flex;flex-direction:column;overflow:hidden;
+  animation:al .3s cubic-bezier(.3,1.5,.6,1)}
+.help-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px 12px;border-bottom:.5px solid var(--sep)}
+.help-head h2{margin:0;font-size:15.5px;font-weight:700;letter-spacing:-.2px}
+.help-close{width:26px;height:26px;border:0;background:var(--fill2);border-radius:50%;cursor:pointer;
+  font-size:16px;line-height:1;display:grid;place-items:center;color:var(--label2);transition:background .15s,color .15s}
+.help-close:hover{background:var(--fill1);color:var(--label)}
+.help-body{flex:1 1 auto;overflow-y:auto;padding:16px 20px 20px;font-size:13px;line-height:1.55;
+  color:var(--label);user-select:text;scrollbar-width:thin}
+.help-foot{flex:0 0 auto;display:flex;justify-content:flex-end;padding:12px 18px;
+  border-top:.5px solid var(--sep);background:var(--pop)}
+.help-foot button{border:0;background:var(--blue);color:#fff;padding:8px 20px;border-radius:8px;
+  font-size:13.5px;font-weight:600;cursor:pointer;transition:filter .15s}
+.help-foot button:hover{filter:brightness(1.08)}
+.help-body h3{font-size:13.5px;font-weight:700;margin:18px 0 6px;color:var(--label);letter-spacing:-.1px}
+.help-body h3:first-child{margin-top:0}
+.help-body p{margin:6px 0}
+.help-body ul,.help-body ol{margin:6px 0;padding-left:20px}
+.help-body li{margin:3px 0}
+.help-body code,.help-body kbd{background:var(--fill2);border-radius:5px;padding:1px 6px;
+  font-family:ui-monospace,Menlo,monospace;font-size:11.5px;font-weight:600;color:var(--label)}
+.help-body b{font-weight:700}
+.help-body .tip{background:var(--tintf);border-radius:8px;padding:10px 13px;margin:10px 0;
+  font-size:12.5px;color:var(--label);border-left:3px solid var(--blue)}
+.help-body .warn{background:rgba(255,149,0,.14);border-radius:8px;padding:10px 13px;margin:10px 0;
+  font-size:12.5px;border-left:3px solid var(--orange)}
+.help-body table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}
+.help-body table th,.help-body table td{padding:6px 8px;text-align:left;
+  border-bottom:.5px solid var(--sep);vertical-align:top}
+.help-body table th{font-weight:700;font-size:11px;text-transform:uppercase;
+  letter-spacing:.03em;color:var(--label2);background:var(--fill3)}
+.help-body table tr:last-child td{border-bottom:0}
 .scrim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.28);backdrop-filter:blur(3px);display:grid;place-items:center;animation:fi .18s}
 .scrim[hidden]{display:none}
 @keyframes fi{from{opacity:0}to{opacity:1}}
@@ -472,6 +509,145 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
   </div>
 </div></div>
 <div class="toast" id="toast"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span id="toastText"></span></div>
+
+<div class="scrim" id="helpScrim" hidden><div class="helpbox">
+  <div class="help-head">
+    <h2>Метод резки горячей струной</h2>
+    <button class="help-close" id="helpClose" title="Закрыть (Esc)">×</button>
+  </div>
+  <div class="help-body">
+
+    <p>Станок режет пенопласт <b>горячей струной</b>, натянутой вертикально между двумя конусами. Струна нагревается электрическим током и плавит материал, образуя рез без стружки. Программа строит траекторию движения струны и поворотов стола, а затем экспортирует её в G-code для контроллера.</p>
+
+    <h3>Кинематика станка</h3>
+    <ul>
+      <li><b>Ось X</b> — горизонтальное перемещение струны вдоль передней стенки станка.</li>
+      <li><b>Ось Y</b> — вертикальное перемещение струны (вверх-вниз).</li>
+      <li><b>Ось A</b> — поворотный стол, вращающийся вокруг вертикальной оси Y.</li>
+      <li><b>Струна всегда вертикальна</b> и перемещается в плоскости XZ. Наклона струны нет — это станок 2+1 оси.</li>
+    </ul>
+
+    <h3>Как формируется деталь</h3>
+    <p>Струна, двигаясь по замкнутому контуру, «вырезает» призму — тело, у которого каждое горизонтальное сечение повторяет силуэт контура. За N проходов стол поворачивается на общий угол <b>180°</b> (или <b>360°</b> в режиме «точка ↔ ось»), и материал, оставшийся после всех проходов, представляет собой <b>пересечение N силуэтных призм</b>. Чем больше проходов — тем ближе эта форма к настоящей 3D-модели.</p>
+    <div class="tip">
+      <b>Геометрическое правило:</b> горизонтальное сечение детали всегда является пересечением выпуклых оболочек срезов под разными углами. Именно поэтому внутренние полости и поднутрения не вырезаются — струна «не видит» их.
+    </div>
+
+    <h3>Цикл одного прохода</h3>
+    <ol style="margin:6px 0 6px 20px;padding:0">
+      <li>Струна выключена, подходит к точке старта <b>за пределами заготовки</b>.</li>
+      <li>Опускается на рабочую высоту Y.</li>
+      <li>Прогрев (пауза) — струна набирает температуру.</li>
+      <li>Включается (<code>M3</code>).</li>
+      <li>Режет по силуэту текущего угла A — обходит контур по контуру.</li>
+      <li>Выходит за пределы заготовки и ждёт.</li>
+      <li>Выключается (<code>M5</code>).</li>
+      <li>Стол поворачивается на заданный шаг A.</li>
+      <li>Цикл повторяется в обратном направлении (зиг-заг) или продолжается в ту же сторону.</li>
+    </ol>
+
+    <h3>Режимы движения струны</h3>
+    <table>
+      <tr>
+        <th>Режим</th>
+        <th>Как работает</th>
+        <th>Оборот стола</th>
+      </tr>
+      <tr>
+        <td><b>Точка ↔ точка</b></td>
+        <td>Струна режет полный силуэт — правый борт, верх, левый борт — и останавливается слева. Затем обратно справа налево.</td>
+        <td>180°</td>
+      </tr>
+      <tr>
+        <td><b>Точка ↔ ось</b></td>
+        <td>Струна режет только правый борт, доходит до оси A, уходит вертикально вверх и ждёт. Обратный рез — тем же маршрутом.</td>
+        <td>360°</td>
+      </tr>
+    </table>
+    <p>Первый режим быстрее и подходит для симметричных моделей. Второй даёт больше контроля над поднутрениями, но занимает вдвое больше времени.</p>
+
+    <h3>Подрезка основания</h3>
+    <p>Чтобы деталь держалась на столе во время резки, нижняя часть заготовки (высотой «высота основания») остаётся нетронутой. После всех проходов струна отделяет деталь одним из трёх способов:</p>
+    <table>
+      <tr>
+        <th>Режим</th>
+        <th>Что происходит</th>
+      </tr>
+      <tr>
+        <td><b>Не подрезать</b></td>
+        <td>Деталь остаётся соединённой с основанием. Используйте, если будете отрезать вручную или если нужен «козырёк».</td>
+      </tr>
+      <tr>
+        <td><b>На всю ширину</b></td>
+        <td>Один горизонтальный рез от края до края на заданной высоте. Деталь полностью освобождается и падает на стол.</td>
+      </tr>
+      <tr>
+        <td><b>С перемычкой</b></td>
+        <td>Струна режет с одной стороны до центральной «перемычки», возвращается, стол поворачивается на <b>180°</b> или <b>90°</b> (2 или 4 подреза), и режет с другой стороны. Деталь остаётся на тонком «мостике», который легко отломить.</td>
+      </tr>
+    </table>
+
+    <h3>Параметры и их влияние</h3>
+    <table>
+      <tr><th>Параметр</th><th>Что влияет</th></tr>
+      <tr><td>Число проходов</td><td>Больше — точнее форма, но дольше рез. 24–48 для типовой задачи, 72+ для моделей с плавными изгибами.</td></tr>
+      <tr><td>Срезы по высоте</td><td>Сколько горизонтальных сечений берётся из STL. 150 по умолчанию, 300+ для высоких моделей.</td></tr>
+      <tr><td>Допуск упрощения</td><td>Максимальное отклонение ломаной от исходного контура. Меньше — точнее, но длиннее G-code. 0.12 мм по умолчанию.</td></tr>
+      <tr><td>Радиус струны</td><td>Реальная толщина нихрома (0.2–0.5 мм). Учитывается в опорной функции — компенсирует пропил.</td></tr>
+      <tr><td>Выход за заготовку</td><td>Насколько струна выезжает за радиус заготовки, чтобы гарантированно выйти из материала перед поворотом.</td></tr>
+      <tr><td>Безопасный отступ</td><td>На сколько струна поднимается над верхом заготовки при переходах между проходами.</td></tr>
+      <tr><td>Подача</td><td>Скорость реза (мм/мин). Зависит от плотности пенопласта и мощности нагрева.</td></tr>
+      <tr><td>Прогрев струны</td><td>Пауза после включения перед началом движения. Даёт струне набрать температуру.</td></tr>
+      <tr><td>Зиг-заг</td><td>Струна идёт вперёд и обратно, стол всегда поворачивается в одну сторону. Экономит время на реверсах.</td></tr>
+      <tr><td>Компенсация люфта</td><td>Дополнительный перелёт по A с возвратом. Убирает ошибки от люфта червячной передачи.</td></tr>
+    </table>
+
+    <h3>Что метод не может сделать</h3>
+    <ul>
+      <li><b>Внутренние полости.</b> Отверстия в детали (например, «рот» буквы R) не вырезаются — струна обходит только внешний контур.</li>
+      <li><b>Поднутрения.</b> Вогнутости на боковой поверхности (средний изгиб S, C-образные профили) срезаются как выпуклая оболочка.</li>
+      <li><b>4-осевые поверхности.</b> Винты, спирали, конические отверстия со сложной геометрией требуют наклоняемой струны (U/V оси).</li>
+    </ul>
+    <div class="warn">
+      <b>Важно:</b> если модель имеет вогнутости, деталь получится полнее, чем STL — «залитая» выпуклой оболочкой. Программа покажет прогноз зелёным цветом: он уже учитывает это упрощение.
+    </div>
+
+    <h3>Типичные проблемы</h3>
+    <table>
+      <tr><th>Симптом</th><th>Решение</th></tr>
+      <tr><td>Ступеньки на плавных изгибах</td><td>Увеличить число проходов (24 → 48 или 72).</td></tr>
+      <tr><td>Деталь держится на тонком «волоске»</td><td>Уменьшить «рез ниже низа модели» или увеличить перемычку.</td></tr>
+      <tr><td>Рез идёт слишком долго</td><td>Уменьшить срезы или увеличить допуск упрощения.</td></tr>
+      <tr><td>Деталь отваливается в середине цикла</td><td>Увеличить высоту основания или отключить подрезку до конца.</td></tr>
+      <tr><td>Ошибка модели «не вписывается в заготовку»</td><td>Увеличить диаметр или высоту заготовки, либо уменьшить масштаб модели.</td></tr>
+      <tr><td>Струна режет по воздуху (не касается заготовки)</td><td>Уменьшить диаметр заготовки или передвинуть модель к центру.</td></tr>
+    </table>
+
+    <h3>С чего начать</h3>
+    <ol style="margin:6px 0 6px 20px;padding:0">
+      <li>Откройте демо-модель кнопкой «Демо» — ваза идеально подходит для знакомства.</li>
+      <li>Запустите симуляцию (Space) — посмотрите, как ходит струна, как поворачивается стол.</li>
+      <li>Посмотрите развёртку траектории внизу — там видно, как меняется силуэт от прохода к проходу.</li>
+      <li>Нажмите «G-code» — изучите постпроцессор. Проверьте, что ось A на вашем контроллере называется так же (в LinuxCNC это A).</li>
+      <li>Загрузите свою STL-модель, настройте ориентацию (поворот Z-up → Y-up часто нужен для файлов из CAD).</li>
+      <li>Установите заготовку реального размера, запустите «Подобрать по модели», затем «Вписать модель в заготовку».</li>
+      <li>Проверьте симуляцию целиком. Убедитесь, что струна нигде не «прорубает» воздух и не задевает станок.</li>
+      <li>Экспортируйте G-code, прогоните в симуляторе вашего контроллера (LinuxCNC/Axiom/Mach3).</li>
+      <li>Запускайте на реальном станке.</li>
+    </ol>
+    <div class="tip">
+      <b>Совет:</b> начните с <b>числа проходов 24–36</b> и небольшой модели. Если деталь устраивает — не увеличивайте. Каждый дополнительный проход увеличивает время реза линейно.
+    </div>
+
+    <h3>Горячие клавиши</h3>
+    <p>Полный список — по клавише <kbd>?</kbd>. Основные: <kbd>Space</kbd> — пуск/пауза, <kbd>R</kbd> — пересчёт, <kbd>F</kbd> — показать всё, <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> — виды, <kbd>⌘K</kbd> — палитра команд, <kbd>T</kbd> — тема.</p>
+
+  </div>
+  <div class="help-foot">
+    <button id="helpOk">Понятно</button>
+  </div>
+</div></div>
+
 <input type="file" id="file" accept=".stl,model/stl" hidden>
 
 <script type="importmap">
@@ -1032,7 +1208,8 @@ const MENUS={
     {t:'Ориентация: как в файле',fn:function(){applyOrientPreset('asis');segAll('orient','asis');}},
     {t:'Ориентация: Z-up → Y-up',fn:function(){applyOrientPreset('zup');segAll('orient','zup');}},
     {t:'Сбросить параметры резания',fn:resetParams},{sep:1},
-    {t:'Тема оформления',k:'T',fn:cycleTheme}],
+      {t:'Тема оформления',k:'T',fn:cycleTheme},{sep:1},
+    {t:'О методе резки',k:'?',fn:aboutMethod}],
   view:[{t:'Изометрия',k:'1',fn:function(){setView('iso');}},{t:'Спереди (плоскость XY)',k:'2',fn:function(){setView('front');}},
     {t:'Сверху',k:'3',fn:function(){setView('top');}},{t:'Сбоку',k:'4',fn:function(){setView('side');}},
     {t:'Показать всё',k:'F',fn:fitAll},{sep:1}].concat(
@@ -1167,14 +1344,12 @@ function showKeys(){
   alert_('Горячие клавиши','',html);
 }
 function aboutMethod(){
-  alert_('Метод резки · оси X, Y, A',
-    'Струна перпендикулярна плоскости XY и обходит силуэт модели, выходя за пределы заготовки. Затем она ждёт, стол оси A поворачивается вокруг Y на заданный угол — и струна обходит силуэт в обратном направлении. После всех проходов отдельной операцией подрезается основание.',
-    '<div class="keys"><span class="hd">Деталь = пересечение всех силуэтных призм, поэтому:</span>'+
-    '<kbd>◦</kbd><span>внутренние отверстия и полости игнорируются — берётся только внешний контур;</span>'+
-    '<kbd>◦</kbd><span>каждое горизонтальное сечение стремится к своей выпуклой оболочке;</span>'+
-    '<kbd>◦</kbd><span>чем больше проходов, тем меньше огранка и избыток материала;</span>'+
-    '<kbd>◦</kbd><span>прогноз детали строится строго в габаритах STL-модели.</span></div>');
+  $('#helpScrim').hidden=false;
+  /* скролл к началу каждый раз */
+  const body=document.querySelector('#helpScrim .help-body');
+  if(body)body.scrollTop=0;
 }
+function closeHelp(){$('#helpScrim').hidden=true;}
 function resetParams(){
   S.motionMode='shuttle2';
   S.machineGrid=620;S.machineTableD=260;S.machineTableH=20;
@@ -2853,6 +3028,10 @@ function initEvents(){
   $('#axisCancel').onclick=closeAxisDialog;
   $('#axisReset').onclick=resetAxisDialog;
   $('#axisScrim').onclick=function(e){if(e.target.id==='axisScrim')closeAxisDialog();};
+
+  $('#helpOk').onclick=closeHelp;
+  $('#helpClose').onclick=closeHelp;
+  $('#helpScrim').onclick=function(e){if(e.target.id==='helpScrim')closeHelp();};
   paintSlider($('#simRange'));
   $('#file').onchange=function(e){const f=e.target.files[0];if(f)loadFile(f);e.target.value='';};
 
@@ -2878,12 +3057,14 @@ function initEvents(){
       if(e.shiftKey)screenshot();else download();return;}
     if(mod&&(e.key==='`'||e.key==='~'||e.key==='ё'||e.key==='Ё')){e.preventDefault();toggleConsole();return;}
         if(e.key==='Escape'){
+      if(!$('#helpScrim').hidden){closeHelp();return;}
       if(!$('#axisScrim').hidden){closeAxisDialog();return;}
       closePalette();closeMenu();return;
     }
     if(mod||e.altKey)return;
        if(e.code==='Space'){e.preventDefault();setPlaying(!SIM.playing);return;}
-    if(e.key==='Enter'&&!$('#axisScrim').hidden){e.preventDefault();saveAxisDialog();return;}
+        if(e.key==='Enter'&&!$('#axisScrim').hidden){e.preventDefault();saveAxisDialog();return;}
+    if(e.key==='Enter'&&!$('#helpScrim').hidden){e.preventDefault();closeHelp();return;}
     const k=e.key;
     if(k==='r'||k==='R'||k==='к'||k==='К'){rebuild();}
     else if(k==='f'||k==='F'||k==='а'||k==='А'){if(e.shiftKey)fitModel();else fitAll();}
