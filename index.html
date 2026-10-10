@@ -478,6 +478,13 @@ function fmt(v,d){d=(d===undefined)?3:d;const x=Math.abs(v)<5e-7?0:v;let s=x.toF
   if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return (s==='-0')?'0':s;}
 function hms(s){s=Math.max(0,Math.round(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
   return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0');}
+  function trimActive(){return S.trimMode&&S.trimMode!=='none';}
+function trimLabel(){
+  if(!trimActive())return 'нет';
+  if(S.trimMode==='full')return 'на всю ширину, '+nf(S.trimBelow,1)+' мм ниже модели';
+  return 'с перемычкой '+nf(S.bridge,0)+' мм, '+nf(S.trimBelow,1)+' мм ниже модели';
+}
+function trimModeName(){return ({none:'не подрезать',full:'на всю ширину',bridge:'с перемычкой'})[S.trimMode]||'выкл';}
 function toast(msg,ok){const t=$('#toast');if(!t)return;$('#toastText').textContent=msg;
   t.querySelector('svg').style.display=(ok===false)?'none':'';t.classList.add('on');
   clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on');},2100);}
@@ -550,8 +557,8 @@ const S={
   zigzag:true, compBacklash:false, backlash:0.6,
   /* точность */
   slices:150, tol:0.12, smooth:false,
-  /* основание */
-  keepBase:true, baseH:16, baseW:100, trimBase:true, trimBelow:2, bridge:16,
+    /* основание */
+  keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimBelow:2, bridge:16,
   /* G-code */
   post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
   layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
@@ -786,11 +793,14 @@ function buildPanes(){
     slider('Высота основания','baseH','мм','0','80','0.5',null,'var(--mint)'),
     slider('Ширина основания','baseW','%','40','160','1',null,'var(--mint)')
   ],'Основание — неподрезанный низ заготовки: струна не опускается ниже этой высоты, деталь не падает.'));
-  rB.appendChild(group('Подрезка основания (в самом конце)',[
-    toggle('Подрезать после всех проходов','trimBase','Отдельная финальная операция'),
-    slider('Рез ниже низа модели','trimBelow','мм','0','40','0.5',null,'var(--mint)'),
-    slider('Перемычка (не дорезать)','bridge','мм','0','80','1',null,'var(--mint)')
-  ],'Финальный проход режет горизонтально на заданной высоте: сначала с одной стороны до перемычки, затем с другой. Деталь остаётся на тонком донце и легко снимается.'));
+    rB.appendChild(group('Подрезка основания (в самом конце)',[
+    seg([
+      {t:'Не подрезать',v:'none'},
+      {t:'На всю ширину',v:'full'},
+      {t:'С перемычкой',v:'bridge'}
+    ],'trimMode',function(){buildTrimUI();scheduleRebuild();}),
+    el('div',{id:'trimOpts'})
+  ],'Струна режет горизонтально на заданной высоте — деталь отваливается от основания. Режим «с перемычкой»: сначала рез с одной стороны, возврат, поворот стола 180°, рез с другой стороны — остаётся тонкая перемычка, которую легко отломить.'));
   rB.appendChild(group('Карта операций',[el('div',{id:'passList',style:'max-height:300px;overflow:auto'})],
     'Клик по операции — переход к ней в симуляции.'));
 
@@ -813,7 +823,8 @@ function buildPanes(){
   rR.appendChild(group('Параметры',[el('div',{id:'repRows'})]));
   rR.appendChild(group('',[btns([{t:'Экспорт отчёта .txt',k:'btn-gray',fn:exportReport}])]));
 
-  buildCutMode();
+    buildCutMode();
+  buildTrimUI();
 
   const tb=$('#tabsB');tb.innerHTML='';
   [['unroll','Развёртка траектории',IC.wave],['log','Журнал',IC.list],['code','G-code',IC.code]].forEach(function(a){
@@ -830,11 +841,21 @@ function buildPanes(){
   switchL(S.tabL);switchR(S.tabR);switchB(S.tabB);
   setTimeout(syncSegs,60);
 }
+function buildTrimUI(){
+  const box=$('#trimOpts');if(!box)return;
+  box.innerHTML='';
+  if(S.trimMode==='none')return;
+  box.appendChild(slider('Рез ниже низа модели','trimBelow','мм','0','40','0.5',null,'var(--mint)'));
+  if(S.trimMode==='bridge'){
+    box.appendChild(slider('Ширина перемычки','bridge','мм','0','80','1',null,'var(--mint)'));
+  }
+  setTimeout(syncSegs,30);
+}
 function buildCutMode(){
   const box=$('#cutMode');if(!box)return;box.innerHTML='';
   box.appendChild(S.angleMode==='passes'
     ? slider('Проходов на оборот','passes','','2','90','1',null,'var(--blue)')
-    : slider('Угол поворота стола','angleStep','°','1','45','0.5',null,'var(--blue)'));
+    : slider('Угол поворота стола','angleStep','°','1','90','0.5',null,'var(--blue)'));
   setTimeout(syncSegs,30);
 }
 /* Компактный слайдер скорости симуляции для тулбара */
@@ -994,8 +1015,9 @@ const CMDS=[
   {t:'Ориентация: Z-up → Y-up',i:IC.rot,fn:function(){applyOrientPreset('zup');segAll('orient','zup');}},
   {t:'Ориентация: на боку',i:IC.rot,fn:function(){applyOrientPreset('side');segAll('orient','side');}},
   {t:'Ориентация: вверх ногами',i:IC.rot,fn:function(){applyOrientPreset('flip');segAll('orient','flip');}},
-  {t:'Подрезка основания: вкл/выкл',i:IC.base,fn:function(){S.trimBase=!S.trimBase;
-    if(V.sw_trimBase)V.sw_trimBase.classList.toggle('on',S.trimBase);rebuild();}},
+  {t:'Подрезка основания: не подрезать',i:IC.base,fn:function(){S.trimMode='none';segAll('trimMode','none');buildTrimUI();rebuild();}},
+{t:'Подрезка основания: на всю ширину',i:IC.base,fn:function(){S.trimMode='full';segAll('trimMode','full');buildTrimUI();rebuild();}},
+{t:'Подрезка основания: с перемычкой',i:IC.base,fn:function(){S.trimMode='bridge';segAll('trimMode','bridge');buildTrimUI();rebuild();}},
   {t:'Технологическое основание: вкл/выкл',i:IC.base,fn:function(){S.keepBase=!S.keepBase;
     if(V.sw_keepBase)V.sw_keepBase.classList.toggle('on',S.keepBase);rebuild();}},
   {t:'Струна: показать / скрыть',i:IC.wire,fn:function(){S.layers.wire=!S.layers.wire;
@@ -1064,13 +1086,15 @@ function resetParams(){
   S.passes=24;S.angleStep=15;S.startAngle=0;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
   S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
   S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
-  S.trimBase=true;S.trimBelow=2;S.bridge=16;
+  S.trimMode='bridge';S.trimBelow=2;S.bridge=16;
   ['passes','angleStep','startAngle','feed','rapid','aFeed','wireR','safeGap','dwell','exitLen','waitRot',
    'backlash','slices','tol','baseH','baseW','trimBelow','bridge',
    'machineGrid','machineTableD','machineTableH'].forEach(sync);
   segAll('motionMode','shuttle2');
-  [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true],['trimBase',true]].forEach(function(p){
+  [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true]].forEach(function(p){
     if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
+  segAll('trimMode','bridge');
+  buildTrimUI();
   rebuildMachine();
   rebuild();toast('Параметры сброшены');log('Параметры резания сброшены к значениям по умолчанию');
 }
@@ -1678,11 +1702,19 @@ function buildPasses(){
     contour=post(contour);
     if(contour.length<2)continue;
 
-    const moves=[];
+      const moves=[];
     const startPt=contour[0];
-    if(k===0){
+    const dx=Math.abs(startPt[0]-prevX),dy=Math.abs(startPt[1]-prevY);
+
+    if(dx<0.05&&dy<0.05){
+      /* струна уже на месте — перемещение не нужно (типично для зиг-зага) */
+    }else if(k===0){
       moves.push({t:'rap',pts:[[prevX,prevY],[startPt[0],safeTop],[startPt[0],startPt[1]]]});
+    }else if(dx<0.05){
+      /* та же X, но другая Y — поднимаемся и спускаемся по вертикали */
+      moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[startPt[0],startPt[1]]]});
     }else{
+      /* реальная смена X — полный облёт через safeTop */
       moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[startPt[0],safeTop],[startPt[0],startPt[1]]]});
     }
     moves.push({t:'cut',pts:contour.slice()});
@@ -1702,39 +1734,78 @@ function buildPasses(){
     prevY=contour[contour.length-1][1];
   }
 
-  NPASS=N;
+   NPASS=N;
 
-  /* Финальный рез — отделение детали от основания */
-  if(S.trimBase){
+  /* Финальная подрезка основания — три режима */
+  if(trimActive()){
     const angFinal=S.startAngle+N*step;
     const a=angFinal*D2R,ca=Math.cos(a),sa=Math.sin(a);
     const cp=S.stockX*ca+S.stockZ*sa;
     const X1=cp+R+S.exitLen;
     const X2=cp-R-S.exitLen;
+    const gR=cp+S.bridge/2;
+    const gL=cp-S.bridge/2;
 
-    const moves=[];
-    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[X1,safeTop],[X1,trimY]]});
-
-    if(S.bridge>0.05){
-      const gL=cp-S.bridge/2,gR=cp+S.bridge/2;
-      moves.push({t:'cut',pts:[[X1,trimY],[gR,trimY],[X1,trimY]]});
-      moves.push({t:'rap',pts:[[X1,trimY],[X1,safeTop],[X2,safeTop],[X2,trimY]]});
-      moves.push({t:'cut',pts:[[X2,trimY],[gL,trimY],[X2,trimY]]});
-    }else{
+    if(S.trimMode==='full'){
+      /* Режим 2: одна длинная резка от X1 до X2 */
+      const moves=[];
+      moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[X1,safeTop],[X1,trimY]]});
       moves.push({t:'cut',pts:[[X1,trimY],[X2,trimY]]});
-    }
 
-    let cutPts=[],cutLen=0;
-    moves.forEach(function(m){
-      if(m.t==='cut'){cutPts=cutPts.concat(m.pts);cutLen+=polyLen(m.pts);}
-    });
-    out.push({
-      k:N,type:'trim',ang:angFinal,a:a,dir:1,
-      contour:[[X1,trimY],[X2,trimY]],
-      moves:moves,cutPts:cutPts,cum:null,cutLen:cutLen,
-      smin:null,smax:null,yBot:trimY,yTop:trimY,
-      trimY:trimY,X1:X1,X2:X2
-    });
+      let cutPts=[],cutLen=0;
+      moves.forEach(function(m){
+        if(m.t==='cut'){cutPts=cutPts.concat(m.pts);cutLen+=polyLen(m.pts);}
+      });
+      out.push({
+        k:N,type:'trim',subtype:'full',ang:angFinal,a:a,dir:1,
+        contour:[[X1,trimY],[X2,trimY]],
+        moves:moves,cutPts:cutPts,cum:null,cutLen:cutLen,
+        smin:null,smax:null,yBot:trimY,yTop:trimY,
+        trimY:trimY,X1:X1,X2:X2
+      });
+      prevX=X2;prevY=trimY;
+    }
+    else if(S.trimMode==='bridge'){
+      /* Режим 3: два прохода подрезки с поворотом стола 180° между ними */
+
+      /* Проход N — первая сторона */
+      const movesA=[];
+      movesA.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[X1,safeTop],[X1,trimY]]});
+      movesA.push({t:'cut',pts:[[X1,trimY],[gR,trimY]]});   /* рез до перемычки */
+      movesA.push({t:'cut',pts:[[gR,trimY],[X1,trimY]]});   /* возврат G1 */
+      let cPtsA=[],cLenA=0;
+      movesA.forEach(function(m){
+        if(m.t==='cut'){cPtsA=cPtsA.concat(m.pts);cLenA+=polyLen(m.pts);}
+      });
+      out.push({
+        k:N,type:'trim',subtype:'first',ang:angFinal,a:a,dir:1,
+        contour:[[X1,trimY],[gR,trimY]],
+        moves:movesA,cutPts:cPtsA,cum:null,cutLen:cLenA,
+        smin:null,smax:null,yBot:trimY,yTop:trimY,
+        trimY:trimY,X1:X1,bridgeEdge:gR
+      });
+
+      /* Проход N+1 — вторая сторона (после поворота A на 180°) */
+      const angSecond=angFinal+180;
+      const a2=angSecond*D2R;
+      /* Струна осталась в точке (X1, trimY) — рапа нет, рез начинается сразу */
+      const movesB=[];
+      movesB.push({t:'rap',pts:[[X1,trimY],[X1,trimY]]});   /* пустышка, отфильтруется */
+      movesB.push({t:'cut',pts:[[X1,trimY],[gR,trimY]]});   /* тот же рез, но с другой стороны материала */
+      movesB.push({t:'cut',pts:[[gR,trimY],[X1,trimY]]});   /* возврат G1 */
+      let cPtsB=[],cLenB=0;
+      movesB.forEach(function(m){
+        if(m.t==='cut'){cPtsB=cPtsB.concat(m.pts);cLenB+=polyLen(m.pts);}
+      });
+      out.push({
+        k:N+1,type:'trim',subtype:'second',ang:angSecond,a:a2,dir:1,
+        contour:[[X1,trimY],[gR,trimY]],
+        moves:movesB,cutPts:cPtsB,cum:null,cutLen:cLenB,
+        smin:null,smax:null,yBot:trimY,yTop:trimY,
+        trimY:trimY,X1:X1,bridgeEdge:gR
+      });
+      prevX=X1;prevY=trimY;
+    }
   }
 
   return out;
@@ -1902,10 +1973,14 @@ function buildContours(){
 function passListUI(){
   const box=$('#passList');if(!box)return;box.innerHTML='';
   if(!PASSES.length){box.appendChild(el('div',{cls:'row'},[el('div',{cls:'rt',style:'color:var(--label2)'},['Нет данных'])]));return;}
-  PASSES.forEach(function(p,k){
-    const label=p.type==='trim'
-      ? '⚑ Подрезка основания · A '+nf(p.ang,2)+'° · Y '+nf(p.trimY,1)
-      : String(p.k+1).padStart(2,'0')+' · A '+nf(p.ang,2)+'° · '+(p.dir>0?'↻ CCW':'↺ CW');
+    PASSES.forEach(function(p,k){
+    let label;
+    if(p.type==='trim'){
+      const sub=p.subtype==='first'?' (1-я сторона)':p.subtype==='second'?' (после 180°)':'';
+      label='⚑ Подрезка основания'+sub+' · A '+nf(p.ang,2)+'° · Y '+nf(p.trimY,1);
+    }else{
+      label=String(p.k+1).padStart(2,'0')+' · A '+nf(p.ang,2)+'° · '+(p.dir>0?'↻ CCW':'↺ CW');
+    }
     const r=el('div',{cls:'row tap',onclick:function(){jumpPass(k);}},[
       el('div',{cls:'rt mono',style:'font-size:11.5px'},[label]),
       el('div',{cls:'rv'},[nf(p.cutLen,1)+' мм'])]);
@@ -1942,7 +2017,9 @@ function genGCode(){
   C('(Wire      : R'+F(S.wireR)+' mm   feed '+S.feed+' mm/min   '+rot+'-feed '+S.aFeed+' deg/min)');
   C('(Exit beyond stock: '+F(S.exitLen)+' mm   wait before rotate: '+F(S.waitRot,1)+' s)');
   C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate A)');
-  C(('(Base trim : '+(S.trimBase?('YES, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, bridge '+F(S.bridge)+' mm'):'no'))+')');
+    C('(Base trim : '+(S.trimMode==='full'?('full width, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model')
+    :S.trimMode==='bridge'?('bridge '+F(S.bridge)+' mm, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, 2-sided with 180 deg flip')
+    :'none')+')');
   C('(Cut length: '+F(STATS.cutLen,1)+' mm   est. time '+hms(STATS.time)+')');
   C('(Generated: '+new Date().toLocaleString('ru-RU')+')');
   L.push('G21 G90 G94 G17');
@@ -1952,7 +2029,10 @@ function genGCode(){
 
     PASSES.forEach(function(p,k){
     C('');
-    if(p.type==='trim')C('(--- FINAL: BASE TRIM  '+rot+'='+F(p.ang)+'  Y='+F(p.trimY)+' ---)');
+    if(p.type==='trim'){
+      const sub=p.subtype==='first'?' / 1st SIDE':p.subtype==='second'?' / 2nd SIDE (after 180 deg)':'';
+      C('(--- FINAL: BASE TRIM'+sub+'  '+rot+'='+F(p.ang)+'  Y='+F(p.trimY)+' ---)');
+    }
     else{
       const modeTag=(S.motionMode==='shuttleAxis')?'AXIS':'SHUTTLE';
       C('(--- PASS '+(k+1)+'/'+NPASS+'  '+modeTag+'  '+rot+'='+F(p.ang)+'  '+(p.dir>0?'→':'←')+' ---)');
@@ -2062,7 +2142,7 @@ function exportReport(){
 '  зиг-заг: '+(S.zigzag?'да':'нет')+'   компенсация люфта: '+(S.compBacklash?nf(S.backlash,2)+' град':'нет'),
 '  срезов по высоте '+S.slices+'  допуск упрощения '+nf(S.tol,2)+' мм  сглаживание: '+(S.smooth?'да':'нет'),'',
 'ОСНОВАНИЕ: '+(S.keepBase?'высота '+nf(S.baseH,1)+' мм, ширина '+nf(S.baseW,0)+'%':'нет')+
-  '   подрезка в конце: '+(S.trimBase?'да, на '+nf(S.trimBelow,1)+' мм ниже модели, перемычка '+nf(S.bridge,0)+' мм':'нет'),'',
+  '   подрезка в конце: '+(trimActive()?('да, '+trimModeName()+', '+nf(S.trimBelow,1)+' мм ниже модели'+(S.trimMode==='bridge'?', перемычка '+nf(S.bridge,0)+' мм':'')):'нет'),'',
 'РЕЗУЛЬТАТ: длина реза '+nf(STATS.cutLen,1)+' мм   холостые '+nf(STATS.airLen,0)+' мм   поворот A '+nf(STATS.rotDeg,0)+' град',
 '  расчётное время '+hms(STATS.time),
 '  объём детали (прогноз) '+nf(STATS.volR,1)+' см3   избыток +'+nf(STATS.excess,1)+'%   макс. отклонение '+nf(STATS.maxDev,2)+' мм',
@@ -2175,9 +2255,9 @@ function rebuild(quiet){
       applyLayers();
       resizeAll();
       const ms=Math.round(((window.performance&&performance.now)?performance.now():Date.now())-t0);
-      if(!quiet)toast('Пересчитано за '+ms+' мс · '+NPASS+' проходов'+(S.trimBase?' + подрезка':''));
+      if(!quiet)toast('Пересчитано за '+ms+' мс · '+NPASS+' проходов'+(trimActive()?' + подрезка':''));
       log('Пересчёт: '+NPASS+' проходов (шаг '+nf(360/Math.max(1,NPASS),2)+'°)'+
-        (S.trimBase?' + подрезка основания':'')+', '+nf(STATS.pts)+' точек, '+
+  (trimActive()?(' + '+trimModeName()):'')+', '+nf(STATS.pts)+' точек, '+
         nf(STATS.cutLen/1000,2)+' м реза, '+hms(STATS.time)+' · '+ms+' мс','s');
       validate(true);
     }catch(err){
@@ -2229,9 +2309,10 @@ function validate(silent){
   const N=NPASS;
   setVal('chkP',N+' × '+nf(360/Math.max(1,N),2)+'°',N<6?'warn':'ok');
   setVal('chkX',nf(STATS.xMin,1)+' … '+nf(STATS.xMax,1)+' мм');
+  const doTrim=trimActive();
   const yT=Math.max(0.4,PLACED.yMin-Math.max(0,S.trimBelow));
-  const okT=!S.trimBase||(yT>0.4&&yT<PLACED.yMin+1e-6);
-  setVal('chkT',S.trimBase?(okT?('Y = '+nf(yT,1)+' мм'):'слишком высоко'):выклText(),okT?'ok':'warn');
+  const okT=!doTrim||(yT>0.4&&yT<PLACED.yMin+1e-6);
+  setVal('chkT',doTrim?(okT?(trimModeName()+', Y = '+nf(yT,1)+' мм'):'слишком высоко'):'выкл',okT?'ok':'warn');
   const chip=$('#mbChip');
   if(chip)chip.textContent='X '+nf(STATS.xMin,0)+'…'+nf(STATS.xMax,0)+' · Y '+nf(S.stockH,0)+' · A '+N+'×'+nf(360/Math.max(1,N),1)+'°';
   const tp=$('#tbPass');if(tp)tp.textContent=N+' проходов'+(S.trimBase?' + рез':'');
@@ -2254,7 +2335,7 @@ function updateInfoUI(){
   setVal('mH',nf(PLACED?PLACED.hModel:0,1)+' мм · низ на Y '+nf(PLACED?PLACED.yMin:0,1));
   const sl=$('#stLen');if(sl)sl.textContent=nf(STATS.cutLen,0);
   const si=$('#stInfo');
-  if(si)si.textContent=NPASS+' проходов'+(S.trimBase?' + подрезка':'')+' · '+nf(STATS.cutLen/1000,2)+' м реза · '+
+  if(si)si.textContent=NPASS+' проходов'+(trimActive()?' + подрезка':'')+' · '+nf(STATS.cutLen/1000,2)+' м реза · '+
     nf(STATS.pts)+' точек · '+hms(STATS.time)+' · '+nf((STATS.bytes||0)/1024,1)+' КБ';
 }
 function reportUI(){
@@ -2284,7 +2365,7 @@ function reportUI(){
     ['Допуск упрощения',nf(S.tol,2)+' мм'],['Точек в УП',nf(STATS.pts)],['Строк УП',nf(STATS.lines)],
     ['Объём заготовки',nf(stockV,0)+' см³'],['Объём модели (срезы)',nf(STATS.volM,1)+' см³'],
     ['Основание',S.keepBase?(nf(S.baseH,1)+' мм / '+nf(S.baseW,0)+' %'):'нет'],
-    ['Подрезка основания',S.trimBase?(nf(S.trimBelow,1)+' мм ниже модели, перемычка '+nf(S.bridge,0)+' мм'):'нет']];
+    ['Подрезка основания',trimLabel()]];
   info2.forEach(function(r,i){
     box.appendChild(el('div',{cls:'row'+(i===0?' nosep':'')},
       [el('div',{cls:'rt'},[r[0]]),el('div',{cls:'rv'},[r[1]])]));});
@@ -2479,7 +2560,7 @@ function setSimTime(t){
   const spp=$('#simPass');
   if(spp){
     let label;
-    if(fin)label='Готово · '+NPASS+' проходов'+(S.trimBase?' + подрезка основания':'')+' · '+hms(SIM.total);
+    if(fin)label='Готово · '+NPASS+' проходов'+(trimActive()?' + подрезка':'')+' · '+hms(SIM.total);
     else if(s.type==='rot')label='Поворот стола A → '+nf(ang,2)+'°';
     else if(s.type==='wait')label='Ожидание · струна вне заготовки · A '+nf(ang,2)+'°';
     else label=(s.pt==='trim'?'Подрезка основания':'Проход '+(s.k+1)+'/'+NPASS)+' · A '+nf(ang,2)+'° · '+
@@ -2554,7 +2635,7 @@ function animate(ts){
   if(SIM.playing){
     SIM.t+=dt*S.simSpeed;
     if(SIM.t>=SIM.total){SIM.t=SIM.total;setPlaying(false);
-      toast('Резка завершена · '+NPASS+' проходов'+(S.trimBase?' + подрезка':''));
+      toast('Резка завершена · '+NPASS+' проходов'+(trimActive()?' + подрезка':''));
       log('Симуляция завершена. Деталь готова к снятию со стола.','s');}
     setSimTime(SIM.t);
   }
