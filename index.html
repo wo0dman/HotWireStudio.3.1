@@ -336,7 +336,7 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
     <div class="mb-item" data-menu="tools">Инструменты</div>
     <div class="mb-item" data-menu="help">Справка</div>
     <div class="sp"></div>
-    <div class="mb-state"><span class="chip blue" id="mbChip">X·Y·A</span><span id="mbFile">—</span></div>
+    <div class="mb-state"><span id="mbFile">—</span></div>
   </div>
 
   <div class="toolbar">
@@ -352,11 +352,8 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
     <button class="tbtn" id="tbEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
     <div style="width:196px;flex:0 0 auto;display:flex;align-items:center;gap:6px" id="tbSpeed"></div>
     <div class="tsep"></div>
-    <div style="width:252px;flex:0 0 auto" id="tbView"></div>
+    
     <div class="tb-sp"></div>
-    <span class="chip" id="tbPass">—</span>
-    <span class="chip green" id="tbTime">—</span>
-    <div class="tsep"></div>
     <button class="tbtn" id="tbPal" title="Палитра команд (⌘K)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
     <button class="tbtn" id="tbTheme" title="Тема (T)"></button>
   </div>
@@ -381,7 +378,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 
       <div class="vp vp-tools">
         <div class="toolrow">
-          <button class="rbtn" id="btnLayers" title="Слои"></button>
           <button class="rbtn" id="btnFit" title="Показать всё (F)"></button>
           <button class="rbtn" id="btnShot" title="Снимок вида (PNG)"></button>
         </div>
@@ -398,7 +394,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
         </div>
       </div>
 
-      <div class="pop" id="popLayers" hidden style="top:52px;right:11px"></div>
       <div class="busy" id="busy"><div class="box"><div class="spinner"></div><span id="busyText">Расчёт…</span></div></div>
     </main>
 
@@ -423,9 +418,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
   <footer class="statusbar">
     <span><span class="sdot" id="stDot"></span><b id="stState">Готов</b></span>
     <span>Операция <b id="stPass">—</b></span>
-    <span>X <b id="stX">0.000</b></span>
-    <span>Y <b id="stY">0.000</b></span>
-    <span>A <b id="stA">0.000°</b></span>
     <span>Струна <b id="stWire">выкл</b></span>
     <span>Рез <b id="stLen">0</b> мм</span>
     <span class="sp"></span>
@@ -604,6 +596,28 @@ function group(title,kids,foot){
   if(foot)g.appendChild(el('div',{cls:'group-foot',html:foot}));
   return g;
 }
+function groupCollapsible(title,kids,foot,open){
+  const g=el('div',{cls:'group'});
+  const arrow=el('span',{style:'font-size:8px;margin-right:2px;opacity:.7;display:inline-block;transition:transform .2s',
+    html:open?'▼':'▶'});
+  const titleEl=el('div',{cls:'group-title',style:'cursor:pointer;user-select:none'},
+    [arrow,title]);
+  const wrap=el('div');
+  const c=el('div',{cls:'card'});
+  (kids||[]).forEach(function(k){if(k)c.appendChild(k);});
+  wrap.appendChild(c);
+  if(foot)wrap.appendChild(el('div',{cls:'group-foot',html:foot}));
+  g.appendChild(titleEl);
+  g.appendChild(wrap);
+  if(!open)wrap.style.display='none';
+  let isOpen=open;
+  titleEl.onclick=function(){
+    isOpen=!isOpen;
+    wrap.style.display=isOpen?'':'none';
+    arrow.innerHTML=isOpen?'▼':'▶';
+  };
+  return g;
+}
 const V={},SEGS={},LBTN={};
 function info(label,val,id,cls){const v=el('div',{cls:'rv '+(cls||'')},[val]);if(id)V[id]=v;
   return el('div',{cls:'row'},[el('div',{cls:'rt'},[label]),v]);}
@@ -704,6 +718,12 @@ function buildPanes(){
       log('Модель центрирована по оси A');}}])
   ],'Низ модели всегда точно на высоте «зазор от стола» — деталь (зелёный прогноз) строится строго в пределах STL.'));
 
+  pM.appendChild(group('Точность аппроксимации',[
+    slider('Срезов по высоте','slices','','16','400','2',null,'var(--purple)'),
+    slider('Допуск упрощения','tol','мм','0','1.5','0.01',null,'var(--purple)'),
+    toggle('Сглаживание контура','smooth','Chaikin — скругление углов силуэта')
+  ],'Срезы по высоте определяют, сколько горизонтальных сечений берётся из STL. Допуск и сглаживание влияют на форму силуэтов.'));
+
   pS.appendChild(group('Виртуальная цилиндрическая заготовка',[
     slider('Диаметр','stockD','мм','20','3000','1',null,'var(--teal)'),
     slider('Высота','stockH','мм','20','4000','1',null,'var(--teal)'),
@@ -744,17 +764,6 @@ function buildPanes(){
   const rC=el('div',{'data-rtab':'cut'}),rB=el('div',{'data-rtab':'base'}),
         rG=el('div',{'data-rtab':'code'}),rR=el('div',{'data-rtab':'rep'});
   [rC,rB,rG,rR].forEach(function(n){br.appendChild(n);});
-
-  rC.appendChild(group('Цикл одного прохода',[
-    el('div',{cls:'seq'},[
-      el('b',{},['подход вне заготовки']),el('i',{},['→']),
-      el('b',{cls:'hot'},['струна ВКЛ']),el('i',{},['→']),
-      el('b',{cls:'hot'},['рез по силуэту']),el('i',{},['→']),
-      el('b',{cls:'hot'},['выход за заготовку']),el('i',{},['→']),
-      el('b',{},['пауза / ожидание']),el('i',{},['→']),
-      el('b',{},['струна ВЫКЛ']),el('i',{},['→']),
-      el('b',{},['поворот стола A'])])
-  ],'Струна обходит силуэт, выходит за пределы заготовки и ждёт поворота стола на заданный угол. Затем обход повторяется в обратном направлении. Подрезка основания выполняется только в самом конце.'));
 
       rC.appendChild(group('Режим движения струны',[
     seg([
@@ -803,9 +812,9 @@ function buildPanes(){
     ],'trimMode',function(){buildTrimUI();scheduleRebuild();}),
     el('div',{id:'trimOpts'})
   ],'Струна режет горизонтально на заданной высоте — деталь отваливается от основания. Режим «с перемычкой»: сначала рез с одной стороны, возврат, поворот стола 180°, рез с другой стороны — остаётся тонкая перемычка, которую легко отломить.'));
-  rB.appendChild(group('Карта операций',[el('div',{id:'passList',style:'max-height:300px;overflow:auto'})],
-    'Клик по операции — переход к ней в симуляции.'));
-
+  rB.appendChild(groupCollapsible('Карта операций',
+    [el('div',{id:'passList',style:'max-height:300px;overflow:auto'})],
+    'Клик по операции — переход к ней в симуляции.',false));
   rG.appendChild(group('Постпроцессор',[
     seg([{t:'LinuxCNC',v:'linuxcnc'},{t:'Mach3',v:'mach3'},{t:'GRBL',v:'grbl'}],'post',function(){genGCode();log('Постпроцессор: '+S.post);}),
     toggle('Комментарии в УП','gComments',null,function(){genGCode();}),
@@ -834,12 +843,11 @@ function buildPanes(){
       onclick:function(){switchB(a[0]);}});
     b.dataset.k=a[0];tb.appendChild(b);});
 
-  const s1=seg(VIEWS,'view',function(v){setView(v);},true);s1.classList.add('sm');$('#tbView').appendChild(s1);
   const s2=seg([{t:'Изо',v:'iso'},{t:'Спереди',v:'front'},{t:'Сверху',v:'top'},{t:'Сбоку',v:'side'}],
     'view',function(v){setView(v);},true);s2.classList.add('sm');$('#vpSeg').appendChild(s2);
   buildSpeedSlider();
 
-  buildLayerPop();drawLegend();
+  drawLegend();
   switchL(S.tabL);switchR(S.tabR);switchB(S.tabB);
   setTimeout(syncSegs,60);
 }
@@ -886,22 +894,7 @@ function buildSpeedSlider(){
   /* сохраняем ссылки — пригодится, если захотите синхронизировать из кода */
   V['sl_simSpeed']={inp:inp,v:lbl,paint:paint,unit:''};
 }
-function buildLayerPop(){
-  const p=$('#popLayers');p.innerHTML='';
-  p.appendChild(el('div',{cls:'gt'},['Слои сцены']));
-  Object.keys(LNAMES).forEach(function(k){p.appendChild(layerToggle(k));});
-  p.appendChild(el('div',{cls:'gt'},['Проекция камеры']));
-  VIEWS.forEach(function(v,i){
-    const mark=el('span',{style:'width:14px;flex:0 0 14px;color:var(--blue);font-weight:700'},[S.view===v.v?'✓':'']);
-    const r=el('div',{cls:'row tap',style:'min-height:31px;padding:4px 11px',onclick:function(){
-      setView(v.v);
-      const ms=p.querySelectorAll('.row.tap .ckmark');
-      Array.prototype.forEach.call(p.querySelectorAll('.row.tap'),function(row,j){
-        row.firstChild.textContent=(j===i)?'✓':'';});
-    }},[mark,el('div',{cls:'rt'},[v.t])]);
-    mark.className='ckmark';
-    p.appendChild(r);});
-}
+
 function switchL(k){S.tabL=k;
   $$('#tabsL .ptab').forEach(function(b){b.classList.toggle('active',b.dataset.k===k);});
   $$('#bodyL>[data-ltab]').forEach(function(n){n.hidden=(n.dataset.ltab!==k);});
@@ -2339,10 +2332,7 @@ function validate(silent){
   const yT=Math.max(0.4,PLACED.yMin-Math.max(0,S.trimBelow));
   const okT=!doTrim||(yT>0.4&&yT<PLACED.yMin+1e-6);
   setVal('chkT',doTrim?(okT?(trimModeName()+', Y = '+nf(yT,1)+' мм'):'слишком высоко'):'выкл',okT?'ok':'warn');
-  const chip=$('#mbChip');
-  if(chip)chip.textContent='X '+nf(STATS.xMin,0)+'…'+nf(STATS.xMax,0)+' · Y '+nf(S.stockH,0)+' · A '+N+'×'+nf(360/Math.max(1,N),1)+'°';
-  const tp=$('#tbPass');if(tp)tp.textContent=N+' проходов'+(S.trimBase?' + рез':'');
-  const tt=$('#tbTime');if(tt)tt.textContent=hms(STATS.time||0);
+
   if(!silent&&(!okD||!okH)){
     alert_('Модель не помещается в заготовку',
       !okD?('Требуемый диаметр '+nf(needD2,1)+' мм больше заготовки Ø'+nf(S.stockD,1)+' мм.')
@@ -2612,10 +2602,7 @@ function updateDRO(x,y,a,on,p){
   if(a2)a2.textContent=y.toFixed(3);
   if(a3)a3.textContent=a.toFixed(2);
   if(a4)a4.textContent=p?(p.type==='trim'?' ⚑':(p.dir>0?' ↻':' ↺')):'';
-  const b1=$('#stX'),b2=$('#stY'),b3=$('#stA');
-  if(b1)b1.textContent=x.toFixed(3);
-  if(b2)b2.textContent=y.toFixed(3);
-  if(b3)b3.textContent=a.toFixed(3)+'°';
+
 }
 function setPassPath(k,u,cutting){
   if(!pathLine)return;
@@ -2730,17 +2717,7 @@ function initEvents(){
   $('#tbTheme').onclick=cycleTheme;
   $('#btnFit').onclick=function(){fitAll();toast('Показан весь станок');};
   $('#btnShot').onclick=screenshot;
-  $('#btnLayers').onclick=function(e){
-    e.stopPropagation();
-    const p=$('#popLayers');p.hidden=!p.hidden;
-    $('#btnLayers').classList.toggle('act',!p.hidden);
-  };
-  document.addEventListener('mousedown',function(e){
-    const p=$('#popLayers');
-    if(p&&!p.hidden&&!(e.target.closest&&e.target.closest('#popLayers'))&&
-       !(e.target.closest&&e.target.closest('#btnLayers'))){
-      p.hidden=true;$('#btnLayers').classList.remove('act');}
-  });
+
   $('#simRange').oninput=function(e){if(SIM.playing)setPlaying(false);setSimTime(e.target.value/1000*SIM.total);};
   $('#file').onchange=function(e){const f=e.target.files[0];if(f)loadFile(f);e.target.value='';};
 
@@ -2765,8 +2742,7 @@ function initEvents(){
     if(mod&&(e.key==='s'||e.key==='S'||e.key==='ы'||e.key==='Ы')){e.preventDefault();
       if(e.shiftKey)screenshot();else download();return;}
     if(mod&&(e.key==='`'||e.key==='~'||e.key==='ё'||e.key==='Ё')){e.preventDefault();toggleConsole();return;}
-    if(e.key==='Escape'){closePalette();closeMenu();
-      const p=$('#popLayers');if(p){p.hidden=true;$('#btnLayers').classList.remove('act');}return;}
+    if(e.key==='Escape'){closePalette();closeMenu();return;}
     if(mod||e.altKey)return;
     if(e.code==='Space'){e.preventDefault();setPlaying(!SIM.playing);return;}
     const k=e.key;
@@ -2792,7 +2768,6 @@ function initEvents(){
 ================================================================== */
 try{
   $('#tbTheme').innerHTML=IC.moon;
-  $('#btnLayers').innerHTML=IC.layers;
   $('#btnFit').innerHTML=IC.fit;
   $('#btnShot').innerHTML=IC.cam;
   $('#btnPlay').innerHTML=IC.play;
