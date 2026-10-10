@@ -540,7 +540,10 @@ const S={
   offX:0, offY:16, offZ:0,
   /* заготовка */
   stockD:150, stockH:215, stockX:0, stockZ:0,
+  /* модель станка */
+  machineGrid:620, machineTableD:260, machineTableH:20,
   /* проходы */
+  motionMode:'shuttle2',
   angleMode:'passes', passes:24, angleStep:15, startAngle:0,
   feed:280, rapid:1400, aFeed:1080, wireR:0.35, safeGap:10, dwell:0.7,
   exitLen:12, waitRot:0.6,
@@ -693,14 +696,25 @@ function buildPanes(){
   ],'Низ модели всегда точно на высоте «зазор от стола» — деталь (зелёный прогноз) строится строго в пределах STL.'));
 
   pS.appendChild(group('Виртуальная цилиндрическая заготовка',[
-    slider('Диаметр','stockD','мм','20','400','1',null,'var(--teal)'),
-    slider('Высота','stockH','мм','20','500','1',null,'var(--teal)'),
-    slider('Смещение центра X','stockX','мм','-100','100','0.5',null,'var(--teal)'),
-    slider('Смещение центра Z','stockZ','мм','-100','100','0.5',null,'var(--teal)'),
+    slider('Диаметр','stockD','мм','20','3000','1',null,'var(--teal)'),
+    slider('Высота','stockH','мм','20','4000','1',null,'var(--teal)'),
+    slider('Смещение центра X','stockX','мм','-1500','1500','0.5',null,'var(--teal)'),
+    slider('Смещение центра Z','stockZ','мм','-1500','1500','0.5',null,'var(--teal)'),
     btns([{t:'Подобрать по модели',k:'btn-tint',fn:autoStock},
       {t:'Ø200 × 250',k:'btn-gray',fn:function(){S.stockD=200;S.stockH=250;S.stockX=0;S.stockZ=0;
         ['stockD','stockH','stockX','stockZ'].forEach(sync);rebuild();}}])
   ],'Ноль координат — центр поворотного стола оси A, ось Y направлена вверх вдоль оси вращения.'));
+
+  /* Новая группа — размеры станка */
+  pS.appendChild(group('Модель станка',[
+    slider('Размер станины и сетки','machineGrid','мм','300','4000','10',function(){
+      rebuildMachine();fitAll();},'var(--gray)'),
+    slider('Диаметр стола A','machineTableD','мм','100','3000','5',function(){
+      rebuildMachine();fitAll();},'var(--gray)'),
+    slider('Высота стола','machineTableH','мм','5','200','1',function(){
+      rebuildMachine();},'var(--gray)'),
+    btns([{t:'Подогнать под заготовку',k:'btn-tint',fn:autoMachine}])
+  ],'Размеры станочной оснастки в сцене. Кнопка «Подогнать» подбирает их по габаритам заготовки — удобно для крупных моделей.'));
   pS.appendChild(group('Контроль размещения',[
     info('Модель в заготовке','—','chkFit'),info('Запас по диаметру','—','chkD'),
     info('Запас по высоте','—','chkH'),info('Проходов / шаг A','—','chkP'),
@@ -732,6 +746,14 @@ function buildPanes(){
       el('b',{},['струна ВЫКЛ']),el('i',{},['→']),
       el('b',{},['поворот стола A'])])
   ],'Струна обходит силуэт, выходит за пределы заготовки и ждёт поворота стола на заданный угол. Затем обход повторяется в обратном направлении. Подрезка основания выполняется только в самом конце.'));
+
+      rC.appendChild(group('Режим движения струны',[
+    seg([
+      {t:'Точка ↔ точка (180°)',v:'shuttle2'},
+      {t:'Точка ↔ ось (360°)',v:'shuttleAxis'}
+    ],'motionMode',function(){scheduleRebuild();toast('Режим: '+(S.motionMode==='shuttle2'?'точка ↔ точка':'точка ↔ ось'));})
+  ],'Челночный рез: струна ходит туда-обратно, стол поворачивается между проходами. За 180° или 360° — в зависимости от режима.'));
+
 
   rC.appendChild(group('Разбиение на проходы',[
     seg([{t:'Число проходов',v:'passes'},{t:'Угол поворота A',v:'angle'}],'angleMode',function(){buildCutMode();scheduleRebuild();}),
@@ -1037,14 +1059,19 @@ function aboutMethod(){
     '<kbd>◦</kbd><span>прогноз детали строится строго в габаритах STL-модели.</span></div>');
 }
 function resetParams(){
+  S.motionMode='shuttle2';
+  S.machineGrid=620;S.machineTableD=260;S.machineTableH=20;
   S.passes=24;S.angleStep=15;S.startAngle=0;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
   S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
   S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
   S.trimBase=true;S.trimBelow=2;S.bridge=16;
   ['passes','angleStep','startAngle','feed','rapid','aFeed','wireR','safeGap','dwell','exitLen','waitRot',
-   'backlash','slices','tol','baseH','baseW','trimBelow','bridge'].forEach(sync);
+   'backlash','slices','tol','baseH','baseW','trimBelow','bridge',
+   'machineGrid','machineTableD','machineTableH'].forEach(sync);
+  segAll('motionMode','shuttle2');
   [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true],['trimBase',true]].forEach(function(p){
     if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
+  rebuildMachine();
   rebuild();toast('Параметры сброшены');log('Параметры резания сброшены к значениям по умолчанию');
 }
 function cycleTheme(){
@@ -1066,7 +1093,7 @@ function applyTheme(){
 ================================================================== */
 let renderer,scene,camera,controls,tableGroup,machineGroup,wireGroup,wireCore,wireLine,wireGlow,
     coneA,coneB,stockMesh,modelMesh,resultMesh,baseMesh,pathLine,pathRest,contourGroup,
-    armMesh,carriage,gridH,polarG,bedMesh,tableMesh;
+    gridH,polarG,bedMesh,tableMesh;
 
 function initScene(){
   renderer=new THREE.WebGLRenderer({canvas:$('#scene'),antialias:true,alpha:true,preserveDrawingBuffer:true});
@@ -1084,33 +1111,15 @@ function initScene(){
 
   machineGroup=new THREE.Group();scene.add(machineGroup);
   const bm=new THREE.MeshStandardMaterial({color:0x6b6f76,roughness:0.85,metalness:0.15});
-  bedMesh=new THREE.Mesh(new THREE.BoxGeometry(620,14,460),bm);bedMesh.position.y=-27;machineGroup.add(bedMesh);
+  bedMesh=new THREE.Mesh(new THREE.BoxGeometry(620,14,460),bm);
+  bedMesh.position.y=-27;machineGroup.add(bedMesh);
   gridH=new THREE.GridHelper(620,31,0x9aa0aa,0xb9bec7);gridH.position.y=-19.5;
   gridH.material.transparent=true;gridH.material.opacity=0.34;machineGroup.add(gridH);
-  const railMat=new THREE.MeshStandardMaterial({color:0x54585f,roughness:0.42,metalness:0.62});
-  [-210,210].forEach(function(z){const r=new THREE.Mesh(new THREE.BoxGeometry(16,560,16),railMat);
-    r.position.set(275,260,z);machineGroup.add(r);});
-  const beam=new THREE.Mesh(new THREE.BoxGeometry(20,18,440),railMat);beam.position.set(275,532,0);machineGroup.add(beam);
-  carriage=new THREE.Mesh(new THREE.BoxGeometry(48,56,68),
-    new THREE.MeshStandardMaterial({color:0x7d838c,roughness:0.4,metalness:0.55}));machineGroup.add(carriage);
-  armMesh=new THREE.Mesh(new THREE.BoxGeometry(1,12,12),
-    new THREE.MeshStandardMaterial({color:0x8a9099,roughness:0.4,metalness:0.6}));machineGroup.add(armMesh);
-  const axg=new THREE.Group();
-  axg.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0),new THREE.Vector3(0,-20,0),64,0xff453a,13,8));
-  axg.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(0,-20,0),64,0x30d158,13,8));
-  axg.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1),new THREE.Vector3(0,-20,0),64,0x0a84ff,13,8));
-  machineGroup.add(axg);
 
   tableGroup=new THREE.Group();scene.add(tableGroup);
   tableMesh=new THREE.Group();tableGroup.add(tableMesh);
-  const tm=new THREE.MeshStandardMaterial({color:0x3c4046,roughness:0.55,metalness:0.5});
-  const plate=new THREE.Mesh(new THREE.CylinderGeometry(126,130,12,72),tm);plate.position.y=-6;tableMesh.add(plate);
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(110,2.4,8,72),
-    new THREE.MeshStandardMaterial({color:0x8e9298,roughness:0.35,metalness:0.75}));
-  ring.rotation.x=Math.PI/2;ring.position.y=0.7;tableMesh.add(ring);
-  for(let i=0;i<4;i++){const j=new THREE.Mesh(new THREE.BoxGeometry(16,7,54),tm);const a=i*Math.PI/2+Math.PI/4;
-    j.position.set(Math.cos(a)*82,-13,Math.sin(a)*82);j.rotation.y=-a;tableMesh.add(j);}
-  polarG=new THREE.PolarGridHelper(126,8,6,72,0x6c727c,0x4a4f57);polarG.position.y=-19.4;tableGroup.add(polarG);
+  polarG=new THREE.PolarGridHelper(126,8,6,72,0x6c727c,0x4a4f57);
+  polarG.position.y=-19.4;tableGroup.add(polarG);
 
   stockMesh=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,72),
     new THREE.MeshStandardMaterial({color:0x9ea4ad,roughness:0.95,transparent:true,opacity:0.13,
@@ -1157,6 +1166,54 @@ function initScene(){
   resizeAll();
   animate(0);
 }
+function rebuildMachine(){
+  if(!bedMesh||!tableMesh||!polarG)return;
+  const G=S.machineGrid,H=G*0.74;
+  const TD=S.machineTableD/2,TH=S.machineTableH;
+
+  /* станина */
+  bedMesh.geometry.dispose();
+  bedMesh.geometry=new THREE.BoxGeometry(G,14,H);
+  bedMesh.position.y=-27;
+
+  /* сетка */
+  machineGroup.remove(gridH);
+  gridH.geometry.dispose();
+  const div=Math.max(6,Math.round(G/20));
+  gridH=new THREE.GridHelper(G,div,0x9aa0aa,0xb9bec7);
+  gridH.position.y=-19.5;
+  gridH.material.transparent=true;gridH.material.opacity=0.34;
+  machineGroup.add(gridH);
+
+  /* стол A */
+  while(tableMesh.children.length){
+    const c=tableMesh.children[0];
+    if(c.geometry)c.geometry.dispose();
+    tableMesh.remove(c);
+  }
+  const tm=new THREE.MeshStandardMaterial({color:0x3c4046,roughness:0.55,metalness:0.5});
+  const plate=new THREE.Mesh(new THREE.CylinderGeometry(TD*0.95,TD,TH*0.6,72),tm);
+  plate.position.y=-TH*0.3;tableMesh.add(plate);
+  const ringR=TD*0.85;
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(ringR,Math.max(1.2,TD*0.02),8,72),
+    new THREE.MeshStandardMaterial({color:0x8e9298,roughness:0.35,metalness:0.75}));
+  ring.rotation.x=Math.PI/2;ring.position.y=TH*0.04;tableMesh.add(ring);
+  const jawLen=TD*0.42,jawW=Math.max(8,TD*0.12);
+  for(let i=0;i<4;i++){
+    const j=new THREE.Mesh(new THREE.BoxGeometry(jawW,TH*0.35,jawLen),tm);
+    const a=i*Math.PI/2+Math.PI/4;
+    j.position.set(Math.cos(a)*TD*0.65,-TH*0.65,Math.sin(a)*TD*0.65);
+    j.rotation.y=-a;tableMesh.add(j);
+  }
+
+  /* полярная сетка */
+  tableGroup.remove(polarG);
+  polarG.geometry.dispose();
+  polarG=new THREE.PolarGridHelper(TD,8,6,72,0x6c727c,0x4a4f57);
+  polarG.position.y=-19.4;tableGroup.add(polarG);
+
+  updateWireLen();
+}
 function glowTex(){
   const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
   const r=g.createRadialGradient(32,32,0,32,32,32);
@@ -1192,7 +1249,11 @@ let camTween=null;
 function setView(v){
   S.view=v;segAll('view',v);
   if(!camera)return;
-  const c=controls.target.clone(),R=Math.max(210,(S.stockD||150)*2.05);
+  const c=controls.target.clone();
+  const R=Math.max(210,
+    (S.stockD||150)*2.05,
+    (S.stockH||215)*1.15,
+    (S.machineGrid||620)*1.4);
   const P={iso:new THREE.Vector3(R*0.98,R*0.88,R*1.08),
     front:new THREE.Vector3(0,c.y,R*1.6),
     top:new THREE.Vector3(0,c.y+R*1.7,0.01),
@@ -1220,8 +1281,6 @@ function applyLayers(){
   contourGroup.visible=S.layers.contours;
   tableMesh.visible=S.layers.table;
   polarG.visible=S.layers.grid;gridH.visible=S.layers.grid;bedMesh.visible=S.layers.grid;
-  machineGroup.children.forEach(function(o){
-    if(o!==bedMesh&&o!==gridH)o.visible=false;});
   wireGroup.visible=S.layers.wire;
   pathLine.visible=S.layers.path;pathRest.visible=S.layers.path;
 }
@@ -1482,10 +1541,61 @@ function chaikin(p){
 }
 function post(ch){let c=rdp(ch,S.tol);if(S.smooth&&c.length>3)c=chaikin(c);return c;}
 function passCount(){
-  return S.angleMode==='passes'?clamp(Math.round(S.passes),2,90)
-                              :clamp(Math.round(360/Math.max(0.5,S.angleStep)),2,120);
+  const totalAngle=(S.motionMode==='shuttleAxis')?360:180;
+  if(S.angleMode==='passes')return clamp(Math.round(S.passes),2,180);
+  return clamp(Math.round(totalAngle/Math.max(0.5,S.angleStep)),2,240);
 }
 function polyLen(pts){let L=0;for(let i=1;i<pts.length;i++)L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return L;}
+/* Построение правой и левой огибающих силуэта от yBot до yTop */
+function buildSides(P,smax,smin,yBot,yTop){
+  const samples=[];
+  for(let i=0;i<P.n;i++){
+    if(!P.hulls[i])continue;
+    samples.push({y:P.levels[i],smax:smax[i],smin:smin[i]});
+  }
+  if(samples.length<1)return null;
+
+  let first=-1,last=-1;
+  for(let s=0;s<samples.length;s++){
+    if(samples[s].y>=yBot-1e-6&&samples[s].y<=yTop+1e-6){
+      if(first<0)first=s;
+      last=s;
+    }
+  }
+  if(first<0){
+    /* Все срезы ниже yBot или выше yTop — берём ближайший */
+    first=0;last=samples.length-1;
+  }
+
+  const right=[],left=[];
+
+  if(first>0){
+    const A=samples[first-1],B=samples[first];
+    const t=clamp((yBot-A.y)/(B.y-A.y),0,1);
+    right.push([lerp(A.smax,B.smax,t),yBot]);
+    left.push([lerp(A.smin,B.smin,t),yBot]);
+  }else{
+    right.push([samples[0].smax,yBot]);
+    left.push([samples[0].smin,yBot]);
+  }
+
+  for(let s=first;s<=last;s++){
+    right.push([samples[s].smax,samples[s].y]);
+    left.push([samples[s].smin,samples[s].y]);
+  }
+
+  if(last<samples.length-1){
+    const A=samples[last],B=samples[last+1];
+    const t=clamp((yTop-A.y)/(B.y-A.y),0,1);
+    right.push([lerp(A.smax,B.smax,t),yTop]);
+    left.push([lerp(A.smin,B.smin,t),yTop]);
+  }else{
+    right.push([samples[samples.length-1].smax,yTop]);
+    left.push([samples[samples.length-1].smin,yTop]);
+  }
+
+  return {right:right,left:left};
+}
 function polyCum(pts){const c=[0];let L=0;
   for(let i=1;i<pts.length;i++){L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);c.push(L);}
   return {cum:c,len:L};}
@@ -1493,92 +1603,140 @@ function polyCum(pts){const c=[0];let L=0;
 function buildPasses(){
   const P=PLACED;
   if(!P||!P.valid.length)return [];
-  const N=passCount(),step=360/N,w=S.wireR,bw=S.baseW/100;
-  const yTop=P.yMax,yModelBot=P.yMin,bh=P.hulls[P.valid[0]];
+
+  const N=passCount();
+  const mode=S.motionMode||'shuttle2';
+  const totalAngle=(mode==='shuttleAxis')?360:180;
+  const step=totalAngle/N;
+  const w=S.wireR;
+
+  const yTop=P.yMax;
+  const yModelBot=P.yMin;
   const yBot=S.keepBase?Math.min(S.baseH,yModelBot-0.001):Math.max(0.8,yModelBot);
-  const safeTop=S.stockH+S.safeGap,R=S.stockD/2;
+  const safeTop=S.stockH+S.safeGap;
+  const R=S.stockD/2;
+  const trimY=Math.max(0.4,yModelBot-Math.max(0,S.trimBelow));
+  const gapY=S.safeGap;
+
   const out=[];
   let prevX=0,prevY=S.stockH*0.5;
 
   for(let k=0;k<N;k++){
-    const ang=S.startAngle+k*step,a=ang*D2R,ca=Math.cos(a),sa=Math.sin(a);
-    const smin=new Float64Array(P.n),smax=new Float64Array(P.n);
+    const ang=S.startAngle+k*step;
+    const a=ang*D2R,ca=Math.cos(a),sa=Math.sin(a);
+
+    const sminArr=new Float64Array(P.n);
+    const smaxArr=new Float64Array(P.n);
     for(let i=0;i<P.n;i++){
       const hh=P.hulls[i];
-      if(!hh){smin[i]=NaN;smax[i]=NaN;continue;}
-      const sp=support(hh,ca,sa);smin[i]=sp.mn-w;smax[i]=sp.mx+w;
+      if(!hh){sminArr[i]=NaN;smaxArr[i]=NaN;continue;}
+      const sp=support(hh,ca,sa);
+      sminArr[i]=sp.mn-w;
+      smaxArr[i]=sp.mx+w;
     }
-    const sb=support(bh,ca,sa),cc=sb.cx*ca+sb.cz*sa;
-    const bMin=cc+((sb.mn-w)-cc)*bw,bMax=cc+((sb.mx+w)-cc)*bw;
 
-    /* замкнутый силуэт */
-    const Rc=[],Lc=[];
-    let si=P.valid[0];
-    for(let q=0;q<P.valid.length;q++){if(P.levels[P.valid[q]]>=yBot-1e-9){si=P.valid[q];break;}}
-    if(yBot<yModelBot-1e-6){
-      Rc.push([bMax,yBot]);Rc.push([bMax,yModelBot]);
-      Lc.push([bMin,yBot]);Lc.push([bMin,yModelBot]);
-    }else{
-      let i1=si;while(i1<P.n-1&&!P.hulls[i1+1])i1++;
-      const y0=P.levels[si],y1=P.levels[i1];
-      const t=(y1>y0+1e-9)?clamp((yBot-y0)/(y1-y0),0,1):0;
-      Rc.push([lerp(smax[si],smax[i1],t),yBot]);
-      Lc.push([lerp(smin[si],smin[i1],t),yBot]);
-    }
-    for(let i=si;i<P.n;i++){
-      if(!P.hulls[i])continue;
-      Rc.push([smax[i],P.levels[i]]);Lc.push([smin[i],P.levels[i]]);
-    }
-    if(Rc.length&&Rc[Rc.length-1][1]<yTop-1e-9){
-      Rc.push([Rc[Rc.length-1][0],yTop]);Lc.push([Lc[Lc.length-1][0],yTop]);}
-    let contour=post(Rc).concat(post(Lc).slice().reverse());
-    if(contour.length>2){
-      const f=contour[0],l=contour[contour.length-1];
-      if(Math.hypot(f[0]-l[0],f[1]-l[1])>1e-9)contour.push([f[0],f[1]]);
-    }
-    const dir=(S.zigzag&&k%2===1)?-1:1;
-    if(dir<0)contour=contour.slice().reverse();
-
-    /* выход за пределы заготовки */
     const cp=S.stockX*ca+S.stockZ*sa;
-    const side=contour[0][0]>=cp?1:-1;
-    const exitX=cp+side*(R+S.exitLen);
-    const y0=contour[0][1];
+    const X1=cp+R+S.exitLen;
+    const X2=cp-R-S.exitLen;
+
+    const sides=buildSides(P,smaxArr,sminArr,yBot,yTop);
+    if(!sides)continue;
+    const right=sides.right,left=sides.left;
+
+    const dir=(S.zigzag&&k%2===1)?-1:1;
+    let contour;
+
+    if(mode==='shuttle2'){
+      /* Вариант 1: челнок точка 1 ↔ точка 2, полный силуэт за проход */
+      const pA=[X1,yBot],pB=[X2,yBot];
+      if(dir>0){
+        contour=[pA].concat(right);
+        contour=contour.concat(left.slice().reverse());
+        contour.push(pB);
+      }else{
+        contour=[pB].concat(left);
+        contour=contour.concat(right.slice().reverse());
+        contour.push(pA);
+      }
+    }else{
+      /* Вариант 2: челнок точка 1 ↔ ось A, один борт + верх + вертикаль */
+      const axisX=cp;
+      const pA=[X1,yBot];
+      const pB=[axisX,yTop+gapY];
+      if(dir>0){
+        contour=[pA].concat(right);
+        contour.push([axisX,yTop]);
+        contour.push(pB);
+      }else{
+        contour=[pB];
+        contour.push([axisX,yTop]);
+        contour=contour.concat(right.slice().reverse());
+        contour.push(pA);
+      }
+    }
+
+    contour=post(contour);
+    if(contour.length<2)continue;
 
     const moves=[];
-    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[exitX,safeTop],[exitX,y0]]});
-    moves.push({t:'cut',pts:[[exitX,y0]].concat(contour).concat([[exitX,y0]])});
+    const startPt=contour[0];
+    if(k===0){
+      moves.push({t:'rap',pts:[[prevX,prevY],[startPt[0],safeTop],[startPt[0],startPt[1]]]});
+    }else{
+      moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[startPt[0],safeTop],[startPt[0],startPt[1]]]});
+    }
+    moves.push({t:'cut',pts:contour.slice()});
 
-    const cl=moves[1].pts;
-    const cm=polyCum(cl);
-    out.push({k:k,type:'cut',ang:ang,a:a,dir:dir,contour:contour,moves:moves,
-      cutPts:cl,cum:cm.cum,cutLen:cm.len,smin:smin,smax:smax,yBot:yBot,yTop:yTop,exitX:exitX});
-    prevX=exitX;prevY=y0;
+    const cm=polyCum(contour);
+    out.push({
+      k:k,type:'cut',ang:ang,a:a,dir:dir,
+      contour:contour,moves:moves,
+      cutPts:contour,cum:cm.cum,cutLen:cm.len,
+      smin:sminArr,smax:smaxArr,
+      yBot:yBot,yTop:yTop,
+      pointA:(mode==='shuttle2'?[X1,yBot]:[X1,yBot]),
+      pointB:(mode==='shuttle2'?[X2,yBot]:[cp,yTop+gapY])
+    });
+
+    prevX=contour[contour.length-1][0];
+    prevY=contour[contour.length-1][1];
   }
+
   NPASS=N;
 
-  /* финальная операция: подрезка основания */
+  /* Финальный рез — отделение детали от основания */
   if(S.trimBase){
-    const ang=S.startAngle+N*step,a=ang*D2R,ca=Math.cos(a),sa=Math.sin(a);
-    const yT=Math.max(0.4,yModelBot-Math.max(0,S.trimBelow));
-    const sb=support(bh,ca,sa),cc=sb.cx*ca+sb.cz*sa;
+    const angFinal=S.startAngle+N*step;
+    const a=angFinal*D2R,ca=Math.cos(a),sa=Math.sin(a);
     const cp=S.stockX*ca+S.stockZ*sa;
-    const xL=cp-(R+S.exitLen),xR=cp+(R+S.exitLen);
+    const X1=cp+R+S.exitLen;
+    const X2=cp-R-S.exitLen;
+
     const moves=[];
-    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[xL,safeTop],[xL,yT]]});
+    moves.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[X1,safeTop],[X1,trimY]]});
+
     if(S.bridge>0.05){
-      const g1=Math.max(xL,cc-S.bridge/2),g2=Math.min(xR,cc+S.bridge/2);
-      moves.push({t:'cut',pts:[[xL,yT],[g1,yT],[xL,yT]]});
-      moves.push({t:'rap',pts:[[xL,yT],[xL,safeTop],[xR,safeTop],[xR,yT]]});
-      moves.push({t:'cut',pts:[[xR,yT],[g2,yT],[xR,yT]]});
+      const gL=cp-S.bridge/2,gR=cp+S.bridge/2;
+      moves.push({t:'cut',pts:[[X1,trimY],[gR,trimY],[X1,trimY]]});
+      moves.push({t:'rap',pts:[[X1,trimY],[X1,safeTop],[X2,safeTop],[X2,trimY]]});
+      moves.push({t:'cut',pts:[[X2,trimY],[gL,trimY],[X2,trimY]]});
     }else{
-      moves.push({t:'cut',pts:[[xL,yT],[xR,yT]]});
+      moves.push({t:'cut',pts:[[X1,trimY],[X2,trimY]]});
     }
+
     let cutPts=[],cutLen=0;
-    moves.forEach(function(m){if(m.t==='cut'){cutPts=cutPts.concat(m.pts);cutLen+=polyLen(m.pts);}});
-    out.push({k:N,type:'trim',ang:ang,a:a,dir:1,contour:[[xL,yT],[xR,yT]],moves:moves,
-      cutPts:cutPts,cum:null,cutLen:cutLen,smin:null,smax:null,yBot:yT,yTop:yT,exitX:xR,trimY:yT});
+    moves.forEach(function(m){
+      if(m.t==='cut'){cutPts=cutPts.concat(m.pts);cutLen+=polyLen(m.pts);}
+    });
+    out.push({
+      k:N,type:'trim',ang:angFinal,a:a,dir:1,
+      contour:[[X1,trimY],[X2,trimY]],
+      moves:moves,cutPts:cutPts,cum:null,cutLen:cutLen,
+      smin:null,smax:null,yBot:trimY,yTop:trimY,
+      trimY:trimY,X1:X1,X2:X2
+    });
   }
+
   return out;
 }
 
@@ -1710,6 +1868,9 @@ function buildResultMesh(){
 function buildSceneObjects(){
   const O=buildOrient(),bb=O.bb;
   const R=S.stockD/2,H=S.stockH;
+  /* если пользователь не задавал размеры станка вручную — подстраиваем */
+  if(S.machineGrid<Math.max(620,S.stockD*1.4,S.stockH*0.7)||
+     S.machineTableD<Math.max(260,S.stockD*1.15))autoMachine();
   stockMesh.geometry.dispose();stockMesh.geometry=new THREE.CylinderGeometry(R,R,H,72);
   stockMesh.position.set(S.stockX,H/2,S.stockZ);
   const g=new THREE.BufferGeometry();
@@ -1775,7 +1936,9 @@ function genGCode(){
   C('(Orient    : X'+F(S.rotX)+' Y'+F(S.rotY)+' Z'+F(S.rotZ)+' deg, scale '+F(S.scale,1)+'%)');
   C('(Triangles : '+RAW.info.count+')');
   C('(Stock     : D'+F(S.stockD)+' x H'+F(S.stockH)+' mm, center X'+F(S.stockX)+' Z'+F(S.stockZ)+')');
-  C('(Passes    : '+NPASS+'   step '+F(360/Math.max(1,NPASS))+' deg   start '+F(S.startAngle)+' deg)');
+    const totalAng=(S.motionMode==='shuttleAxis')?360:180;
+  C('(Motion    : '+(S.motionMode==='shuttleAxis'?'shuttle to axis A, '+totalAng+' deg total':'shuttle between two points, '+totalAng+' deg total')+')');
+  C('(Passes    : '+NPASS+'   step '+F(totalAng/Math.max(1,NPASS))+' deg   start '+F(S.startAngle)+' deg)');
   C('(Wire      : R'+F(S.wireR)+' mm   feed '+S.feed+' mm/min   '+rot+'-feed '+S.aFeed+' deg/min)');
   C('(Exit beyond stock: '+F(S.exitLen)+' mm   wait before rotate: '+F(S.waitRot,1)+' s)');
   C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate A)');
@@ -1787,31 +1950,45 @@ function genGCode(){
   L.push('G0 X0.000 Y'+F(S.stockH*0.5));
   L.push('G0 '+rot+F(S.startAngle));
 
-  PASSES.forEach(function(p,k){
+    PASSES.forEach(function(p,k){
     C('');
     if(p.type==='trim')C('(--- FINAL: BASE TRIM  '+rot+'='+F(p.ang)+'  Y='+F(p.trimY)+' ---)');
-    else C('(--- PASS '+(k+1)+'/'+NPASS+'  '+rot+'='+F(p.ang)+'  '+(p.dir>0?'CCW':'CW')+' ---)');
+    else{
+      const modeTag=(S.motionMode==='shuttleAxis')?'AXIS':'SHUTTLE';
+      C('(--- PASS '+(k+1)+'/'+NPASS+'  '+modeTag+'  '+rot+'='+F(p.ang)+'  '+(p.dir>0?'→':'←')+' ---)');
+    }
+
+    /* 1) Быстрые перемещения в точку старта */
     p.moves.forEach(function(m){
-      if(m.t==='rap'){
-        for(let i=1;i<m.pts.length;i++){
-          const q=m.pts[i],pr=m.pts[i-1];
-          if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
-          L.push('G0 X'+F(q[0])+' Y'+F(q[1]));
-        }
-        if(S.dwell>0&&m===p.moves[0])L.push('G4 P'+F(S.dwell)+(S.gComments?' (heat)':''));
-        L.push(S.wireOn+(S.gComments?' (wire on)':''));
-      }else{
-        let first=true;
-        for(let i=1;i<m.pts.length;i++){
-          const q=m.pts[i],pr=m.pts[i-1];
-          if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
-          L.push('G1 X'+F(q[0])+' Y'+F(q[1])+(first?' F'+S.feed:''));first=false;
-        }
+      if(m.t!=='rap')return;
+      for(let i=1;i<m.pts.length;i++){
+        const q=m.pts[i],pr=m.pts[i-1];
+        if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
+        L.push('G0 X'+F(q[0])+' Y'+F(q[1]));
       }
     });
+
+    /* 2) Прогрев + включение струны */
+    if(S.dwell>0)L.push('G4 P'+F(S.dwell)+(S.gComments?' (heat)':''));
+    L.push(S.wireOn+(S.gComments?' (wire on)':''));
+
+    /* 3) Рабочий ход */
+    p.moves.forEach(function(m){
+      if(m.t!=='cut')return;
+      let first=true;
+      for(let i=1;i<m.pts.length;i++){
+        const q=m.pts[i],pr=m.pts[i-1];
+        if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
+        L.push('G1 X'+F(q[0])+' Y'+F(q[1])+(first?' F'+S.feed:''));
+        first=false;
+      }
+    });
+
+    /* 4) Пауза перед поворотом + выключение струны */
     if(S.waitRot>0)L.push('G4 P'+F(S.waitRot)+(S.gComments?' (wait, wire outside stock)':''));
     L.push(S.wireOff+(S.gComments?' (wire off)':''));
-    /* поворот стола — после выхода струны за заготовку */
+
+    /* 5) Поворот стола */
     const nxt=PASSES[k+1];
     if(nxt&&Math.abs(nxt.ang-p.ang)>1e-9){
       if(S.compBacklash&&S.backlash>0)L.push('G1 '+rot+F(nxt.ang+S.backlash)+' F'+S.aFeed);
@@ -1945,7 +2122,7 @@ function drawUnroll(){
     p.contour.forEach(function(q,j){
       const px=cxp+q[0]*sc,py=Y(q[1]);
       if(j)g.lineTo(px,py);else g.moveTo(px,py);});
-    if(p.type==='cut')g.closePath();
+    
     g.stroke();
   });
   g.globalAlpha=1;
@@ -2113,6 +2290,16 @@ function reportUI(){
       [el('div',{cls:'rt'},[r[0]]),el('div',{cls:'rv'},[r[1]])]));});
   rows.appendChild(box);
 }
+function autoMachine(){
+  S.machineTableD=Math.max(260,Math.ceil(S.stockD*1.25/5)*5);
+  S.machineTableH=Math.max(20,Math.ceil(S.stockD*0.05));
+  S.machineGrid=Math.max(620,
+    Math.ceil(Math.max(S.stockD*1.8,S.stockH*0.7)/10)*10);
+  ['machineGrid','machineTableD','machineTableH'].forEach(sync);
+  rebuildMachine();fitAll();
+  toast('Станок подогнан: Ø'+S.machineTableD+' · сетка '+S.machineGrid+' мм');
+  log('Модель станка подогнана: стол Ø'+S.machineTableD+', сетка '+S.machineGrid+' мм','s');
+}
 function autoStock(){
   let rMax=0,hTop=0;
   if(PLACED){
@@ -2190,32 +2377,59 @@ function buildTimeline(){
   SIM.segs=[];let t=0;
   if(!PASSES.length){SIM.total=0.001;return;}
   let pa=0,px=0,py=S.stockH*0.5;
-  /* начальный поворот стола */
+
   if(Math.abs(PASSES[0].ang-pa)>1e-9){
     const d=Math.max(0.06,Math.abs(PASSES[0].ang-pa)/S.aFeed*60);
     SIM.segs.push({type:'rot',t0:t,t1:t+d,a0:pa,a1:PASSES[0].ang,k:-1,done:-1,wx:px,wy:py});
     t+=d;pa=PASSES[0].ang;
   }
+
   PASSES.forEach(function(p,k){
+    /* Быстрые перемещения */
     p.moves.forEach(function(m){
+      if(m.t!=='rap')return;
       const cm=polyCum(m.pts);
       if(cm.len<1e-9)return;
-      const feed=(m.t==='cut')?S.feed:S.rapid;
-      const d=Math.max(0.02,cm.len/feed*60);
-      SIM.segs.push({type:'mv',t0:t,t1:t+d,k:k,done:k-1,cut:(m.t==='cut'),
+      const d=Math.max(0.02,cm.len/S.rapid*60);
+      SIM.segs.push({type:'mv',t0:t,t1:t+d,k:k,done:k-1,cut:false,
         pts:m.pts,cum:cm.cum,len:cm.len,a:p.ang,pt:p.type});
       t+=d;
       px=m.pts[m.pts.length-1][0];py=m.pts[m.pts.length-1][1];
     });
+
+    /* Прогрев (dwell) */
+    if(S.dwell>0){
+      SIM.segs.push({type:'wait',t0:t,t1:t+S.dwell,k:k,done:k-1,cut:true,
+        x:px,y:py,a:p.ang});
+      t+=S.dwell;
+    }
+
+    /* Рабочий ход */
+    p.moves.forEach(function(m){
+      if(m.t!=='cut')return;
+      const cm=polyCum(m.pts);
+      if(cm.len<1e-9)return;
+      const d=Math.max(0.02,cm.len/S.feed*60);
+      SIM.segs.push({type:'mv',t0:t,t1:t+d,k:k,done:k-1,cut:true,
+        pts:m.pts,cum:cm.cum,len:cm.len,a:p.ang,pt:p.type});
+      t+=d;
+      px=m.pts[m.pts.length-1][0];py=m.pts[m.pts.length-1][1];
+    });
+
+    /* Пауза перед поворотом */
     if(S.waitRot>0){
-      SIM.segs.push({type:'wait',t0:t,t1:t+S.waitRot,k:k,done:k-1,cut:true,x:px,y:py,a:p.ang});
+      SIM.segs.push({type:'wait',t0:t,t1:t+S.waitRot,k:k,done:k,cut:true,
+        x:px,y:py,a:p.ang});
       t+=S.waitRot;
     }
+
+    /* Поворот */
     const nxt=PASSES[k+1];
     if(nxt&&Math.abs(nxt.ang-p.ang)>1e-9){
       if(S.compBacklash&&S.backlash>0){
         const d1=S.backlash/S.aFeed*60;
-        SIM.segs.push({type:'rot',t0:t,t1:t+d1,a0:p.ang,a1:p.ang+S.backlash,k:k,done:k,wx:px,wy:py});t+=d1;
+        SIM.segs.push({type:'rot',t0:t,t1:t+d1,a0:p.ang,a1:p.ang+S.backlash,k:k,done:k,wx:px,wy:py});
+        t+=d1;
       }
       const da=Math.abs(nxt.ang-p.ang),d=Math.max(0.06,da/S.aFeed*60);
       SIM.segs.push({type:'rot',t0:t,t1:t+d,a0:p.ang,a1:nxt.ang,k:k,done:k,wx:px,wy:py});
@@ -2283,9 +2497,6 @@ function setWire(x,y,on){
   wireLine.material.color.setHex(on?0xff453a:0x9aa0aa);
   wireLine.material.opacity=on?1:0.75;
   wireGlow.material.opacity=on?0.85:0;
-  const railX=275;
-  if(carriage)carriage.position.set(railX,y,0);
-  if(armMesh){const dx=railX-x;armMesh.scale.x=Math.max(1,Math.abs(dx));armMesh.position.set(x+dx/2,y,0);}
   const sw=$('#stWire');if(sw)sw.textContent=on?'ВКЛ':'выкл';
 }
 function updateDRO(x,y,a,on,p){
@@ -2482,6 +2693,7 @@ try{
   buildPanes();
   initSplitters();
   initScene();
+  rebuildMachine();
   initEvents();
 
   const pos=buildDemoModel();
