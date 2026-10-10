@@ -239,16 +239,18 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .legend div.off{opacity:.38;text-decoration:line-through}
 .transport{left:50%;bottom:12px;transform:translateX(-50%);width:min(880px,calc(100% - 24px));padding:8px 10px;
   display:flex;align-items:center;gap:12px}
-.tp-ctrl{display:flex;align-items:center;gap:1px;flex:0 0 auto}
-.tp-btn{width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;
-  display:grid;place-items:center;color:var(--label2);flex:0 0 auto;
-  transition:background .16s,color .16s,transform .12s cubic-bezier(.34,1.56,.64,1)}
-.tp-btn:hover{background:var(--fill2);color:var(--label)}
-.tp-btn:active{transform:scale(.9)}
-.tp-btn svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.tp-ctrl{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.tp-btn{width:36px;height:36px;border-radius:50%;border:0;background:transparent;cursor:pointer;
+  display:grid;place-items:center;color:var(--blue);flex:0 0 auto;
+  transition:background .16s,transform .12s cubic-bezier(.34,1.56,.64,1)}
+.tp-btn:hover{background:var(--tintf)}
+.tp-btn:active{transform:scale(.88);background:rgba(0,122,255,.22)}
+.tp-btn svg{width:20px;height:20px;fill:currentColor;stroke:none}
 .tp-spd{width:132px;flex:0 0 auto;display:flex;align-items:center;gap:5px}
-.playbtn{width:34px;height:34px;border-radius:50%;border:0;background:var(--blue);color:#fff;display:grid;place-items:center;
-  cursor:pointer;flex:0 0 auto;box-shadow:0 2px 9px rgba(0,122,255,.42);transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
+.playbtn{width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;
+  display:grid;place-items:center;cursor:pointer;flex:0 0 auto;
+  box-shadow:0 1px 5px rgba(0,122,255,.38);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),filter .18s}
 .playbtn:hover{filter:brightness(1.08)}.playbtn:active{transform:scale(.9)}
 .playbtn svg{width:15px;height:15px;fill:currentColor;stroke:none}
 .trk{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -389,10 +391,10 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 
       <div class="vp hud transport">
         <div class="tp-ctrl">
-          <button class="tp-btn" id="btnStart" title="В начало (Home)"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5.5v13L9 12l10-6.5z"/></svg></button>
+          <button class="tp-btn" id="btnStart" title="В начало (Home)"><svg viewBox="0 0 24 24"><path d="M6 6h2.2v12H6zM19 6v12L9 12l10-6z"/></svg></button>
           <button class="playbtn" id="btnPlay" title="Пуск / пауза (Space)"></button>
-          <button class="tp-btn" id="btnStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
-          <button class="tp-btn" id="btnEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
+          <button class="tp-btn" id="btnStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M5 6v12l7-6-7-6zM13 6v12l7-6-7-6z"/></svg></button>
+          <button class="tp-btn" id="btnEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M5 6v12l9-6-9-6zM17 6h2.2v12H17z"/></svg></button>
         </div>
         <div class="trk">
           <input type="range" class="sl" id="simRange" min="0" max="1000" value="1000" step="1">
