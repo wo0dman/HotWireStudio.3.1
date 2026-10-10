@@ -237,8 +237,16 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 .legend div:hover{color:var(--label)}
 .legend i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
 .legend div.off{opacity:.38;text-decoration:line-through}
-.transport{left:50%;bottom:12px;transform:translateX(-50%);width:min(720px,calc(100% - 24px));padding:8px 11px;
-  display:flex;align-items:center;gap:10px}
+.transport{left:50%;bottom:12px;transform:translateX(-50%);width:min(880px,calc(100% - 24px));padding:8px 10px;
+  display:flex;align-items:center;gap:12px}
+.tp-ctrl{display:flex;align-items:center;gap:1px;flex:0 0 auto}
+.tp-btn{width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;
+  display:grid;place-items:center;color:var(--label2);flex:0 0 auto;
+  transition:background .16s,color .16s,transform .12s cubic-bezier(.34,1.56,.64,1)}
+.tp-btn:hover{background:var(--fill2);color:var(--label)}
+.tp-btn:active{transform:scale(.9)}
+.tp-btn svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.tp-spd{width:132px;flex:0 0 auto;display:flex;align-items:center;gap:5px}
 .playbtn{width:34px;height:34px;border-radius:50%;border:0;background:var(--blue);color:#fff;display:grid;place-items:center;
   cursor:pointer;flex:0 0 auto;box-shadow:0 2px 9px rgba(0,122,255,.42);transition:transform .15s cubic-bezier(.34,1.56,.64,1)}
 .playbtn:hover{filter:brightness(1.08)}.playbtn:active{transform:scale(.9)}
@@ -345,13 +353,6 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
     <button class="tbtn" id="tbOpen" title="Открыть STL (⌘O)"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>STL…</button>
     <button class="tbtn" id="tbDemo" title="Демо-модель"><svg viewBox="0 0 24 24"><path d="M12 2.6l8 4.6v9.6l-8 4.6-8-4.6V7.2l8-4.6zM12 12l8-4.6M12 12v9.4M12 12L4 7.2"/></svg>Демо</button>
     <button class="tbtn" id="tbSave" title="Экспорт G-code (⌘S)"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 18v1.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V18"/></svg>G-code</button>
-    <div class="tsep"></div>
-    <button class="tbtn" id="tbStart" title="В начало (Home)"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5.5v13L9 12l10-6.5z"/></svg></button>
-    <button class="tbtn" id="tbPlay" title="Пуск / пауза (Space)"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4L20 12 7 4.8z" fill="currentColor" stroke="none"/></svg></button>
-    <button class="tbtn" id="tbStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
-    <button class="tbtn" id="tbEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
-    <div style="width:196px;flex:0 0 auto;display:flex;align-items:center;gap:6px" id="tbSpeed"></div>
-    <div class="tsep"></div>
     
     <div class="tb-sp"></div>
     <button class="tbtn" id="tbPal" title="Палитра команд (⌘K)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
@@ -387,11 +388,17 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
       <div class="vp hud legend" id="legend"></div>
 
       <div class="vp hud transport">
-        <button class="playbtn" id="btnPlay"></button>
+        <div class="tp-ctrl">
+          <button class="tp-btn" id="btnStart" title="В начало (Home)"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5.5v13L9 12l10-6.5z"/></svg></button>
+          <button class="playbtn" id="btnPlay" title="Пуск / пауза (Space)"></button>
+          <button class="tp-btn" id="btnStep" title="Следующий проход (→)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
+          <button class="tp-btn" id="btnEnd" title="В конец (End)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5.5v13L15 12 5 5.5z"/></svg></button>
+        </div>
         <div class="trk">
           <input type="range" class="sl" id="simRange" min="0" max="1000" value="1000" step="1">
           <div class="meta"><span id="simPass">Готово</span><span id="simTime">00:00 / 00:00</span></div>
         </div>
+        <div class="tp-spd" id="tpSpeed"></div>
       </div>
 
       <div class="busy" id="busy"><div class="box"><div class="spinner"></div><span id="busyText">Расчёт…</span></div></div>
@@ -872,9 +879,9 @@ function buildCutMode(){
     : slider('Угол поворота стола','angleStep','°','1','90','0.5',null,'var(--blue)'));
   setTimeout(syncSegs,30);
 }
-/* Компактный слайдер скорости симуляции для тулбара */
+/* Компактный слайдер скорости симуляции в панели транспорта */
 function buildSpeedSlider(){
-  const box=$('#tbSpeed');if(!box)return;box.innerHTML='';
+  const box=$('#tpSpeed');if(!box)return;box.innerHTML='';
   const inp=el('input',{cls:'sl',type:'range',min:1,max:100,step:1,value:S.simSpeed});
   inp.style.setProperty('--tintc','var(--blue)');
   inp.style.flex='1 1 auto';
@@ -2627,9 +2634,8 @@ function setPassPath(k,u,cutting){
 }
 function setPlaying(v){
   SIM.playing=v;SIM.everRun=true;
-  const a=$('#btnPlay'),b=$('#tbPlay');
+  const a=$('#btnPlay');
   if(a)a.innerHTML=v?IC.pause:IC.play;
-  if(b)b.innerHTML=v?IC.pause:IC.play;
   if(v&&SIM.t>=SIM.total-1e-3){SIM.t=0;SIM.done=-1;log('Симуляция запущена с начала');}
   const ss=$('#stState');if(ss)ss.textContent=v?'Резка':'Пауза';
 }
@@ -2709,11 +2715,10 @@ function initEvents(){
   $('#tbDemo').onclick=loadDemo;
   $('#tbSave').onclick=download;
   $('#tbCalc').onclick=function(){rebuild();};
-  $('#tbPlay').onclick=function(){setPlaying(!SIM.playing);};
   $('#btnPlay').onclick=function(){setPlaying(!SIM.playing);};
-  $('#tbStart').onclick=function(){setPlaying(false);setSimTime(0);};
-  $('#tbEnd').onclick=function(){setPlaying(false);setSimTime(SIM.total);};
-  $('#tbStep').onclick=function(){stepPass(1);};
+  $('#btnStart').onclick=function(){setPlaying(false);setSimTime(0);};
+  $('#btnEnd').onclick=function(){setPlaying(false);setSimTime(SIM.total);};
+  $('#btnStep').onclick=function(){stepPass(1);};
   $('#tbTheme').onclick=cycleTheme;
   $('#btnFit').onclick=function(){fitAll();toast('Показан весь станок');};
   $('#btnShot').onclick=screenshot;
