@@ -1255,7 +1255,7 @@ function updateWireLen(){
   if(!wireGroup)return;
   const L=Math.max(70,S.stockD*1.35),hz=L/2;
   coneA.position.set(0,0,-(hz+12));coneB.position.set(0,0,(hz+12));
-  wireCore.scale.set(1,L,1);
+  wireCore.scale.set(1,L/10,1);
   const pos=wireLine.geometry.attributes.position;
   pos.setXYZ(0,0,0,-hz);pos.setXYZ(1,0,0,hz);pos.needsUpdate=true;
   wireLine.geometry.computeBoundingSphere();
@@ -1650,7 +1650,11 @@ function buildPasses(){
   const gapY=S.safeGap;
 
   const out=[];
-  let prevX=0,prevY=S.stockH*0.5;
+  /* Парковочная позиция: справа от заготовки, над её верхом.
+     Такое же смещение по X, как у бокового выхода (exitLen),
+     и такое же по Y, как у безопасного отступа (safeGap). */
+  let prevX=S.stockX + R + S.exitLen;
+  let prevY=safeTop;
 
   for(let k=0;k<N;k++){
     const ang=S.startAngle+k*step;
