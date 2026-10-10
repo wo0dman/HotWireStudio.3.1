@@ -482,7 +482,9 @@ function hms(s){s=Math.max(0,Math.round(s||0));const h=Math.floor(s/3600),m=Math
 function trimLabel(){
   if(!trimActive())return 'нет';
   if(S.trimMode==='full')return 'на всю ширину, '+nf(S.trimBelow,1)+' мм ниже модели';
-  return 'с перемычкой '+nf(S.bridge,0)+' мм, '+nf(S.trimBelow,1)+' мм ниже модели';
+  const cnt=S.trimCount||2;
+  return 'с перемычкой '+nf(S.bridge,0)+' мм ('+cnt+' подрезов, шаг '+(360/cnt)+'°), '+
+    nf(S.trimBelow,1)+' мм ниже модели';
 }
 function trimModeName(){return ({none:'не подрезать',full:'на всю ширину',bridge:'с перемычкой'})[S.trimMode]||'выкл';}
 function toast(msg,ok){const t=$('#toast');if(!t)return;$('#toastText').textContent=msg;
@@ -558,7 +560,7 @@ const S={
   /* точность */
   slices:150, tol:0.12, smooth:false,
     /* основание */
-  keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimBelow:2, bridge:16,
+  keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimCount:2, trimBelow:2, bridge:16,
   /* G-code */
   post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
   layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
@@ -848,6 +850,10 @@ function buildTrimUI(){
   box.appendChild(slider('Рез ниже низа модели','trimBelow','мм','0','40','0.5',null,'var(--mint)'));
   if(S.trimMode==='bridge'){
     box.appendChild(slider('Ширина перемычки','bridge','мм','0','80','1',null,'var(--mint)'));
+    box.appendChild(seg([
+      {t:'2 подреза (180°)',v:2},
+      {t:'4 подреза (90°)', v:4}
+    ],'trimCount',function(){scheduleRebuild();}));
   }
   setTimeout(syncSegs,30);
 }
@@ -1086,14 +1092,15 @@ function resetParams(){
   S.passes=24;S.angleStep=15;S.startAngle=0;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
   S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
   S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
-  S.trimMode='bridge';S.trimBelow=2;S.bridge=16;
+  S.trimMode='bridge';S.trimCount=2;S.trimBelow=2;S.bridge=16;
   ['passes','angleStep','startAngle','feed','rapid','aFeed','wireR','safeGap','dwell','exitLen','waitRot',
    'backlash','slices','tol','baseH','baseW','trimBelow','bridge',
    'machineGrid','machineTableD','machineTableH'].forEach(sync);
   segAll('motionMode','shuttle2');
-  [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true]].forEach(function(p){
+    [['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true]].forEach(function(p){
     if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
   segAll('trimMode','bridge');
+  segAll('trimCount',2);
   buildTrimUI();
   rebuildMachine();
   rebuild();toast('Параметры сброшены');log('Параметры резания сброшены к значениям по умолчанию');
@@ -1765,46 +1772,51 @@ function buildPasses(){
       });
       prevX=X2;prevY=trimY;
     }
-    else if(S.trimMode==='bridge'){
-      /* Режим 3: два прохода подрезки с поворотом стола 180° между ними */
+        else if(S.trimMode==='bridge'){
+      /* Режим 3: N подрезов с равномерным поворотом стола между ними.
+         trimCount=2 → 180° между проходами (2 стороны).
+         trimCount=4 → 90°  между проходами (4 стороны, квадратная перемычка). */
 
-      /* Проход N — первая сторона */
-      const movesA=[];
-      movesA.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[X1,safeTop],[X1,trimY]]});
-      movesA.push({t:'cut',pts:[[X1,trimY],[gR,trimY]]});   /* рез до перемычки */
-      movesA.push({t:'cut',pts:[[gR,trimY],[X1,trimY]]});   /* возврат G1 */
-      let cPtsA=[],cLenA=0;
-      movesA.forEach(function(m){
-        if(m.t==='cut'){cPtsA=cPtsA.concat(m.pts);cLenA+=polyLen(m.pts);}
-      });
-      out.push({
-        k:N,type:'trim',subtype:'first',ang:angFinal,a:a,dir:1,
-        contour:[[X1,trimY],[gR,trimY]],
-        moves:movesA,cutPts:cPtsA,cum:null,cutLen:cLenA,
-        smin:null,smax:null,yBot:trimY,yTop:trimY,
-        trimY:trimY,X1:X1,bridgeEdge:gR
-      });
+      const total=S.trimCount||2;
+      const angleStepTrim=360/total;
+      /* Струна стоит на одной и той же X для всех подрезов.
+         Корректно при центрированной заготовке (stockX=stockZ=0).
+         Точка перемычки gR тоже фиксирована. */
+      const Xstay=X1;
+      const gRstay=gR;
 
-      /* Проход N+1 — вторая сторона (после поворота A на 180°) */
-      const angSecond=angFinal+180;
-      const a2=angSecond*D2R;
-      /* Струна осталась в точке (X1, trimY) — рапа нет, рез начинается сразу */
-      const movesB=[];
-      movesB.push({t:'rap',pts:[[X1,trimY],[X1,trimY]]});   /* пустышка, отфильтруется */
-      movesB.push({t:'cut',pts:[[X1,trimY],[gR,trimY]]});   /* тот же рез, но с другой стороны материала */
-      movesB.push({t:'cut',pts:[[gR,trimY],[X1,trimY]]});   /* возврат G1 */
-      let cPtsB=[],cLenB=0;
-      movesB.forEach(function(m){
-        if(m.t==='cut'){cPtsB=cPtsB.concat(m.pts);cLenB+=polyLen(m.pts);}
-      });
-      out.push({
-        k:N+1,type:'trim',subtype:'second',ang:angSecond,a:a2,dir:1,
-        contour:[[X1,trimY],[gR,trimY]],
-        moves:movesB,cutPts:cPtsB,cum:null,cutLen:cLenB,
-        smin:null,smax:null,yBot:trimY,yTop:trimY,
-        trimY:trimY,X1:X1,bridgeEdge:gR
-      });
-      prevX=X1;prevY=trimY;
+      for(let i=0;i<total;i++){
+        const angI=angFinal+i*angleStepTrim;
+        const aI=angI*D2R;
+        const movesI=[];
+
+        if(i===0){
+          /* Первый подрез: переезд в точку старта с подъёмом */
+          movesI.push({t:'rap',pts:[[prevX,prevY],[prevX,safeTop],[Xstay,safeTop],[Xstay,trimY]]});
+        }else{
+          /* Последующие подрезы: струна остаётся на месте (только поворот стола был) */
+          movesI.push({t:'rap',pts:[[Xstay,trimY],[Xstay,trimY]]});   /* пустышка, отфильтруется */
+        }
+
+        movesI.push({t:'cut',pts:[[Xstay,trimY],[gRstay,trimY]]});   /* рез до перемычки */
+        movesI.push({t:'cut',pts:[[gRstay,trimY],[Xstay,trimY]]});   /* возврат G1 */
+
+        let cPtsI=[],cLenI=0;
+        movesI.forEach(function(m){
+          if(m.t==='cut'){cPtsI=cPtsI.concat(m.pts);cLenI+=polyLen(m.pts);}
+        });
+
+        const sub=(i===0)?'first':(i===total-1?'last':'mid');
+        out.push({
+          k:N+i,type:'trim',subtype:sub,trimIndex:i,trimTotal:total,
+          ang:angI,a:aI,dir:1,
+          contour:[[Xstay,trimY],[gRstay,trimY]],
+          moves:movesI,cutPts:cPtsI,cum:null,cutLen:cLenI,
+          smin:null,smax:null,yBot:trimY,yTop:trimY,
+          trimY:trimY,X1:Xstay,bridgeEdge:gRstay
+        });
+      }
+      prevX=Xstay;prevY=trimY;
     }
   }
 
@@ -1976,7 +1988,11 @@ function passListUI(){
     PASSES.forEach(function(p,k){
     let label;
     if(p.type==='trim'){
-      const sub=p.subtype==='first'?' (1-я сторона)':p.subtype==='second'?' (после 180°)':'';
+      let sub='';
+      if(p.trimIndex!==undefined&&p.trimTotal){
+        sub=' ('+(p.trimIndex+1)+'/'+p.trimTotal+' · '+
+          (p.trimIndex===0?'старт':(p.trimIndex===p.trimTotal-1?'финал':'промежут.'))+')';
+      }
       label='⚑ Подрезка основания'+sub+' · A '+nf(p.ang,2)+'° · Y '+nf(p.trimY,1);
     }else{
       label=String(p.k+1).padStart(2,'0')+' · A '+nf(p.ang,2)+'° · '+(p.dir>0?'↻ CCW':'↺ CW');
@@ -2017,8 +2033,9 @@ function genGCode(){
   C('(Wire      : R'+F(S.wireR)+' mm   feed '+S.feed+' mm/min   '+rot+'-feed '+S.aFeed+' deg/min)');
   C('(Exit beyond stock: '+F(S.exitLen)+' mm   wait before rotate: '+F(S.waitRot,1)+' s)');
   C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate A)');
-    C('(Base trim : '+(S.trimMode==='full'?('full width, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model')
-    :S.trimMode==='bridge'?('bridge '+F(S.bridge)+' mm, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, 2-sided with 180 deg flip')
+      C('(Base trim : '+(S.trimMode==='full'?('full width, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model')
+    :S.trimMode==='bridge'?('bridge '+F(S.bridge)+' mm, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, '+
+      (S.trimCount||2)+' cuts with '+(360/(S.trimCount||2))+' deg flip')
     :'none')+')');
   C('(Cut length: '+F(STATS.cutLen,1)+' mm   est. time '+hms(STATS.time)+')');
   C('(Generated: '+new Date().toLocaleString('ru-RU')+')');
@@ -2030,7 +2047,12 @@ function genGCode(){
     PASSES.forEach(function(p,k){
     C('');
     if(p.type==='trim'){
-      const sub=p.subtype==='first'?' / 1st SIDE':p.subtype==='second'?' / 2nd SIDE (after 180 deg)':'';
+      let sub='';
+      if(p.trimIndex!==undefined&&p.trimTotal){
+        const rotStep=360/p.trimTotal;
+        sub=' / '+(p.trimIndex+1)+' of '+p.trimTotal+
+          (p.trimIndex>0?' (after '+F(rotStep)+' deg)':'');
+      }
       C('(--- FINAL: BASE TRIM'+sub+'  '+rot+'='+F(p.ang)+'  Y='+F(p.trimY)+' ---)');
     }
     else{
