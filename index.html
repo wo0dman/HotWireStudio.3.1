@@ -374,9 +374,9 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
         Инициализация 3D-сцены и расчётного ядра. Если сообщение не исчезает — проверьте доступ к CDN (three.js) и поддержку WebGL.</div></div>
 
       <div class="vp hud dro">
-        <div class="ax x"><span>X · мм</span><b id="droX">0.000</b></div>
-        <div class="ax y"><span>Y · мм</span><b id="droY">0.000</b></div>
-        <div class="ax a"><span>A · град</span><b id="droA">0.00</b><i id="droDir"></i></div>
+        <div class="ax x"><span id="droXLabel">X · мм</span><b id="droX">0.000</b></div>
+        <div class="ax y"><span id="droYLabel">Y · мм</span><b id="droY">0.000</b></div>
+        <div class="ax a"><span id="droALabel">A · град</span><b id="droA">0.00</b><i id="droDir"></i></div>
       </div>
 
       <div class="vp vp-tools">
@@ -442,6 +442,33 @@ html[data-theme="dark"] .card{box-shadow:none;border:.5px solid rgba(255,255,255
 <div class="scrim" id="pscrim" hidden><div class="palette">
   <input id="palInput" placeholder="Команды, параметры, действия…" spellcheck="false" autocomplete="off">
   <div class="res" id="palRes"></div>
+</div></div>
+<div class="scrim" id="axisScrim" hidden><div class="alert" style="text-align:left;width:min(420px,90vw)">
+  <div class="bd">
+    <h3 style="text-align:center">Буквы осей станка</h3>
+    <p style="text-align:center">Используются в DRO и G-code. Стандартные: X, Y, A.<br>
+      Одна заглавная латинская буква (A–Z), буквы не должны повторяться.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+      <div class="row nosep" style="padding:0;min-height:auto">
+        <div class="rt" style="flex:0 0 130px">Линейная ось X</div>
+        <input class="tf mono" id="axXInput" maxlength="1" style="text-align:center;font-size:15px;font-weight:700">
+      </div>
+      <div class="row nosep" style="padding:0;min-height:auto">
+        <div class="rt" style="flex:0 0 130px">Линейная ось Y</div>
+        <input class="tf mono" id="axYInput" maxlength="1" style="text-align:center;font-size:15px;font-weight:700">
+      </div>
+      <div class="row nosep" style="padding:0;min-height:auto">
+        <div class="rt" style="flex:0 0 130px">Поворотная ось</div>
+        <input class="tf mono" id="axAInput" maxlength="1" style="text-align:center;font-size:15px;font-weight:700">
+      </div>
+    </div>
+    <div id="axisErr" style="color:var(--red);font-size:12px;min-height:16px;margin-top:10px;text-align:center"></div>
+  </div>
+  <div class="ac" style="border-top:.5px solid var(--sep)">
+    <button id="axisReset" style="color:var(--gray);flex:0 0 auto;padding:11px 14px;border-right:.5px solid var(--sep)">Сброс</button>
+    <button id="axisCancel" style="color:var(--red);border-right:.5px solid var(--sep)">Отмена</button>
+    <button id="axisOk" style="font-weight:700">Сохранить</button>
+  </div>
 </div></div>
 <div class="toast" id="toast"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span id="toastText"></span></div>
 <input type="file" id="file" accept=".stl,model/stl" hidden>
@@ -566,6 +593,8 @@ const S={
   keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimCount:2, trimBelow:2, bridge:16,
   /* G-code */
   post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
+  /* буквы осей станка для DRO и G-code */
+  axisX:'X', axisY:'Y', axisA:'A',
   layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
           wire:true,table:true,grid:true},
   view:'iso', simSpeed:20, tabL:'model', tabR:'cut', tabB:'unroll'
@@ -696,6 +725,50 @@ function field(label,key,ph,mono,cb){
   i.oninput=function(){S[key]=i.value;(cb||scheduleRebuild)();};
   return el('div',{cls:'row'},[el('div',{cls:'rt',style:'flex:0 0 104px'},[label]),i]);}
 function setVal(id,t,c){const n=V[id];if(n){n.textContent=t;n.className='rv '+(c||'');}}
+/* ----- Буквы осей станка ----- */
+function applyAxisLabels(){
+  const lx=$('#droXLabel'),ly=$('#droYLabel'),la=$('#droALabel');
+  if(lx)lx.textContent=S.axisX+' · мм';
+  if(ly)ly.textContent=S.axisY+' · мм';
+  if(la)la.textContent=S.axisA+' · град';
+}
+function openAxisDialog(){
+  $('#axXInput').value=S.axisX;
+  $('#axYInput').value=S.axisY;
+  $('#axAInput').value=S.axisA;
+  $('#axisErr').textContent='';
+  $('#axisScrim').hidden=false;
+  setTimeout(function(){$('#axXInput').focus();$('#axXInput').select();},40);
+}
+function closeAxisDialog(){$('#axisScrim').hidden=true;}
+function saveAxisDialog(){
+  const rawX=$('#axXInput').value.toUpperCase().trim();
+  const rawY=$('#axYInput').value.toUpperCase().trim();
+  const rawA=$('#axAInput').value.toUpperCase().trim();
+  const err=$('#axisErr');
+  const re=/^[A-Z]$/;
+  if(!re.test(rawX)||!re.test(rawY)||!re.test(rawA)){
+    err.textContent='Каждая буква должна быть одной заглавной латинской A–Z';
+    return;
+  }
+  if(rawX===rawY||rawX===rawA||rawY===rawA){
+    err.textContent='Буквы не должны повторяться';
+    return;
+  }
+  S.axisX=rawX;S.axisY=rawY;S.axisA=rawA;
+  applyAxisLabels();
+  genGCode();
+  updateInfoUI();
+  closeAxisDialog();
+  toast('Буквы осей: '+rawX+', '+rawY+', '+rawA);
+  log('Буквы осей изменены: линейная X → '+rawX+', линейная Y → '+rawY+', поворотная → '+rawA,'s');
+}
+function resetAxisDialog(){
+  $('#axXInput').value='X';
+  $('#axYInput').value='Y';
+  $('#axAInput').value='A';
+  $('#axisErr').textContent='';
+}
 
 /* ==================================================================
    3 · ПАНЕЛИ
@@ -971,6 +1044,7 @@ const MENUS={
     {t:'Следующая операция',k:'→',fn:function(){stepPass(1);}},
     {t:'Предыдущая операция',k:'←',fn:function(){stepPass(-1);}},{sep:1},
     {t:'Палитра команд',k:'⌘K',fn:openPalette},{sep:1},
+    {t:'Буквы осей станка…',fn:openAxisDialog},
     {t:'Проверить размещение',fn:function(){validate(false);}}],
   help:[{t:'О методе резки',fn:aboutMethod},{t:'Горячие клавиши',k:'?',fn:showKeys},
     {t:'О программе',fn:function(){alert_('Пенорез Studio · Desktop',
@@ -1017,6 +1091,7 @@ const CMDS=[
   {t:'Копировать G-code',i:IC.copy,fn:copyCode},
   {t:'Экспорт отчёта (.txt)',i:IC.chart,fn:exportReport},
     {t:'Снимок вида (PNG)',i:IC.cam,fn:screenshot},
+  {t:'Буквы осей станка…',i:IC.sliders,fn:openAxisDialog},
   {t:'На весь экран',i:IC.expand,fn:toggleFullscreen},
   {t:'Пуск / пауза симуляции',k:'Space',i:IC.play,fn:function(){setPlaying(!SIM.playing);}},
   {t:'Симуляция: в начало',k:'Home',i:IC.home,fn:function(){setPlaying(false);setSimTime(0);}},
@@ -1102,6 +1177,7 @@ function aboutMethod(){
 function resetParams(){
   S.motionMode='shuttle2';
   S.machineGrid=620;S.machineTableD=260;S.machineTableH=20;
+  S.axisX='X';S.axisY='Y';S.axisA='A';
   S.passes=24;S.angleStep=15;S.startAngle=0;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
   S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
   S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
@@ -1116,6 +1192,7 @@ function resetParams(){
   segAll('trimCount',2);
   buildTrimUI();
   rebuildMachine();
+  applyAxisLabels();
   rebuild();toast('Параметры сброшены');log('Параметры резания сброшены к значениям по умолчанию');
 }
 function cycleTheme(){
@@ -2058,7 +2135,9 @@ function stepPass(d){
 ================================================================== */
 function genGCode(){
   if(!PASSES.length){GCODE='';updateCodeUI();return;}
-  const rot=(S.post==='grbl')?'Z':'A',d=S.gDec,F=function(v){return fmt(v,d);};
+  const AX=S.axisX||'X',AY=S.axisY||'Y';
+  const rot=(S.post==='grbl')?'Z':(S.axisA||'A');
+  const d=S.gDec,F=function(v){return fmt(v,d);};
   const L=[],C=function(s){if(S.gComments)L.push(s);};
   C('(===== PENOREZ STUDIO / HOT WIRE =====)');
   C('(Post      : '+({linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A mapped to Z)'}[S.post])+')');
@@ -2071,7 +2150,7 @@ function genGCode(){
   C('(Passes    : '+NPASS+'   step '+F(totalAng/Math.max(1,NPASS))+' deg   start '+F(S.startAngle)+' deg)');
   C('(Wire      : R'+F(S.wireR)+' mm   feed '+S.feed+' mm/min   '+rot+'-feed '+S.aFeed+' deg/min)');
   C('(Exit beyond stock: '+F(S.exitLen)+' mm   wait before rotate: '+F(S.waitRot,1)+' s)');
-  C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate A)');
+  C('(Cycle     : approach -> wire ON -> contour -> exit -> wait -> wire OFF -> rotate '+rot+')');
       C('(Base trim : '+(S.trimMode==='full'?('full width, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model')
     :S.trimMode==='bridge'?('bridge '+F(S.bridge)+' mm, '+F(Math.max(0.4,PLACED.yMin-S.trimBelow),2)+' mm below model, '+
       (S.trimCount||2)+' cuts with '+(360/(S.trimCount||2))+' deg flip')
@@ -2080,7 +2159,7 @@ function genGCode(){
   C('(Generated: '+new Date().toLocaleString('ru-RU')+')');
   L.push('G21 G90 G94 G17');
   L.push(S.wireOff+(S.gComments?' (wire off)':''));
-  L.push('G0 X0.000 Y'+F(S.stockH*0.5));
+    L.push('G0 '+AX+'0.000 '+AY+F(S.stockH*0.5));
   L.push('G0 '+rot+F(S.startAngle));
 
     PASSES.forEach(function(p,k){
@@ -2105,7 +2184,7 @@ function genGCode(){
       for(let i=1;i<m.pts.length;i++){
         const q=m.pts[i],pr=m.pts[i-1];
         if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
-        L.push('G0 X'+F(q[0])+' Y'+F(q[1]));
+        L.push('G0 '+AX+F(q[0])+' '+AY+F(q[1]));
       }
     });
 
@@ -2120,7 +2199,7 @@ function genGCode(){
       for(let i=1;i<m.pts.length;i++){
         const q=m.pts[i],pr=m.pts[i-1];
         if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
-        L.push('G1 X'+F(q[0])+' Y'+F(q[1])+(first?' F'+S.feed:''));
+               L.push('G1 '+AX+F(q[0])+' '+AY+F(q[1])+(first?' F'+S.feed:''));
         first=false;
       }
     });
@@ -2138,7 +2217,7 @@ function genGCode(){
   });
   C('');C('(--- END OF PROGRAM ---)');
   L.push('G0 '+rot+F(S.startAngle));
-  L.push('G0 X0.000 Y0.000');
+    L.push('G0 '+AX+'0.000 '+AY+'0.000');
   L.push(S.wireOff);
   L.push('M2');L.push('%');
   GCODE=L.join('\n');
@@ -2148,9 +2227,12 @@ function genGCode(){
 function hlLine(s){
   let o=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   if(/^\s*[();]/.test(o))return '<span class="cd">'+o+'</span>';
+  const letters=(S.axisX||'X')+(S.axisY||'Y')+(S.axisA||'A')+'Z';
+  const uniq=Array.from(new Set(letters.split(''))).join('');
+  const re=new RegExp('\\b(['+uniq+'])(-?\\d+\\.?\\d*)','g');
   return o.replace(/\b(G)(\d+\.?\d*)/g,'<span class="g">$1$2</span>')
           .replace(/\b(M)(\d+\.?\d*)/g,'<span class="m">$1$2</span>')
-          .replace(/\b([XYZA])(-?\d+\.?\d*)/g,'<span class="ax">$1$2</span>');
+          .replace(re,'<span class="ax">$1$2</span>');
 }
 function renderCode(box,lines,max){
   if(!box)return;
@@ -2417,7 +2499,8 @@ function reportUI(){
   const rows=$('#repRows');rows.innerHTML='';
   const box=el('div',{cls:'card'});
   const info2=[['Постпроцессор',{linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A→Z)'}[S.post]],
-    ['Ось вращения','A вокруг Y'],['Ориентация модели','X'+nf(S.rotX,0)+'° Y'+nf(S.rotY,0)+'° Z'+nf(S.rotZ,0)+'°'],
+    ['Ось вращения',S.axisA+' вокруг '+S.axisY],
+    ['Ориентация модели','X'+nf(S.rotX,0)+'° Y'+nf(S.rotY,0)+'° Z'+nf(S.rotZ,0)+'°'],
     ['Радиус струны',nf(S.wireR,2)+' мм'],['Выход за заготовку',nf(S.exitLen,1)+' мм'],
     ['Пауза перед поворотом',nf(S.waitRot,1)+' с'],['Срезов по высоте',String(S.slices)],
     ['Допуск упрощения',nf(S.tol,2)+' мм'],['Точек в УП',nf(STATS.pts)],['Строк УП',nf(STATS.lines)],
@@ -2765,6 +2848,10 @@ function initEvents(){
     if(SIM.playing)setPlaying(false);
     setSimTime(e.target.value/1000*SIM.total);
   };
+    $('#axisOk').onclick=saveAxisDialog;
+  $('#axisCancel').onclick=closeAxisDialog;
+  $('#axisReset').onclick=resetAxisDialog;
+  $('#axisScrim').onclick=function(e){if(e.target.id==='axisScrim')closeAxisDialog();};
   paintSlider($('#simRange'));
   $('#file').onchange=function(e){const f=e.target.files[0];if(f)loadFile(f);e.target.value='';};
 
@@ -2789,9 +2876,13 @@ function initEvents(){
     if(mod&&(e.key==='s'||e.key==='S'||e.key==='ы'||e.key==='Ы')){e.preventDefault();
       if(e.shiftKey)screenshot();else download();return;}
     if(mod&&(e.key==='`'||e.key==='~'||e.key==='ё'||e.key==='Ё')){e.preventDefault();toggleConsole();return;}
-    if(e.key==='Escape'){closePalette();closeMenu();return;}
+        if(e.key==='Escape'){
+      if(!$('#axisScrim').hidden){closeAxisDialog();return;}
+      closePalette();closeMenu();return;
+    }
     if(mod||e.altKey)return;
-    if(e.code==='Space'){e.preventDefault();setPlaying(!SIM.playing);return;}
+       if(e.code==='Space'){e.preventDefault();setPlaying(!SIM.playing);return;}
+    if(e.key==='Enter'&&!$('#axisScrim').hidden){e.preventDefault();saveAxisDialog();return;}
     const k=e.key;
     if(k==='r'||k==='R'||k==='к'||k==='К'){rebuild();}
     else if(k==='f'||k==='F'||k==='а'||k==='А'){if(e.shiftKey)fitModel();else fitAll();}
@@ -2808,6 +2899,15 @@ function initEvents(){
   });
   window.addEventListener('resize',function(){resizeAll();syncSegs();});
   if(window.ResizeObserver)new ResizeObserver(function(){drawUnroll();}).observe($('#bottom'));
+
+  /* Отключаем стандартное меню ПКМ, кроме полей ввода */
+  document.addEventListener('contextmenu',function(e){
+    const t=e.target;
+    const tag=(t.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||tag==='select')return;
+    if(t.isContentEditable)return;
+    e.preventDefault();
+  });
 }
 
 /* ==================================================================
@@ -2819,6 +2919,7 @@ try{
   $('#btnShot').innerHTML=IC.cam;
   $('#btnPlay').innerHTML=IC.play;
   syncFullBtn();
+  applyAxisLabels();
   applyTheme();
   buildPanes();
   initSplitters();
