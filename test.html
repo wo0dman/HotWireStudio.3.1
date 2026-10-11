@@ -1060,7 +1060,7 @@ S.rotX=0;S.rotY=0;S.rotZ=0;
 ['rotX','rotY','rotZ'].forEach(sync);rebuild();}}])
 ],'Кнопки +90° поворачивают модель пошагово. Числовые поля позволяют задать произвольный угол (Enter — применить, Esc — отменить). Поворот выполняется относительно центра габаритов модели, поэтому положение не «уезжает».'));
 pM.appendChild(group('Размещение модели',[
-numbox('Масштаб','scale','%','10','400','0.5',null,'var(--indigo)'),
+numbox('Масштаб','scale','%','10','1000','0.5',null,'var(--indigo)'),
 numbox('Смещение X','offX','мм','-200','200','1',null,'var(--indigo)'),
 numbox('Смещение Y','offY','мм','-200','200','1',null,'var(--indigo)'),
 numbox('Смещение Z','offZ','мм','-200','200','1',null,'var(--indigo)'),
@@ -1077,9 +1077,7 @@ numbox('Диаметр','stockD','мм','20','3000','1',null,'var(--teal)'),
 numbox('Высота','stockH','мм','20','4000','1',null,'var(--teal)'),
 numbox('Смещение центра X','stockX','мм','-1500','1500','0.5',null,'var(--teal)'),
 numbox('Смещение центра Z','stockZ','мм','-1500','1500','0.5',null,'var(--teal)'),
-btns([{t:'Подобрать по модели',k:'btn-tint',fn:autoStock},
-{t:'Ø200 × 250',k:'btn-gray',fn:function(){S.stockD=200;S.stockH=250;S.stockX=0;S.stockZ=0;
-['stockD','stockH','stockX','stockZ'].forEach(sync);rebuild();}}])
+btns([{t:'Подобрать по модели',k:'btn-tint',fn:autoStock}])
 ],'Ноль координат — центр поворотного стола оси A, ось Y направлена вверх вдоль оси вращения.'));
 /* Новая группа — размеры станка */
 pS.appendChild(group('Модель станка',[
@@ -2818,7 +2816,7 @@ const O=buildOrient(),bb=O.bb;
 const d=Math.max(1e-6,Math.hypot(bb.size[0],bb.size[2])),h=Math.max(1e-6,bb.size[1]);
 const baseZone=S.keepBase?Math.max(0,S.baseH):0;
 const s=Math.min((S.stockD-16)/d,(S.stockH-baseZone-14)/h);
-S.scale=clamp(Math.round(s*1000)/10,5,400);
+S.scale=clamp(Math.round(s*1000)/10,5,1000);
 S.offX=0;S.offZ=0;S.offY=baseZone>0?baseZone:1;S.rotX=S.rotX;
 ['scale','offX','offZ','offY'].forEach(sync);
 rebuild();fitAll();
@@ -2839,7 +2837,7 @@ const O=buildOrient(),bb=O.bb;
 const d=Math.max(1e-6,Math.hypot(bb.size[0],bb.size[2])),h=Math.max(1e-6,bb.size[1]);
 const baseZone=S.keepBase?Math.max(0,S.baseH):0;
 const s=Math.min((S.stockD-16)/d,(S.stockH-baseZone-14)/h);
-S.scale=clamp(Math.round(s*1000)/10,5,400);
+S.scale=clamp(Math.round(s*1000)/10,5,1000);
 S.offX=0;S.offZ=0;
 /* Если модель ниже основания — не поднимаем её над столом,
    иначе она окажется «в воздухе». В этом случае ставим низ на 0 (или чуть ниже). */
