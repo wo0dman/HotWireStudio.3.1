@@ -750,7 +750,7 @@ slices:150, tol:0.12, smooth:false,
 /* основание */
 keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimCount:2, trimBelow:2, bridge:16,
 /* G-code */
-post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', gComments:true, gDec:3, fileName:'penorez_model',
+post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', wireKeepOn:false, gComments:true, gDec:3, fileName:'penorez_model',
 /* буквы осей станка для DRO и G-code */
 axisX:'X', axisY:'Y', axisA:'A',
 layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
@@ -759,7 +759,7 @@ view:'iso', simSpeed:20, tabL:'model', tabR:'cut', tabB:'unroll'
 };
 const LNAMES={stock:'Заготовка (цилиндр)',model:'STL-модель',result:'Деталь (прогноз)',
 base:'Основание (технолог.)',path:'Текущий контур',contours:'Все силуэты',
-wire:'Горячая струна',table:'Стол оси A',grid:'Сетка и станина'};
+wire:'Горячая струна',table:'Стол оси A',grid:'Сетка'};
 const LCOL={stock:'#8e8e93',model:'#0a84ff',result:'#30d158',base:'#ff9f0a',path:'#ff453a',
 contours:'#af52de',wire:'#ff9f0a',table:'#6b6f76',grid:'#9aa0aa'};
 const ORIENTS=[{t:'Как в файле',v:'asis',rx:0,ry:0,rz:0},
@@ -1043,21 +1043,30 @@ info('Высота после поворота','—','mH'),
 btns([{t:'Демо-модель',k:'btn-tint',fn:loadDemo},{t:'Вписать в заготовку',k:'btn-blue',fn:fitModel}])
 ],'Внутренние отверстия и полости STL игнорируются: для каждого среза берётся только внешняя выпуклая оболочка.'));
 pM.appendChild(group('Ориентация модели',[
-seg(ORIENTS.map(function(o){return {t:o.t,v:o.v};}),'orient',function(v){applyOrientPreset(v);}),
+el('div',{cls:'row nosep',style:'padding:2px 10px 6px'},[
+el('div',{cls:'sub',style:'font-size:11px;line-height:1.4'},[
+'Кнопки поворачивают модель приращениями по 90°. Нажмите дважды, чтобы получить 180°, трижды — 270° (= −90°).'
+])]),
+btns([
+{t:'X +90°',k:'btn-tint',fn:function(){rotateAxis90('rotX');}},
+{t:'Y +90°',k:'btn-tint',fn:function(){rotateAxis90('rotY');}},
+{t:'Z +90°',k:'btn-tint',fn:function(){rotateAxis90('rotZ');}}
+]),
 numbox('Поворот вокруг X','rotX','°','-180','180','1',null,'var(--indigo)'),
 numbox('Поворот вокруг Y','rotY','°','-180','180','1',null,'var(--indigo)'),
 numbox('Поворот вокруг Z','rotZ','°','-180','180','1',null,'var(--indigo)'),
-btns([{t:'Сбросить ориентацию',k:'btn-gray',fn:function(){S.rotX=0;S.rotY=0;S.rotZ=0;S.orient='asis';
-segAll('orient','asis');['rotX','rotY','rotZ'].forEach(sync);rebuild();}}])
-],'Порядок поворотов: X → Y → Z. Поворот выполняется относительно центра габаритов модели, поэтому положение не «уезжает».'));
+btns([{t:'Сбросить ориентацию',k:'btn-gray',fn:function(){
+S.rotX=0;S.rotY=0;S.rotZ=0;
+['rotX','rotY','rotZ'].forEach(sync);rebuild();}}])
+],'Кнопки +90° поворачивают модель пошагово. Числовые поля позволяют задать произвольный угол (Enter — применить, Esc — отменить). Поворот выполняется относительно центра габаритов модели, поэтому положение не «уезжает».'));
 pM.appendChild(group('Размещение модели',[
 numbox('Масштаб','scale','%','10','400','0.5',null,'var(--indigo)'),
-numbox('Смещение X','offX','мм','-120','120','0.5',null,'var(--indigo)'),
-numbox('Зазор от стола (низ модели)','offY','мм','0','200','0.5',null,'var(--indigo)'),
-numbox('Смещение Z','offZ','мм','-120','120','0.5',null,'var(--indigo)'),
+numbox('Смещение X','offX','мм','-200','200','1',null,'var(--indigo)'),
+numbox('Смещение Y','offY','мм','-200','200','1',null,'var(--indigo)'),
+numbox('Смещение Z','offZ','мм','-200','200','1',null,'var(--indigo)'),
 btns([{t:'Центрировать по оси A',k:'btn-gray',fn:function(){S.offX=0;S.offZ=0;sync('offX');sync('offZ');rebuild();
 log('Модель центрирована по оси A');}}])
-],'Низ модели всегда точно на высоте «зазор от стола» — деталь (зелёный прогноз) строится строго в пределах STL.'));
+],'Поле Y задаёт высоту низа модели над столом. Отрицательные значения опускают модель ниже плоскости стола — полезно, если у модели тонкое основание и нужно «врезать» её глубже. Деталь (зелёный прогноз) по-прежнему строится строго в пределах STL.'));
 pM.appendChild(group('Точность аппроксимации',[
 numbox('Срезов по высоте','slices','','16','400','2',null,'var(--purple)'),
 numbox('Допуск упрощения','tol','мм','0','1.5','0.01',null,'var(--purple)'),
@@ -1088,7 +1097,7 @@ info('Запас по высоте','—','chkH'),info('Проходов / ша�
 info('Рабочая зона X','—','chkX'),info('Подрезка основания','—','chkT')
 ]));
 pL.appendChild(group('Слои сцены',Object.keys(LNAMES).map(layerToggle),
-'«Горячая струна» и «Портал и приводы» переключаются независимо.'));
+'Сетка станины и полярная сетка стола включаются одним тумблером.'));
 pL.appendChild(group('Проекция камеры',[seg(VIEWS,'view',function(v){setView(v);})]));
 /* правая */
 const tr=$('#tabsR');tr.innerHTML='';
@@ -1155,11 +1164,12 @@ seg([{t:'LinuxCNC',v:'linuxcnc'},{t:'Mach3',v:'mach3'},{t:'GRBL',v:'grbl'}],'pos
 toggle('Комментарии в УП','gComments',null,function(){genGCode();}),
 field('Вкл. струну','wireOn','M3 S255',true,function(){genGCode();}),
 field('Выкл. струну','wireOff','M5',true,function(){genGCode();}),
+toggle('Не выключать струну до конца','wireKeepOn','M3 один раз в начале, M5 — только перед M2',function(){genGCode();}),
 seg([{t:'2 знака',v:2},{t:'3 знака',v:3},{t:'4 знака',v:4}],'gDec',function(){genGCode();}),
 field('Имя файла','fileName','program',false,function(){}),
 info('Строк / размер','—','sFile'),
 btns([{t:'Скачать .nc',k:'btn-blue',fn:download},{t:'Копировать',k:'btn-tint',fn:copyCode}])
-],'Ось A — поворотный стол вокруг Y. Струна включена только на рабочем ходу; повороты стола и подходы — при выключенной струне.'));
+],'Ось A — поворотный стол вокруг Y. По умолчанию струна включается перед резом и выключается перед поворотом стола. Опция «Не выключать струну» оставляет M3 активным между проходами — струна горит от первого реза до конца программы.'));
 rG.appendChild(group('Предпросмотр УП',[
 el('div',{style:'padding:8px 10px'},[el('div',{cls:'codebox',id:'codeBox',
 style:'max-height:330px;border-radius:8px;border:.5px solid var(--sep)'})])]));
@@ -1270,6 +1280,18 @@ if(!o)return;
 S.rotX=o.rx;S.rotY=o.ry;S.rotZ=o.rz;
 ['rotX','rotY','rotZ'].forEach(sync);
 rebuild();log('Ориентация модели: '+o.t+' (X '+o.rx+'° Y '+o.ry+'° Z '+o.rz+'°)');
+}
+/* Приращение ориентации: +90° по выбранной оси.
+   Угол нормализуется в диапазон [-180, 180): 0, 90, 180→-180, -90, 0, … */
+function rotateAxis90(axis){
+if(axis!=='rotX'&&axis!=='rotY'&&axis!=='rotZ')return;
+let v=(+S[axis]||0)+90;
+v=((v+180)%360+360)%360-180;
+S[axis]=v;
+sync(axis);
+rebuild();
+const nm={rotX:'X',rotY:'Y',rotZ:'Z'}[axis]||axis;
+log('Ориентация модели: поворот '+nm+' → '+nf(S[axis],1)+'°');
 }
 /* ==================================================================
 4 · МЕНЮ
@@ -1436,6 +1458,7 @@ S.machineGrid=620;S.machineTableD=260;S.machineTableH=20;
 S.axisX='X';S.axisY='Y';S.axisA='A';
 S.passes=24;S.angleStep=15;S.startAngle=0;S.halvingLevels=4;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
 S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
+S.wireKeepOn=false;
 S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
 S.trimMode='bridge';S.trimCount=2;S.trimBelow=2;S.bridge=16;
 ['passes','angleStep','startAngle','halvingLevels','feed','rapid','aFeed','wireR','safeGap','dwell','exitLen','waitRot',
@@ -1444,7 +1467,7 @@ S.trimMode='bridge';S.trimCount=2;S.trimBelow=2;S.bridge=16;
 segAll('motionMode','shuttle2');
 segAll('orient','asis');
 ['rotX','rotY','rotZ'].forEach(sync);
-[['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true]].forEach(function(p){
+[['zigzag',true],['compBacklash',false],['smooth',false],['keepBase',true],['wireKeepOn',false]].forEach(function(p){
 if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
 segAll('trimMode','bridge');
 segAll('trimCount',2);
@@ -1469,7 +1492,7 @@ requestAnimationFrame(function(){resizeAll();});
 /* ==================================================================
 6 · THREE.JS СЦЕНА
 ================================================================== */
-let renderer,scene,camera,controls,tableGroup,machineGroup,wireGroup,wireCore,wireLine,wireGlow,
+let renderer,scene,camera,controls,tableGroup,machineGroup,wireGroup,wireCore,wireLine,wireGlowA,wireGlowB,
 coneA,coneB,stockMesh,modelMesh,resultMesh,baseMesh,pathLine,pathRest,contourGroup,
 gridH,polarG,bedMesh,tableMesh;
 function initScene(){
@@ -1485,9 +1508,7 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x8a99ac,0.9));
 const d1=new THREE.DirectionalLight(0xffffff,1.05);d1.position.set(260,460,280);scene.add(d1);
 const d2=new THREE.DirectionalLight(0xa9c6ff,0.45);d2.position.set(-280,150,-240);scene.add(d2);
 machineGroup=new THREE.Group();scene.add(machineGroup);
-const bm=new THREE.MeshStandardMaterial({color:0x6b6f76,roughness:0.85,metalness:0.15});
-bedMesh=new THREE.Mesh(new THREE.BoxGeometry(620,14,460),bm);
-bedMesh.position.y=-27;machineGroup.add(bedMesh);
+bedMesh=null;
 gridH=new THREE.GridHelper(620,31,0x9aa0aa,0xb9bec7);gridH.position.y=-19.5;
 gridH.material.transparent=true;gridH.material.opacity=0.34;machineGroup.add(gridH);
 tableGroup=new THREE.Group();scene.add(tableGroup);
@@ -1528,22 +1549,21 @@ wireLine=new THREE.Line(
 new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-50),new THREE.Vector3(0,0,50)]),
 new THREE.LineBasicMaterial({color:0xff453a,transparent:true,opacity:0.95}));
 wireLine.renderOrder=8;wireGroup.add(wireLine);
-wireGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9f0a,transparent:true,opacity:0,
+wireGlowA=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9f0a,transparent:true,opacity:0,
 blending:THREE.AdditiveBlending,depthWrite:false}));
-wireGlow.scale.set(70,70,1);wireGroup.add(wireGlow);
+wireGlowA.scale.set(70,70,1);wireGroup.add(wireGlowA);
+wireGlowB=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex(),color:0xff9f0a,transparent:true,opacity:0,
+blending:THREE.AdditiveBlending,depthWrite:false}));
+wireGlowB.scale.set(70,70,1);wireGroup.add(wireGlowB);
 updateWireLen();
 if(window.ResizeObserver)new ResizeObserver(function(){resizeAll();}).observe($('#stage'));
 resizeAll();
 animate(0);
 }
 function rebuildMachine(){
-if(!bedMesh||!tableMesh||!polarG)return;
-const G=S.machineGrid,H=G*0.74;
+if(!tableMesh||!polarG)return;
+const G=S.machineGrid;
 const TD=S.machineTableD/2,TH=S.machineTableH;
-/* станина */
-bedMesh.geometry.dispose();
-bedMesh.geometry=new THREE.BoxGeometry(G,14,H);
-bedMesh.position.y=-27;
 /* сетка */
 machineGroup.remove(gridH);
 gridH.geometry.dispose();
@@ -1588,7 +1608,10 @@ g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);
 function updateWireLen(){
 if(!wireGroup)return;
 const L=Math.max(70,S.stockD*1.35),hz=L/2;
-coneA.position.set(0,0,-(hz+12));coneB.position.set(0,0,(hz+12));
+const cA=-(hz+12),cB=(hz+12);
+coneA.position.set(0,0,cA);coneB.position.set(0,0,cB);
+if(wireGlowA)wireGlowA.position.set(0,0,cA);
+if(wireGlowB)wireGlowB.position.set(0,0,cB);
 wireCore.scale.set(1,L/10,1);
 const pos=wireLine.geometry.attributes.position;
 pos.setXYZ(0,0,0,-hz);pos.setXYZ(1,0,0,hz);pos.needsUpdate=true;
@@ -1645,7 +1668,7 @@ resultMesh.visible=S.layers.result;
 baseMesh.visible=S.layers.base;
 contourGroup.visible=S.layers.contours;
 tableMesh.visible=S.layers.table;
-polarG.visible=S.layers.grid;gridH.visible=S.layers.grid;bedMesh.visible=S.layers.grid;
+polarG.visible=S.layers.grid;gridH.visible=S.layers.grid;
 wireGroup.visible=S.layers.wire;
 pathLine.visible=S.layers.path;pathRest.visible=S.layers.path;
 }
@@ -2410,6 +2433,7 @@ L.push('G21 G90 G94 G17');
 L.push(S.wireOff+(S.gComments?' (wire off)':''));
 L.push('G0 '+AX+'0.000 '+AY+F(S.stockH*0.5));
 L.push('G0 '+rot+F(S.startAngle));
+if(S.wireKeepOn)L.push(S.wireOn+(S.gComments?' (wire on — stays on until M2)':''));
 PASSES.forEach(function(p,k){
 C('');
 if(p.type==='trim'){
@@ -2434,9 +2458,9 @@ if(Math.abs(q[0]-pr[0])<1e-9&&Math.abs(q[1]-pr[1])<1e-9)continue;
 L.push('G0 '+AX+F(q[0])+' '+AY+F(q[1]));
 }
 });
-/* 2) Прогрев + включение струны */
-if(S.dwell>0)L.push('G4 P'+F(S.dwell)+(S.gComments?' (heat)':''));
-L.push(S.wireOn+(S.gComments?' (wire on)':''));
+/* 2) Включение струны + прогрев (если уже горит — только прогрев) */
+if(!S.wireKeepOn)L.push(S.wireOn+(S.gComments?' (wire on)':''));
+if(S.dwell>0)L.push('G4 P'+F(S.dwell)+(S.gComments?(S.wireKeepOn?' (heat, wire stays on)':'(heat)'):''));
 /* 3) Рабочий ход */
 p.moves.forEach(function(m){
 if(m.t!=='cut')return;
@@ -2448,9 +2472,9 @@ L.push('G1 '+AX+F(q[0])+' '+AY+F(q[1])+(first?' F'+S.feed:''));
 first=false;
 }
 });
-/* 4) Пауза перед поворотом + выключение струны */
+/* 4) Пауза перед поворотом + выключение струны (только если не держим её включённой) */
 if(S.waitRot>0)L.push('G4 P'+F(S.waitRot)+(S.gComments?' (wait, wire outside stock)':''));
-L.push(S.wireOff+(S.gComments?' (wire off)':''));
+if(!S.wireKeepOn)L.push(S.wireOff+(S.gComments?' (wire off)':''));
 /* 5) Поворот стола */
 const nxt=PASSES[k+1];
 if(nxt&&Math.abs(nxt.ang-p.ang)>1e-9){
@@ -2694,7 +2718,7 @@ for(let k=0;k<h.length;k+=2){const r=Math.hypot(h[k]-S.stockX,h[k+1]-S.stockZ);i
 const needD2=rMax*2+2*S.wireR;
 const okD=needD2<=S.stockD-0.5;
 const topY=PLACED.yMax;
-const okH=topY<=S.stockH-0.5&&S.offY>=-0.01;
+const okH=topY<=S.stockH-0.5&&topY>0.5;
 setVal('chkFit',okD&&okH?'вписывается':'НЕ вписывается',okD&&okH?'ok':'bad');
 setVal('chkD',nf(S.stockD-needD2,1)+' мм',okD?'ok':'bad');
 setVal('chkH',nf(S.stockH-topY,1)+' мм',okH?'ok':'bad');
@@ -2816,7 +2840,11 @@ const d=Math.max(1e-6,Math.hypot(bb.size[0],bb.size[2])),h=Math.max(1e-6,bb.size
 const baseZone=S.keepBase?Math.max(0,S.baseH):0;
 const s=Math.min((S.stockD-16)/d,(S.stockH-baseZone-14)/h);
 S.scale=clamp(Math.round(s*1000)/10,5,400);
-S.offX=0;S.offZ=0;S.offY=baseZone>0?baseZone:1;
+S.offX=0;S.offZ=0;
+/* Если модель ниже основания — не поднимаем её над столом,
+   иначе она окажется «в воздухе». В этом случае ставим низ на 0 (или чуть ниже). */
+const modelH=(bb.max[1]-bb.min[1])*S.scale/100;
+S.offY=(modelH>baseZone*1.5)?baseZone:0;
 ['scale','offX','offZ','offY'].forEach(sync);
 }
 function loadFile(f){
@@ -2925,6 +2953,9 @@ let ang=s.a,x=0,y=0,on=false;
 if(s.type==='rot'){ang=lerp(s.a0,s.a1,u);x=s.wx;y=s.wy;on=false;}
 else if(s.type==='wait'){ang=s.a;x=s.x;y=s.y;on=true;}
 else{ang=s.a;const p=atLen(s.pts,s.cum,u*s.len);x=p[0];y=p[1];on=!!s.cut;}
+/* Если струна должна гореть всю программу — держим её включённой,
+   начиная с момента, когда начался первый проход. */
+if(S.wireKeepOn&&s.k>=0)on=true;
 SIM.wire={x:x,y:y,k:Math.max(0,s.k),on:on};
 if(tableGroup)tableGroup.rotation.y=ang*D2R;
 setWire(x,y,on);
@@ -2966,7 +2997,8 @@ wireCore.material.emissiveIntensity=on?2.6:0.15;
 wireCore.material.color.setHex(on?0xffe0b0:0xb9bec6);
 wireLine.material.color.setHex(on?0xff453a:0x9aa0aa);
 wireLine.material.opacity=on?1:0.75;
-wireGlow.material.opacity=on?0.85:0;
+if(wireGlowA)wireGlowA.material.opacity=on?0.85:0;
+if(wireGlowB)wireGlowB.material.opacity=on?0.85:0;
 const sw=$('#stWire');if(sw)sw.textContent=on?'ВКЛ':'выкл';
 }
 function updateDRO(x,y,a,on,p){
