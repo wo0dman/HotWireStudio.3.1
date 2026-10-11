@@ -1156,8 +1156,8 @@ rG=el('div',{'data-rtab':'code'}),rR=el('div',{'data-rtab':'rep'});
 [rC,rB,rG,rR].forEach(function(n){br.appendChild(n);});
 rC.appendChild(group('Режим движения струны',[
 seg([
-{t:'Точка ↔ точка (180°)',v:'shuttle2'},
-{t:'Точка ↔ ось (360°)',v:'shuttleAxis'},
+{t:'Силуэт (180°)',v:'shuttle2'},
+{t:'Радиальное (360°)',v:'shuttleAxis'},
 {t:'Равновесие',v:'equilibrium'}
 ],'motionMode',function(){
 buildCutMode();
@@ -2744,10 +2744,10 @@ buildTimeline();
 passListUI();
 updateInfoUI();
 reportUI();
-setPassPath(PASSES.length-1,0,false);
+setPassPath(0,0,false);
 SIM.done=-1;
-if(!SIM.everRun||SIM.t>=SIM.total-1e-6){SIM.t=SIM.total;setSimTime(SIM.total);}
-else setSimTime(SIM.t);
+SIM.t=0;
+setSimTime(0);
 applyLayers();
 resizeAll();
 const ms=Math.round(((window.performance&&performance.now)?performance.now():Date.now())-t0);
@@ -3304,7 +3304,7 @@ log('Цикл: подход → рез по силуэту → выход за �
 rebuild(true);
 setTimeout(function(){
 const b=$('#boot');if(b&&b.parentNode)b.parentNode.removeChild(b);
-fitAll();setSimTime(SIM.total);syncSegs();resizeAll();
+fitAll();setSimTime(0);syncSegs();resizeAll();
 log('Демо-модель загружена: '+nf(RAW.info.count)+' треугольников','s');
 log('Space — запуск симуляции, ⌘/Ctrl+K — палитра команд, ? — горячие клавиши');
 },140);
