@@ -483,7 +483,11 @@ font-weight:600;box-shadow:0 .5px 0 var(--sep2);white-space:nowrap;display:inlin
 <h3 style="text-align:center">Буквы осей станка</h3>
 <p style="text-align:center">Используются в DRO и G-code. Стандартные: X, Y, A.<br>
 Одна заглавная латинская буква (A–Z), буквы не должны повторяться.</p>
-<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+<div class="row nosep" style="padding:0;min-height:auto;margin-top:14px;margin-bottom:10px;display:flex;align-items:center;gap:10px">
+<div class="rt" style="flex:1">Использовать свои буквы осей</div>
+<button class="switch" id="axEnableSw" type="button"></button>
+</div>
+<div id="axInputs" style="display:flex;flex-direction:column;gap:8px">
 <div class="row nosep" style="padding:0;min-height:auto">
 <div class="rt" style="flex:0 0 130px">Линейная ось X</div>
 <input class="tf mono" id="axXInput" maxlength="1" style="text-align:center;font-size:15px;font-weight:700">
@@ -752,7 +756,7 @@ keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimCount:2, trimBelow:2,
 /* G-code */
 post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', wireKeepOn:false, gComments:true, commentStyle:'paren', gDec:3, gExt:'nc', fileName:'penorez_model',
 /* буквы осей станка для DRO и G-code */
-axisX:'X', axisY:'Y', axisA:'A',
+axisX:'X', axisY:'Y', axisA:'A', axisCustom:false,
 layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
 wire:true,table:true,grid:true},
 view:'iso', simSpeed:20, tabL:'model', tabR:'cut', tabB:'unroll'
@@ -1014,11 +1018,15 @@ return el('div',{cls:'row'},[el('div',{cls:'rt',style:'flex:0 0 104px'},[label])
 }
 function setVal(id,t,c){const n=V[id];if(n){n.textContent=t;n.className='rv '+(c||'');}}
 /* ----- Буквы осей станка ----- */
+function axisLetter(which){
+if(!S.axisCustom)return which==='x'?'X':(which==='y'?'Y':'A');
+return which==='x'?(S.axisX||'X'):(which==='y'?(S.axisY||'Y'):(S.axisA||'A'));
+}
 function applyAxisLabels(){
 const lx=$('#droXLabel'),ly=$('#droYLabel'),la=$('#droALabel');
-if(lx)lx.textContent=S.axisX+' · мм';
-if(ly)ly.textContent=S.axisY+' · мм';
-if(la)la.textContent=S.axisA+' · град';
+if(lx)lx.textContent=axisLetter('x')+' · мм';
+if(ly)ly.textContent=axisLetter('y')+' · мм';
+if(la)la.textContent=axisLetter('a')+' · град';
 }
 function openAxisDialog(){
 $('#axXInput').value=S.axisX;
@@ -1026,6 +1034,27 @@ $('#axYInput').value=S.axisY;
 $('#axAInput').value=S.axisA;
 $('#axisErr').textContent='';
 $('#axisScrim').hidden=false;
+const sw=$('#axEnableSw');
+const syncEnabled=function(){
+const on=!!S.axisCustom;
+if(sw)sw.classList.toggle('on',on);
+const box=$('#axInputs');
+if(box)box.style.opacity=on?'1':'0.4';
+['axXInput','axYInput','axAInput'].forEach(function(id){
+const el=document.getElementById(id);
+if(el)el.disabled=!on;
+});
+};
+syncEnabled();
+if(sw)sw.onclick=function(){
+S.axisCustom=!S.axisCustom;
+syncEnabled();
+applyAxisLabels();
+genGCode();
+updateInfoUI();
+saveState();
+if(S.axisCustom)setTimeout(function(){$('#axXInput').focus();$('#axXInput').select();},20);
+};
 ['axXInput','axYInput','axAInput'].forEach(function(id){
 const el=document.getElementById(id);
 el.onkeydown=function(e){
@@ -1034,7 +1063,9 @@ if(e.key==='Enter'){e.preventDefault();saveAxisDialog();}
 if(e.key==='Escape'){e.preventDefault();closeAxisDialog();}
 };
 });
-setTimeout(function(){$('#axXInput').focus();$('#axXInput').select();},40);
+setTimeout(function(){
+if(S.axisCustom){$('#axXInput').focus();$('#axXInput').select();}
+},40);
 }
 function closeAxisDialog(){$('#axisScrim').hidden=true;}
 function saveAxisDialog(){
@@ -1059,15 +1090,30 @@ S.axisX=rawX;S.axisY=rawY;S.axisA=rawA;
 applyAxisLabels();
 genGCode();
 updateInfoUI();
+saveState();
 closeAxisDialog();
+if(S.axisCustom){
 toast('Буквы осей: '+rawX+', '+rawY+', '+rawA);
-log('Буквы осей изменены: линейная X → '+rawX+', линейная Y → '+rawY+', поворотная → '+rawA,'s');
+log('Буквы осей изменены: линейные → '+rawX+'/'+rawY+', поворотная → '+rawA,'s');
+}else{
+toast('Используются стандартные буквы X, Y, A');
+log('Свои буквы отключены — используются X, Y, A','s');
+}
 }
 function resetAxisDialog(){
 $('#axXInput').value='X';
 $('#axYInput').value='Y';
 $('#axAInput').value='A';
 $('#axisErr').textContent='';
+S.axisCustom=false;
+const sw=$('#axEnableSw');
+if(sw)sw.classList.toggle('on',false);
+const box=$('#axInputs');
+if(box)box.style.opacity='0.4';
+['axXInput','axYInput','axAInput'].forEach(function(id){
+const el=document.getElementById(id);
+if(el)el.disabled=true;
+});
 }
 /* ==================================================================
 3 · ПАНЕЛИ
@@ -1516,7 +1562,7 @@ S.motionMode='shuttle2';
 S.orient='asis';
 S.rotX=0;S.rotY=0;S.rotZ=0;
 S.machineGrid=620;S.machineTableD=260;S.machineTableH=20;
-S.axisX='X';S.axisY='Y';S.axisA='A';
+S.axisX='X';S.axisY='Y';S.axisA='A';S.axisCustom=false;
 S.passes=24;S.angleStep=15;S.startAngle=0;S.halvingLevels=4;S.feed=280;S.rapid=1400;S.aFeed=1080;S.wireR=0.35;
 S.safeGap=10;S.dwell=0.7;S.exitLen=12;S.waitRot=0.6;S.zigzag=true;S.compBacklash=false;S.backlash=0.6;
 S.wireKeepOn=false;S.gExt='nc';S.commentStyle='paren';
@@ -2496,8 +2542,8 @@ return ' ('+s+')';
 }
 function genGCode(){
 if(!PASSES.length){GCODE='';updateCodeUI();return;}
-const AX=S.axisX||'X',AY=S.axisY||'Y';
-const rot=(S.post==='grbl')?'Z':(S.axisA||'A');
+const AX=axisLetter('x'),AY=axisLetter('y');
+const rot=axisLetter('a');
 const d=S.gDec,F=function(v){return fmt(v,d);};
 const L=[],C=function(s){
 if(!S.gComments)return;
@@ -2505,7 +2551,7 @@ if(!s){L.push('');return;}
 L.push(cmtWrap(s));
 };
 C('(===== PENOREZ STUDIO / HOT WIRE =====)');
-C('(Post      : '+({linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A mapped to Z)'}[S.post])+')');
+C('(Post      : '+({linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL'}[S.post])+')');
 C('(Model     : '+RAW.info.name+')');
 C('(Orient    : X'+F(S.rotX)+' Y'+F(S.rotY)+' Z'+F(S.rotZ)+' deg, scale '+F(S.scale,1)+'%)');
 C('(Triangles : '+RAW.info.count+')');
@@ -2596,7 +2642,7 @@ updateCodeUI();
 function hlLine(s){
 let o=String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
 if(/^\s*[();]/.test(o))return '<span class="cd">'+o+'</span>';
-const letters=(S.axisX||'X')+(S.axisY||'Y')+(S.axisA||'A')+'Z';
+const letters=axisLetter('x')+axisLetter('y')+axisLetter('a')+'Z';
 const uniq=Array.from(new Set(letters.split(''))).filter(function(c){
 return c!=='G'&&c!=='M';
 }).join('');
@@ -2880,8 +2926,8 @@ p[0]+' · '+hms(p[1])+' ('+nf(p[1]/T*100,0)+'%)']));});
 const bx=$('#bars');bx.innerHTML='';bx.appendChild(bar);bx.appendChild(lg);
 const rows=$('#repRows');rows.innerHTML='';
 const box=el('div',{cls:'card'});
-const info2=[['Постпроцессор',{linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL (A→Z)'}[S.post]],
-['Ось вращения',S.axisA+' вокруг '+S.axisY],
+const info2=[['Постпроцессор',{linuxcnc:'LinuxCNC',mach3:'Mach3',grbl:'GRBL'}[S.post]],
+['Ось вращения',axisLetter('a')+' вокруг '+axisLetter('y')],
 ['Ориентация модели','X'+nf(S.rotX,0)+'° Y'+nf(S.rotY,0)+'° Z'+nf(S.rotZ,0)+'°'],
 ['Радиус струны',nf(S.wireR,2)+' мм'],['Выход за заготовку',nf(S.exitLen,1)+' мм'],
 ['Пауза перед поворотом',nf(S.waitRot,1)+' с'],['Срезов по высоте',String(S.slices)],
