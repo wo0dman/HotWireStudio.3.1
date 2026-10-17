@@ -651,6 +651,15 @@ function fmt(v,d){d=(d===undefined)?3:d;const x=Math.abs(v)<5e-7?0:v;let s=x.toF
 if(s.indexOf('.')>=0)s=s.replace(/0+$/,'').replace(/\.$/,'');return (s==='-0')?'0':s;}
 function hms(s){s=Math.max(0,Math.round(s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;
 return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(x).padStart(2,'0');}
+/* ✅ NEW: имя выходного файла — счётчик-ДД.ММ.расширение (например 001-17.10.nc) */
+function makeFileName(counter, ext, suffix){
+const d = new Date();
+const dd = String(d.getDate()).padStart(2,'0');
+const mm = String(d.getMonth()+1).padStart(2,'0');
+const n = Math.max(1, Math.round(counter !== undefined ? counter : (S.fileCounter||1)));
+const nnn = String(n).padStart(3,'0');
+return nnn+'-'+dd+'.'+mm+(suffix||'')+'.'+(ext || S.gExt || 'nc');
+}
 function trimActive(){return S.trimMode&&S.trimMode!=='none';}
 function trimLabel(){
 if(!trimActive())return 'нет';
@@ -728,7 +737,8 @@ exitLen:12, waitRot:0.6,
 zigzag:true, compBacklash:false, backlash:0.6,
 slices:150, tol:0.12, smooth:false,
 keepBase:true, baseH:16, baseW:100, trimMode:'bridge', trimCount:2, trimBelow:2, bridge:16,
-post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', wireKeepOn:false, gComments:true, commentStyle:'paren', gDec:3, gExt:'nc', fileName:'penorez_model',
+post:'linuxcnc', wireOn:'M3 S255', wireOff:'M5', wireKeepOn:false, gComments:true, commentStyle:'paren', gDec:3, gExt:'nc',
+fileCounter:1, lastGCodeCounter:0,
 axisX:'X', axisY:'Y', axisA:'A', axisCustom:false,
 layers:{stock:true,model:true,result:true,base:true,path:true,contours:false,
 wire:true,table:true,grid:true},
@@ -775,6 +785,9 @@ S[k]=v;
 if(!isFinite(S.kerf) || S.kerf <= 0){
 S.kerf = Math.max(S.wireR*2 + 0.15, 0.5);
 }
+/* счётчики не было в старых сохранениях */
+if(!isFinite(S.fileCounter) || S.fileCounter < 1) S.fileCounter = 1;
+if(!isFinite(S.lastGCodeCounter) || S.lastGCodeCounter < 0) S.lastGCodeCounter = 0;
 return true;
 }catch(e){return false;}
 }
@@ -1248,10 +1261,23 @@ field('Вкл. струну','wireOn','M3 S255',true,function(){genGCode();}),
 field('Выкл. струну','wireOff','M5',true,function(){genGCode();}),
 toggle('Не выключать струну до конца','wireKeepOn','M3 один раз в начале, M5 — только перед M2',function(){genGCode();}),
 seg([{t:'2 знака',v:2},{t:'3 знака',v:3},{t:'4 знака',v:4}],'gDec',function(){genGCode();}),
-field('Имя файла','fileName','program',false,function(){}),
+/* ✅ NEW: счётчик + авто-имя файла */
+numbox('Счётчик файлов','fileCounter','','1','999','1',function(){
+updateFileNameUI();
+},'var(--blue)'),
+info('Имя файла','—','sFileName'),
 seg([{t:'NC',v:'nc'},{t:'TAP',v:'tap'},{t:'TXT',v:'txt'},{t:'CNC',v:'cnc'}],'gExt',function(v){
-updateDownloadBtn();toast('Расширение файла: .'+v);}),
+updateDownloadBtn();
+updateFileNameUI();
+toast('Расширение файла: .'+v);
+}),
 info('Строк / размер','—','sFile'),
+el('div',{cls:'row nosep',style:'padding:2px 10px 8px'},[
+el('div',{cls:'sub',style:'font-size:11px;line-height:1.4'},[
+'Имя формируется автоматически: <b>001-17.10.nc</b> — где 001 — счётчик, 17.10 — день.месяц. '+
+'Счётчик увеличивается при каждом экспорте G-code. Отчёт и снимок используют номер последнего G-code.'
+])
+]),
 btns([{t:'Скачать .nc',id:'btnDownload',k:'btn-blue',fn:download},{t:'Копировать',k:'btn-tint',fn:copyCode}])
 ]));
 rG.appendChild(group('Предпросмотр УП',[
@@ -1272,6 +1298,7 @@ const s2=seg([{t:'Изо',v:'iso'},{t:'Спереди',v:'front'},{t:'Сверх
 buildSpeedSlider();drawLegend();updateHomeUI();
 switchL(S.tabL);switchR(S.tabR);switchB(S.tabB);
 updateDownloadBtn();
+updateFileNameUI();
 setTimeout(syncSegs,60);
 }
 function buildTrimUI(){
@@ -1311,6 +1338,11 @@ box.appendChild(S.angleMode==='passes'
 setTimeout(syncSegs,30);
 }
 function updateDownloadBtn(){const b=$('#btnDownload');if(b)b.textContent='Скачать .'+(S.gExt||'nc');}
+/* ✅ NEW: обновление отображаемого имени файла */
+function updateFileNameUI(){
+const name = makeFileName();
+setVal('sFileName', name);
+}
 function buildSpeedSlider(){
 const box=$('#tpSpeed');if(!box)return;box.innerHTML='';
 const inp=el('input',{cls:'sl',type:'range',min:1,max:100,step:1,value:S.simSpeed});
@@ -1544,9 +1576,11 @@ S.slices=150;S.tol=0.12;S.smooth=false;S.keepBase=true;S.baseH=16;S.baseW=100;
 S.trimMode='bridge';S.trimCount=2;S.trimBelow=2;S.bridge=16;
 S.homeAuto=true;S.homeOffset=15;S.homeX=170;S.homeY=230;
 S.simSpeed=20;
+/* ✅ NEW: сброс счётчиков файлов */
+S.fileCounter=1;S.lastGCodeCounter=0;
 ['passes','angleStep','startAngle','halvingLevels','feed','rapid','aFeed','wireR','kerf','safeGap','dwell','exitLen','waitRot',
 'backlash','slices','tol','baseH','baseW','trimBelow','bridge','homeOffset','homeX','homeY',
-'machineGrid','machineTableD','machineTableH','simSpeed'].forEach(sync);
+'machineGrid','machineTableD','machineTableH','simSpeed','fileCounter'].forEach(sync);
 segAll('motionMode','shuttle2');segAll('orient','asis');segAll('gExt','nc');segAll('commentStyle','paren');
 updateDownloadBtn();
 ['rotX','rotY','rotZ'].forEach(sync);
@@ -1555,6 +1589,7 @@ if(V['sw_'+p[0]])V['sw_'+p[0]].classList.toggle('on',p[1]);});
 segAll('trimMode','bridge');segAll('trimCount',2);
 buildTrimUI();rebuildMachine();applyAxisLabels();updateHomeUI();
 rebuild();toast('Параметры сброшены');log('Параметры резания сброшены','s');
+updateFileNameUI();
 }
 function resetAllState(){
 alert_('Сбросить все настройки?',
@@ -1796,7 +1831,10 @@ function screenshot(){
 if(!renderer)return;
 renderer.render(scene,camera);
 const a=document.createElement('a');
-a.download=(S.fileName||'view')+'.png';a.href=renderer.domElement.toDataURL('image/png');
+/* ✅ NEW: снимок использует номер последнего G-code */
+const useCounter = S.lastGCodeCounter > 0 ? S.lastGCodeCounter : Math.max(1, Math.round(S.fileCounter)||1);
+a.download = makeFileName(useCounter, 'png');
+a.href=renderer.domElement.toDataURL('image/png');
 document.body.appendChild(a);a.click();
 setTimeout(function(){if(a.parentNode)a.parentNode.removeChild(a);},500);
 toast('Снимок вида сохранён');
@@ -2531,14 +2569,20 @@ setVal('sFile',nf(STATS.lines)+' стр · '+nf((STATS.bytes||0)/1024,1)+' КБ'
 }
 function download(){
 if(!GCODE){toast('Сначала пересчитайте траекторию',false);return;}
-const ext=(S.gExt||'nc');
-const name=(S.fileName||'program')+'.'+ext;
+/* ✅ NEW: имя файла — счётчик-ДД.ММ.ext */
+const usedCounter = Math.max(1, Math.round(S.fileCounter)||1);
+const name = makeFileName(usedCounter);
 const a=document.createElement('a');
 a.href=URL.createObjectURL(new Blob([GCODE],{type:'text/plain'}));
 a.download=name;document.body.appendChild(a);a.click();
 setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},3000);
 toast('УП сохранена: '+name);
 log('Экспорт УП '+name+' ('+nf(STATS.bytes/1024,1)+' КБ)','s');
+/* счётчик увеличивается после успешного экспорта */
+S.lastGCodeCounter = usedCounter;
+S.fileCounter = usedCounter + 1;
+saveState(true);
+updateFileNameUI();
 }
 function copyCode(){
 if(!GCODE){toast('Нет данных для копирования',false);return;}
@@ -2574,7 +2618,9 @@ const t=[
 '  УП: '+nf(STATS.lines)+' строк, '+nf(STATS.bytes/1024,1)+' КБ, постпроцессор '+S.post,''].join('\n');
 const a=document.createElement('a');
 a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));
-a.download=(S.fileName||'report')+'_report.txt';
+/* ✅ NEW: отчёт использует номер последнего G-code */
+const useCounter = S.lastGCodeCounter > 0 ? S.lastGCodeCounter : Math.max(1, Math.round(S.fileCounter)||1);
+a.download = makeFileName(useCounter, 'txt', '_report');
 document.body.appendChild(a);a.click();
 setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},3000);
 toast('Отчёт сохранён');log('Экспорт отчёта','s');
@@ -2876,7 +2922,7 @@ const pos=parseSTL(fr.result);
 if(!pos||pos.length<9)throw new Error('файл пуст');
 RAW={pos:pos,info:meshInfo(pos)};
 RAW.info.name=f.name.replace(/\.stl$/i,'');
-S.fileName='penorez_'+RAW.info.name.slice(0,28).replace(/[^\w\-а-яА-Я]/g,'_');
+/* имя выходного файла формируется автоматически: counter-DD.MM.ext */
 ORIENT=null;ORIENT_KEY='';SLICES=null;SLICES_KEY='';
 fitModelSilent();rebuild();fitAll();
 toast('Загружено '+nf(RAW.info.count)+' треугольников');
