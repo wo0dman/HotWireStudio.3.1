@@ -247,12 +247,14 @@ animation:pop .18s cubic-bezier(.3,1.3,.6,1);max-height:72vh;overflow:auto}
 .pop[hidden]{display:none}
 .pop .row{min-height:31px;padding:4px 11px}
 .pop .gt{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--label3);padding:7px 12px 3px}
-.legend{bottom:11px;left:11px;padding:7px 10px;display:flex;flex-direction:column;gap:4px;
+/* ✅ FIX: легенда поднята над панелью транспорта (транспорт ~60px + 12px + 12px отступ) */
+.legend{bottom:84px;left:11px;padding:7px 10px;display:flex;flex-direction:column;gap:4px;
 font-size:10.5px;font-weight:600;color:var(--label2);
 max-width:38px;overflow:hidden;
+max-height:calc(100% - 96px);
 transition:max-width .28s cubic-bezier(.32,1.3,.5,1);
 will-change:max-width}
-.legend:hover{max-width:320px}
+.legend:hover{max-width:320px;overflow-y:auto;overflow-x:hidden}
 .legend div{display:flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap}
 .legend div:hover{color:var(--label)}
 .legend i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
@@ -1127,7 +1129,6 @@ pM.appendChild(group('Размещение модели',[
 numbox('Масштаб','scale','%','10','1000','0.5',function(){
   /* ✅ FIX: при изменении масштаба подгоняем заготовку и станок под новую модель */
   const oldD = S.stockD, oldH = S.stockH;
-  /* оценим новые габариты модели */
   const O = buildOrient();
   const bb = O.bb;
   const dNeeded = Math.hypot(bb.size[0], bb.size[2]) + 16;
@@ -1141,6 +1142,14 @@ numbox('Масштаб','scale','%','10','1000','0.5',function(){
   }
   scheduleRebuild();
 },'var(--indigo)'),
+/* ✅ NEW: габариты модели после масштабирования и поворотов */
+el('div',{cls:'row stack',style:'padding-top:4px;padding-bottom:6px'},[
+  el('div',{cls:'head'},[
+    el('div',{cls:'rt'},['Размер после масштаба']),
+    el('div',{cls:'rv mono',id:'mBoxScaledSz'},['—'])
+  ]),
+  el('div',{cls:'sub mono',id:'mBoxScaledInfo',style:'font-size:10.5px;color:var(--label3)'},['—'])
+]),
 numbox('Смещение X','offX','мм','-2000','2000','1',null,'var(--indigo)'),
 numbox('Смещение Y','offY','мм','-2000','2000','1',null,'var(--indigo)'),
 numbox('Смещение Z','offZ','мм','-2000','2000','1',null,'var(--indigo)'),
@@ -2845,6 +2854,25 @@ setVal('mTri',nf(I.count));
 setVal('mBox',I.size.map(function(v){return nf(v,1);}).join(' × ')+' мм');
 setVal('mVol',nf(I.vol/1000,1)+' см³');
 setVal('mH',nf(PLACED?PLACED.hModel:0,1)+' мм · низ на Y '+nf(PLACED?PLACED.yMin:0,1));
+/* ✅ NEW: размер после масштаба и поворотов (без учёта смещений) */
+try{
+  const O = buildOrient();
+  const bb = O.bb;
+  const sz = bb.size;
+  const volL = (sz[0]*sz[1]*sz[2])/1e6;   /* мм³ → литры */
+  const bsz = I.size;
+  const baseVol = bsz[0]*bsz[1]*bsz[2];
+  const ratio = baseVol > 0 ? Math.cbrt((sz[0]*sz[1]*sz[2])/baseVol) : 1;
+  const szEl = document.getElementById('mBoxScaledSz');
+  const infoEl = document.getElementById('mBoxScaledInfo');
+  if(szEl) szEl.textContent = sz.map(function(v){return nf(v,1);}).join(' × ')+' мм';
+  if(infoEl) infoEl.textContent = '~'+nf(volL,1)+' л объёма · ×'+nf(ratio,2)+' от исходного';
+}catch(e){
+  const szEl = document.getElementById('mBoxScaledSz');
+  const infoEl = document.getElementById('mBoxScaledInfo');
+  if(szEl) szEl.textContent = '—';
+  if(infoEl) infoEl.textContent = '—';
+}
 const sl=$('#stLen');if(sl)sl.textContent=nf(STATS.cutLen,0);
 const si=$('#stInfo');
 if(si)si.textContent=NPASS+' проходов'+(trimActive()?' + подрезка':'')+' · '+nf(STATS.cutLen/1000,2)+' м реза · '+
