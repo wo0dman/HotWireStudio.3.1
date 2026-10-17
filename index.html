@@ -1124,10 +1124,26 @@ S.rotX=0;S.rotY=0;S.rotZ=0;
 ['rotX','rotY','rotZ'].forEach(sync);rebuild();}}])
 ],'Кнопки +90° поворачивают модель пошагово. Числовые поля позволяют задать произвольный угол.'));
 pM.appendChild(group('Размещение модели',[
-numbox('Масштаб','scale','%','10','1000','0.5',null,'var(--indigo)'),
-numbox('Смещение X','offX','мм','-200','200','1',null,'var(--indigo)'),
-numbox('Смещение Y','offY','мм','-200','200','1',null,'var(--indigo)'),
-numbox('Смещение Z','offZ','мм','-200','200','1',null,'var(--indigo)'),
+numbox('Масштаб','scale','%','10','1000','0.5',function(){
+  /* ✅ FIX: при изменении масштаба подгоняем заготовку и станок под новую модель */
+  const oldD = S.stockD, oldH = S.stockH;
+  /* оценим новые габариты модели */
+  const O = buildOrient();
+  const bb = O.bb;
+  const dNeeded = Math.hypot(bb.size[0], bb.size[2]) + 16;
+  const hNeeded = bb.size[1] + 20 + (S.keepBase?S.baseH:0);
+  if(dNeeded > oldD || hNeeded > oldH){
+    S.stockD = Math.ceil(clamp(Math.max(oldD, dNeeded), 30, 2000));
+    S.stockH = Math.ceil(clamp(Math.max(oldH, hNeeded), 30, 2000));
+    sync('stockD'); sync('stockH');
+    rebuildMachine();
+    log('Заготовка автоматически увеличена: Ø'+S.stockD+' × '+S.stockH+' мм','s');
+  }
+  scheduleRebuild();
+},'var(--indigo)'),
+numbox('Смещение X','offX','мм','-2000','2000','1',null,'var(--indigo)'),
+numbox('Смещение Y','offY','мм','-2000','2000','1',null,'var(--indigo)'),
+numbox('Смещение Z','offZ','мм','-2000','2000','1',null,'var(--indigo)'),
 btns([{t:'Центрировать по оси A',k:'btn-gray',fn:function(){S.offX=0;S.offZ=0;sync('offX');sync('offZ');rebuild();}}])
 ],'Поле Y задаёт высоту низа модели над столом.'));
 /* ✅ УБРАНО дублирование «Точность аппроксимации» из вкладки Модель */
@@ -1139,9 +1155,9 @@ numbox('Смещение центра Z','stockZ','мм','-1500','1500','0.5',fu
 btns([{t:'Подобрать по модели',k:'btn-tint',fn:autoStock}])
 ],'Ноль координат — центр поворотного стола оси A.'));
 pS.appendChild(group('Модель станка',[
-numbox('Размер сетки','machineGrid','мм','300','2000','10',function(){rebuildMachine();fitAll();},'var(--gray)'),
-numbox('Диаметр стола A','machineTableD','мм','100','2000','5',function(){rebuildMachine();fitAll();},'var(--gray)'),
-numbox('Высота стола','machineTableH','мм','5','200','1',function(){rebuildMachine();},'var(--gray)'),
+numbox('Размер сетки','machineGrid','мм','300','4000','10',function(){rebuildMachine();fitAll();},'var(--gray)'),
+numbox('Диаметр стола A','machineTableD','мм','100','4000','5',function(){rebuildMachine();fitAll();},'var(--gray)'),
+numbox('Высота стола','machineTableH','мм','5','400','1',function(){rebuildMachine();},'var(--gray)'),
 btns([{t:'Подогнать под заготовку',k:'btn-tint',fn:autoMachine}])
 ]));
 pS.appendChild(group('Контроль размещения',[
@@ -1776,7 +1792,12 @@ function setView(v){
 S.view=v;segAll('view',v);saveState();
 if(!camera)return;
 const c=controls.target.clone();
-const R=Math.max(210,(S.stockD||150)*2.05,(S.stockH||215)*1.15,(S.machineGrid||620)*1.4);
+/* ✅ FIX: учитываем габариты модели, а не только заготовки */
+let modelSpan = 0;
+if(ORIENT && ORIENT.bb){
+  modelSpan = Math.max(ORIENT.bb.size[0], ORIENT.bb.size[1], ORIENT.bb.size[2]) * 1.6;
+}
+const R=Math.max(210,(S.stockD||150)*2.05,(S.stockH||215)*1.15,(S.machineGrid||620)*1.4, modelSpan);
 const P={iso:new THREE.Vector3(R*0.98,R*0.88,R*1.08),
 front:new THREE.Vector3(0,c.y,R*1.6),
 top:new THREE.Vector3(0,c.y+R*1.7,0.01),
@@ -2738,6 +2759,14 @@ SIM.done=-1;SIM.t=0;
 setSimTime(0);
 applyLayers();
 resizeAll();
+/* ✅ FIX: авто-fit, если камера слишком близко к объекту */
+if(controls && ORIENT && ORIENT.bb){
+  const dist = camera.position.distanceTo(controls.target);
+  const modelDiag = Math.hypot(ORIENT.bb.size[0], ORIENT.bb.size[1], ORIENT.bb.size[2]);
+  if(dist < modelDiag * 0.9){
+    fitAll();
+  }
+}
 const ms=Math.round(((window.performance&&performance.now)?performance.now():Date.now())-t0);
 if(!quiet)toast('Пересчитано за '+ms+' мс · '+NPASS+' проходов'+(trimActive()?' + подрезка':''));
 log('Пересчёт: '+NPASS+' проходов ('+(S.motionMode==='equilibrium'
@@ -2860,12 +2889,14 @@ box.appendChild(el('div',{cls:'row'+(i===0?' nosep':'')},
 rows.appendChild(box);
 }
 function autoMachine(){
-S.machineTableD=Math.max(260,Math.ceil(S.stockD*1.25/5)*5);
-S.machineTableH=Math.max(20,Math.ceil(S.stockD*0.05));
-S.machineGrid=Math.max(620,Math.ceil(Math.max(S.stockD*1.8,S.stockH*0.7)/10)*10);
+/* ✅ FIX: значения клэмпятся в пределах numbox */
+S.machineTableD = clamp(Math.max(260, Math.ceil(S.stockD*1.25/5)*5), 100, 4000);
+S.machineTableH = clamp(Math.max(20, Math.ceil(S.stockD*0.05)), 5, 400);
+S.machineGrid   = clamp(Math.max(620, Math.ceil(Math.max(S.stockD*1.8, S.stockH*0.7)/10)*10), 300, 4000);
 ['machineGrid','machineTableD','machineTableH'].forEach(sync);
 rebuildMachine();fitAll();
 toast('Станок подогнан: Ø'+S.machineTableD+' · сетка '+S.machineGrid+' мм');
+log('Станок: стол Ø'+S.machineTableD+' × '+S.machineTableH+', сетка '+S.machineGrid+' мм','s');
 }
 function autoStock(){
 let rMax=0,hTop=0;
@@ -2874,8 +2905,9 @@ for(let i=0;i<PLACED.n;i++){const h=PLACED.hulls[i];if(!h)continue;
 for(let k=0;k<h.length;k+=2){const r=Math.hypot(h[k],h[k+1]);if(r>rMax)rMax=r;}}
 hTop=PLACED.yMax;
 }
-S.stockD=Math.ceil(clamp(rMax*2+16,30,400));
-S.stockH=Math.ceil(clamp(hTop+20,30,500));
+/* ✅ FIX: пределы соответствуют numbox (20…2000), а не 400/500 */
+S.stockD=Math.ceil(clamp(rMax*2+16,30,2000));
+S.stockH=Math.ceil(clamp(hTop+20,30,2000));
 S.stockX=0;S.stockZ=0;
 ['stockD','stockH','stockX','stockZ'].forEach(sync);
 updateHomeUI();
